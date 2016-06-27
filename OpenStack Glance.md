@@ -39,7 +39,7 @@ Trong OpenStack, Nova cung cấp các tính năng để tạo ra image từ các
 </li>
 <li>Glance đã được thiết kế là một dịch vụ độc lập cho những người cần phải tổ chức tập hợp lớn các hình ảnh đĩa ảo. Tuy nhiên, khi được sử dụng cùng với Nova và Swift, nó cung cấp một giải pháp end-to-end cho quản lý đĩa hình ảnh đám mây.
 <br>
-<img src="./img/glance+nova+swift.PNG"/>
+<img src="./img_Glance/glance+nova+swift.PNG"/>
 </li>
 <li>Trong Glance, các images được sử dụng để vận hành máy ảo mới. Nó cũng có thể lấy bản snapshots từ các máy ảo đang chạy để thực hiện dự phòng cho các VM và trạng thái các máy ảo đó.
 </li>
@@ -53,7 +53,7 @@ Glance bao gồm các thành phần sau:
 <li><b>database: </b>cơ sở dữ liệu lưu trữ metadata của image</li>
 <li><b>image-store: </b>địa điểm lưu trữ các image</li>
 </ul>
-<img src="./img/component_glance.png"/><br><br>
+<img src="./img_Glance/component_glance.png"/><br><br>
 Glance tiếp nhận các API request yêu cầu images từ người dùng đầu cuối hoặc các nova component và có thể lưu trữ các file images trong hệ thống object storage Swift hoặc các storage repos khác. Glance hỗ trợ các hệ thống backend lưu trữ sau:
 <ul>
 <li><b>File system: </b>
@@ -81,7 +81,7 @@ lưu trữ các image sử dụng MongoDB
 <br>
 <h2><b>Luồng điều khiển của Glance</b></h2>
 <br>
-<img src="./img/flow_control.png"/><br><br>
+<img src="./img_Glance/flow_control.png"/><br><br>
 Khi người dùng nhận một image từ Glance, nó yêu cầu Glance database để lấy metadata của image bao gồm cả vị trí lưu trữ image. Khi đó Glance có thể gửi cho người dùng image mà họ muốn.
 <h3><a name="arch">1.4 Kiến trúc của Glance</a></h3>
 Glance có kiến trúc client-server và cung cấp REST API thông qua đó yêu cầu tới server được thực hiện. Yêu cầu từ client được tiếp nhận thông qua REST API và đợi sự xác thực của Keystone. Keystone Domain controller quản lý tất cả các tác vụ vận hành bên trong. Các tác vụ này chia thành các lớp, mỗi lớp triển khai nhiệm vụ vụ riêng của chúng.
@@ -97,7 +97,7 @@ Kiến trúc Glance bao gồm các thành phần sau:
 <li><b>Glance Store: </b>tổ chức việc tương tác giữa Glance và các hệ thống lưu trữ dữ liệu</li>
 <li><b>Registry Layer: </b>lớp tùy chọn tổ chức việc giao tiếp một cách bảo mật giữa domain và DAL nhờ việc sử dụng một dịch vụ riêng biệt</li>
 </ul>
-<img src="./img/architecture.png"/><br>
+<img src="./img_Glance/architecture.png"/><br>
 <h3><a name="formats">1.5 Các định dạng lưu trữ image của Glance</a></h3>
 <h3>Disk Formats</h3>
 Là định dạng của các disk image
@@ -217,7 +217,7 @@ Deactivating một image nhằm mục đích cơ bản là hạn chế không ch
 <br> 
 Một image chỉ có thể deactivated  khi nó thực sự đã active. Image ở các trạng thái khác không thể deactivate được.
 <br><br>
-Luồng trạng thái của Glance cho biết trạng thái của image trong quá trình tải lên. Luồng trạng thái của flow được mô tả theo hình sau: <img src="./img/status_flow.png"/>
+Luồng trạng thái của Glance cho biết trạng thái của image trong quá trình tải lên. Luồng trạng thái của flow được mô tả theo hình sau: <img src="./img_Glance/status_flow.png"/>
 <br>
 <ul>
 <li>Khi tạo một image, bước đầu tiên là <b>Queing</b>, image được đưa vào hàng đợi trong một khoảng thời gian ngắn, được bảo vệ và sẵn sàng để tải lên.
@@ -237,21 +237,21 @@ Instances là các máy ảo riêng biệt chạy trên node compute. User có t
 <br>
 Khi ta vận hành một máy ảo, ta cần phải chỉ ra flavor của máy ảo đó. Flavor đại diện cho tài nguyên ảo hóa cung cấp cho máy ảo, định nghĩa số lượng CPU ảo, tổng dung lượng RAM cấp cho máy ảo và kích thước ổ đĩa không bền vững cấp cho máy ảo. OpenStack cung cấp một số flavors đã định nghĩa sẵn như hình dưới, ta cũng có thể tạo và chỉnh sửa các flavors theo ý mình.
 <br>
-<img src="./img/flavor.png"/>
+<img src="./img_Glance/flavor.png"/>
 <br>
 Sơ đồ dưới đây chỉ ra trạng thái của hệ thống trước khi vận hành máy ảo. Trong đó image store chỉ số lượng các images đã được định nghĩa trước, compute node chứa các vcpu có sẵn, tài nguyên bộ nhớ và tài nguyên đĩa cục bộ, cinder-volume chứa số lượng volumes đã định nghĩa trước đó.
 <br>
-<img src="./img/state_no_runing.png"/>
+<img src="./img_Glance/state_no_runing.png"/>
 <br>
 Để chạy một máy ảo, ta phải chọn một image, flavor và các thuộc tính tùy chọn. Lựa chọn flavor nào cung cấp root volume, có nhãn là vda và một ổ lưu trữ tùy chọn được đánh nhãn vdb (ephemeral - không bền vững, và cinder-volumen được map với ổ đĩa ảo thứ ba, có thể gọi tên là vdc
 <br>
-<img src="./img/state_runing.png"/>
+<img src="./img_Glance/state_runing.png"/>
 <br>
 Theo mô tả trên hình, image gốc được copy vào ổ lưu trữ cục bộ từ image store. Ổ vda là ổ đầu tiên mà máy ảo truy cập. Ổ vdb là ổ tạm thời (không bền vững - ephemeral) và rỗng, được tạo nên cùng với máy ảo, nó sẽ bị xóa khi ngắt hoạt động của máy ảo. Ổ vdc kết nối với cinder-volume sử dụng giao thức iSCSI. Sau khi compute node dự phòng vCPU và tài nguyên bộ nhớ, máy ảo sẽ boot từ root volume là vda. Máy ảo chạy và thay đổi dữ liệu trên các ổ đĩa. Nếu volume store được đặt trên hệ thống mạng khác, tùy chọn "my_block_storage_ip" phải được dặc tả chính xác trong tệp cấu hình storage node chỉ ra lưu lượng image đi tới compute node. 
 <br>
 Khi máy ảo bị xóa, ephemeral storage (khối lưu trữ không bền vững) bị xóa; tài nguyên vCPU và bộ nhớ được giải phóng. Image không bị thay đổi sau tiến trình này.
 <br>
-<img src="./img/state_end_running.png"/>
+<img src="./img_Glance/state_end_running.png"/>
 <br>
 <h2><a name="install">2. Cài đặt dịch vụ Glance</a></h2>
 <b>Lưu ý: </b>Password thống nhất cho tất cả các dịch vụ là Welcome123
