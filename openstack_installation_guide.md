@@ -645,11 +645,7 @@ metadata_proxy_shared_secret = 1111
 ```
 
 ####Cấu hình nova để sử dụng neutron và metadata agent.
-Để nova sử dụng neutron services để quản lý mạng cho các máy ảo, cần cấu hình lại dịch vụ nova.Chỉnh sửa file 
-```sh
-	/etc/nova/nova.conf
-```
-Cập nhật các section sau để cung cấp cho nova endpoint, thông tin xác thực của neutron services và thông tin về metadata service:
+Để nova sử dụng neutron services để quản lý mạng cho các máy ảo, cần cấu hình lại dịch vụ nova.Chỉnh sửa file ```	/etc/nova/nova.conf```, cập nhật các section sau để cung cấp cho nova endpoint, thông tin xác thực của neutron services và thông tin về metadata service:
 ```sh
 	[neutron]
 	...
