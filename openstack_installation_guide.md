@@ -662,7 +662,21 @@ metadata_proxy_shared_secret = 1111
 	service_metadata_proxy = True
 	metadata_proxy_shared_secret = 1111	
 ```
-
+###6.3.4 Kết thúc cài đặt trên controller node
+- Đồng bộ hóa cơ sở dữ liệu cho neutron
+```sh
+	# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
+	  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron 
+```
+- Khởi động lại dịch vụ nova-api và các dịch vụ trong neutron
+```sh
+	# service nova-api restart
+	# service neutron-server restart
+	# service neutron-linuxbridge-agent restart
+	# service neutron-dhcp-agent restart
+	# service neutron-metadata-agent restart
+	# service neutron-l3-agent restart
+```
 ###6.3.4 Chuẩn bị các thành phần của neutron trên compute node
 Trên compute node, ta sẽ triển khai thành phần neutron-linuxbridge-agent. Tải về neutron-linuxbridge-agent:
 ```sh
