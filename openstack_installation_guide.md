@@ -573,7 +573,7 @@ kích hoạt port_security:
 	...
 	extension_drivers = port_security
 ```
-- Cập nhật section [ml2_type_flat], xác định interfaces vật lý hỗ trợ thiết lập mạng ảo flat. Ở đây chúng ta thiết lập giá chị cho option ```flat_networks``` là một ```provider label```. ```provider label``` là một nhãn logic được gán vào 1 interface vật lý. nhãn logic này sẽ được xác định sẽ gán vào interface vật lý nào khi chúng ta cấu hình linux-bridge. Ở đây chúng ta sử dụng tên nhãn logic là ```provider```
+- Cập nhật section [ml2_type_flat], xác định interfaces vật lý hỗ trợ thiết lập mạng ảo flat. Ở đây chúng ta thiết lập giá chị cho option ```flat_networks``` là một ```provider label```. ```provider label``` là một nhãn logic được gán vào 1 interface vật lý. nhãn logic này sẽ được xác định sẽ gán vào interface vật lý nào khi chúng ta cấu hình linux-bridge. Ở đây chúng ta sử dụng tên nhãn logic là ```provider```. 
 ```sh
 	[ml2_type_flat]
 	...
@@ -665,25 +665,25 @@ metadata_proxy_shared_secret = 1111
 ###6.3.4 Kết thúc cài đặt trên controller node
 - Đồng bộ hóa cơ sở dữ liệu cho neutron
 ```sh
-	# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
-	  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron 
+	su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
+	--config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron 
 ```
 - Khởi động lại dịch vụ nova-api và các dịch vụ trong neutron
 ```sh
-	# service nova-api restart
-	# service neutron-server restart
-	# service neutron-linuxbridge-agent restart
-	# service neutron-dhcp-agent restart
-	# service neutron-metadata-agent restart
-	# service neutron-l3-agent restart
+	service nova-api restart
+	service neutron-server restart
+	service neutron-linuxbridge-agent restart
+	service neutron-dhcp-agent restart
+	service neutron-metadata-agent restart
+	service neutron-l3-agent restart
 ```
-###6.3.4 Chuẩn bị các thành phần của neutron trên compute node
+###6.3.5 Chuẩn bị các thành phần của neutron trên compute node
 Trên compute node, ta sẽ triển khai thành phần neutron-linuxbridge-agent. Tải về neutron-linuxbridge-agent:
 ```sh
-	# apt-get install neutron-linuxbridge-agent
+	apt-get install neutron-linuxbridge-agent
 ```
 
-###6.3.5 Cấu hình neutron trên compute node
+###6.3.6 Cấu hình neutron trên compute node
 Ta cấu hình file /etc/neutron/neutron.conf:
 ####Cấu hình để neutron sử dụng messaging service
 Neutron liên lạc với các dịch vụ khác thông qua messaging service. Cập nhật section [DEFAULT] và section [oslo_messaging_rabbit] để cấu hình giúp neutron sử dụng messaging service:
@@ -716,26 +716,77 @@ Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới t
 	...
 	auth_uri = http://controller:5000
 	auth_url = http://controller:35357
-	auth_plugin = password
-	project_domain_id = default
-	user_domain_id = default
+	memcached_servers = controller:11211
+	auth_type = password
+	project_domain_name = default
+	user_domain_name = default
 	project_name = service
 	username = neutron
 	password = 1111
 ```
-
-Sau các thiết lập cơ bản, chúng ta thiết lập
-
-
-## Check virtual machine (Instance)
-
-![mitaka-instance11.png](./images/mitaka-instance11.png)
-
-![mitaka-instance12.png](./images/mitaka-instance12.png)
-
-![mitaka-instance13.png](./images/mitaka-instance13.png)
-- Nhập mật khẩu với thông tin dưới
+####Cấu hình linux-bridge agent
+- Cấu hình linux-bridge agent trên compute node để chuẩn bị hạ tầng mạng ảo trên compute node. Chỉnh sửa file ```/etc/neutron/plugins/ml2/linuxbridge_agent.ini ```, cấu hình để mapping - ánh xạ nhãn ```provider``` vào card vật lý eth1. Khi chúng ta muốn các máy ảo trên compute node có khả năng kết nối trực tiếp vào mạng external network, khi đó các máy ảo này sẽ kết nối vào mạng ảo flat này thông qua 1 bridge kết nối tới eth1.
 ```sh
-user: cirros
-password: cubswin:)
+	[linux_bridge]
+	physical_interface_mappings = provider:eth1
+```
+- Cấu hình cho vxlan tương tự như controller node
+```sh
+	[vxlan]
+	enable_vxlan = True
+	local_ip = 10.10.10.10
+	l2_population = True
+```
+ở đây local_ip là 10.10.10.11 là địa chỉ của card mạng vật lý kết nối tới mạng management network, mà chúng ta sẽ triển khai mạng vxlan trên mạng vât lý này.
+- Kích hoạt security group trên compute node
+```sh
+	[securitygroup]
+	...
+	enable_security_group = True
+	firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+```
+####Cấu hình nova-compute trên computenode để nova-compute sử dụng neutron.
+Chỉnh sửa file cấu hình ```/etc/nova/nova.conf``` để nova-compute có thể sử dụng neutron, thêm thông tin xác thực của neutron vào file cấu hình của nova-compute.
+```sh
+	[neutron]
+	...
+	url = http://controller:9696
+	auth_url = http://controller:35357
+	auth_type = password
+	project_domain_name = default
+	user_domain_name = default
+	region_name = RegionOne
+	project_name = service
+	username = neutron
+	password = 1111
+```
+###6.3.7 Kết thúc cài đặt trên compute node
+- Khởi động lại dịch vụ nova-compute
+```sh
+	service nova-compute restart
+```
+- Khởi động lại linux-bridge agent
+```sh
+	service neutron-linuxbridge-agent restart
+```
+##6.4 Kiểm tra hoạt động của dịch vụ neutron
+Trên controller node, nhập file xác thực admin.sh
+```sh
+	source admin.sh
+```
+Kiểm tra xem các agent đã được bật đầy đủ hay chưa 
+```sh
+	neutron agent-list
+```
+Kết quả nếu như hệ thống hoạt động bình thường
+```sh
+	+--------------------------------------+--------------------+------------+-------+----------------+---------------------------+
+	| id                                   | agent_type         | host       | alive | admin_state_up | binary                    |
+	+--------------------------------------+--------------------+------------+-------+----------------+---------------------------+
+	| 08905043-5010-4b87-bba5-aedb1956e27a | Linux bridge agent | compute1   | :-)   | True           | neutron-linuxbridge-agent |
+	| 27eee952-a748-467b-bf71-941e89846a92 | Linux bridge agent | controller | :-)   | True           | neutron-linuxbridge-agent |
+	| 830344ff-dc36-4956-84f4-067af667a0dc | L3 agent           | controller | :-)   | True           | neutron-l3-agent          |
+	| dd3644c9-1a3a-435a-9282-eb306b4b0391 | DHCP agent         | controller | :-)   | True           | neutron-dhcp-agent        |
+	| f49a4b81-afd6-4b3d-b923-66c8f0517099 | Metadata agent     | controller | :-)   | True           | neutron-metadata-agent    |
+	+--------------------------------------+--------------------+------------+-------+----------------+---------------------------+
 ```
