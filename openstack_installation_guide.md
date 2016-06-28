@@ -542,6 +542,7 @@ Neutron cần thông báo cho Nova khi cấu hình mạng (network topology) tha
 	username = nova
 	password = nova
 ```
+
 ####Note: Viết 1 bài viết về ML2 và các plugin (Linux-bridge, OpenVswitch) của nó.
 
 ####Cấu hình Modular Layer 2 (ML2) plug-in
@@ -626,43 +627,52 @@ Dịch vụ ```neutron-dhcp-agent``` có chức năng tạo ra, quản lý, cấ
 	dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
 	enable_isolated_metadata = True
 ```
-###Cấu hình L3 agent
-Dịch vụ ```neutron-l3-agent``` có chức năng tạo ra và quản lý các router ảo trên hệ thống mạng ảo. Cấu hình file ```/etc/neutron/l3_agent.ini```, thiết lập interface_driver sử dụng Linux-bridge và để trống giá trị external_network_bridge
+####Cấu hình L3 agent
+Dịch vụ ```neutron-l3-agent``` có chức năng tạo ra và quản lý các router ảo trên hệ thống mạng ảo. Cấu hình file ```/etc/neutron/l3_agent.ini```, thiết lập interface_driver của các router sử dụng Linux-bridge và để trống giá trị external_network_bridge.
 ```sh
 	[DEFAULT]
 	...
 	interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver
 	external_network_bridge =
 ```
-####Cấu hình lại nova để sử dụng neutron
+####Cấu hình neutron metadata agent
+Metadata agent có chức năng cung cấp các dữ liệu cho máy ảo khi máy ảo cần. Cấu hình metadata agent bằng cách chỉnh sửa file: ``` /etc/neutron/metadata_agent.ini ``` , thiết lập địa chỉ của metadata server là controller và mật khẩu để truy cập vào metadata server là 1111 trong section [DEFAULT]
+```sh 
+[DEFAULT]
+...
+nova_metadata_ip = controller
+metadata_proxy_shared_secret = 1111
+```
+
+####Cấu hình nova để sử dụng neutron và metadata agent.
 Để nova sử dụng neutron services để quản lý mạng cho các máy ảo, cần cấu hình lại dịch vụ nova.Chỉnh sửa file 
 ```sh
 	/etc/nova/nova.conf
 ```
-Cập nhật các section sau để cung cấp cho nova endpoint của neutron services:
+Cập nhật các section sau để cung cấp cho nova endpoint, thông tin xác thực của neutron services và thông tin về metadata service:
 ```sh
-	[DEFAULT]
-	...
-	network_api_class = nova.network.neutronv2.api.API
 	[neutron]
 	...
 	url = http://controller:9696
+	auth_url = http://controller:35357
+	auth_type = password
+	project_domain_name = default
+	user_domain_name = default
+	region_name = RegionOne
+	project_name = service
+	username = neutron
+	password = NEUTRON_PASS
+	
+	service_metadata_proxy = True
+	metadata_proxy_shared_secret = 1111	
 ```
-Cập nhật thông tin xác thực của neutron cho nova:
-```sh
-	[neutron]
-	...
-	auth_strategy = keystone
-	admin_tenant_name = service
-	admin_username = neutron
-	admin_password = 1111
-	admin_auth_url = http://controller01:35357/v2.0
-```
+
 ###6.3.4 Chuẩn bị các thành phần của neutron trên compute node
 Trên compute node, ta sẽ triển khai thành phần neutron-linuxbridge-agent. Tải về neutron-linuxbridge-agent:
 ```sh
 	# apt-get install neutron-linuxbridge-agent
 ```
+
 ###6.3.5 Cấu hình neutron trên compute node
 Ta cấu hình file /etc/neutron/neutron.conf:
 ####Cấu hình để neutron sử dụng messaging service
@@ -704,26 +714,7 @@ Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới t
 	password = 1111
 ```
 
-####Cấu hình neutron để thông báo các sự kiện cho nova
-
-Neutron cần thông báo cho Nova khi cấu hình mạng (network topology) thay đổi. Cập nhật các section [DEFAULT] và [nova] 
-```sh
-	[DEFAULT]
-	...
-	notify_nova_on_port_status_changes = True
-	notify_nova_on_port_data_changes = True
-	nova_url = http://controller:8774/v2
-	[nova]
-	...
-	auth_url = http://controller:35357
-	auth_plugin = password
-	project_domain_id = default
-	user_domain_id = default
-	region_name = RegionOne
-	project_name = service
-	username = nova
-	password = nova
-```
+Sau các thiết lập cơ bản, chúng ta thiết lập
 
 
 ## Check virtual machine (Instance)
