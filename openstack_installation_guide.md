@@ -475,6 +475,10 @@ Chỉnh sửa section [database] để neutron có thể sử dụng database ne
 ```sh 
 	connection = mysql+pymysql://neutron:1111@controller/neutron
 ```
+Lưu ý: xóa cơ sở dữ liệu mặc định của neutron, comment dòng này ở section [database]
+```sh
+	#connection = sqlite:////var/lib/neutron/neutron.sqlite
+```
 Cấu hình để nova kích hoạt ml2 plugin, router services và ovelaping  ip address:
 ```sh
 	[DEFAULT]
@@ -530,17 +534,17 @@ Neutron cần thông báo cho Nova khi cấu hình mạng (network topology) tha
 	...
 	notify_nova_on_port_status_changes = True
 	notify_nova_on_port_data_changes = True
-	nova_url = http://controller:8774/v2
 	[nova]
 	...
 	auth_url = http://controller:35357
-	auth_plugin = password
-	project_domain_id = default
-	user_domain_id = default
+	auth_type = password
+	project_domain_name = default
+	user_domain_name = default
 	region_name = RegionOne
 	project_name = service
 	username = nova
-	password = nova
+	password = 1111
+
 ```
 
 ####Note: Viết 1 bài viết về ML2 và các plugin (Linux-bridge, OpenVswitch) của nó.
