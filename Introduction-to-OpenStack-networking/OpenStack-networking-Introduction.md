@@ -32,10 +32,12 @@ Như trong hình vẽ, ta có 2 mạng ```flat network 1``` và ```flat network 
 ###1.2.2 Mạng VLAN
 Một vấn đề thường xuyên gặp phải khi thiết kế hệ thống mạng là, cần phân chia một miền quảng bá lớn ra thành nhiều mạng cục bộ độc lập với nhau. Chúng ta có thể sử dụng công nghệ VLAN để giải quyết vấn đề này.
 ![VLAN network.png](./img/VLAN-network.png)
+
 Công nghệ VLAN cho phép chúng ta chia một miền quảng bá vật lý ra thành nhiều mạng cục bộ logic. Mỗi mạng cục bộ được đặc trưng bởi một định danh, đó là VLAN ID. Khi sử dụng công nghệ VLAN, 2 máy trong cùng một mạng cục bộ có thể kết nối với nhau qua mạng cục bộ Layer 2 đó, nhưng nếu 2 máy ở hai mạng cục bộ khác nhau thì không thể kết nối với nhau qua Layer 2, cho dù 2 máy đó cùng nằm trên một mạng quảng bá.
 
 Có rất nhiều cách thức để các switch xác định xem một máy thuộc VLAN nào, ví dụ theo cổng (port): trên Switch 1, từ port 1 -> 5 là VLAN 10, từ port 5 tới port 10 là VLAN 20,... Hoặc cũng có thể xác định theo địa chỉ IP của từng máy như sau:
 ![VLAN table.png](./img/VLAN-table.jpg)
+
 Khi đã phân chia xong, các máy trên miền quảng bá sẽ được chia ra thành các mạng cục bộ. Việc tiếp theo cần phải làm là xác định cách thức để 2 máy trong cùng 1 mạng VLAN có thể kết nối với nhau. Để thực hiện quá trình này, các switch trên miền quảng bá phải hỗ trợ chuẩn 802.1Q. Chi tiết của chuẩn này có trong tài liệu của IEEE:
 ```sh
 http://standards.ieee.org/getieee802/download/802-1Q-2014.pdf
@@ -43,13 +45,17 @@ http://standards.ieee.org/getieee802/download/802-1Q-2014.pdf
 Khi một máy tính gửi một bản tin L2 Frame thông qua layer 2 tới một máy khác trong cùng mạng, gói tin được gửi đi từ máy gửi tới node tiếp theo (switch) dưới dạng 1 L2 frame chuẩn
 
 ![VLAN table.png](./img/L2-Frame-format.svg.png)
+
 Khi tới switch, switch xác định xem gói tin được gửi từ máy thuộc mạng VLAN nào. Sau đó, gói tin được điều chỉnh để thêm thông tin định danh, trở thành 1 L2 Frame theo định dạng 802.1 Q
+
 ![802-1Q-frame.png](./img/802-1Q-frame.jpg)
+
 Chúng ta có thể thấy, 1 L2 Frame theo chuẩn 802.1 Q so với L2 Frame chuẩn có thêm thông tin định danh cho gói tin là phần 802.1 Q Tag, trong đó định danh cho gói tin thuộc mạng VLAN nào chính là ở phần VLAN ID. VLAN ID có 12 bit, do đó có thể có tối đa 2^12 = 4096 giá trị VLAN ID khác nhau, tương ứng với việc chúng ta có thể có tối đa 4096 mạng VLAN trong 1 miền quảng bá.
 
 Dựa vào VLAN ID này và bảng định tuyến, gói tin được chuyển tiếp tới các switch tiếp theo trên đường đi tới máy đích. Tới switch trước máy đích, switch này nhận thấy máy đích kết nối tới mình nên sẽ thực hiện chuyển L2 Frame từ dạng 802.1 Q về  L2 Frame dạng chuẩn, sau đó chuyển L2 Frame chuẩn này tới máy đích. Quá trình truyền tin kết thúc. Cũng chính nhờ có VLAN ID mà switch có thể xác định máy gửi và máy đích có thuộc cùng 1 mạng nội bộ hay không, từ đó cho phép chuyển tiếp hoặc từ chối chuyển gói tin tới máy khách.
 
 ![VLAN_tag_added_removed.jpg](./img/VLAN_tag_added_removed.jpg)
+
 Thông tin thêm về VLAN
 ```sh
 https://en.wikipedia.org/wiki/Virtual_LAN
@@ -66,14 +72,20 @@ Chúng ta có thể thấy, với mô hình thiết kế của VLAN, bài toán 
 Như đã nói ở trên, mạng VXLAN sử dụng Layer 3 để định tuyến. Để hiểu rõ điều này, chúng ta quay lại phần đầu tiên. Như chúng ta đã nói, các loại mạng cục bộ khác nhau chủ yếu ở cách định danh mạng và cách thức truyền gói tin L2 frame tới đích. Ở mạng VXLAN, chúng ta truyền gói tin L2 frame bằng cách sử dụng giao thức MAC-in-UDP (MAC Address-in-User Datagram Protocol). Tức là phương thức để truyền gói tin L2 frame trong mạng là sử dụng IP và UDP để truyền dẫn.
 
 Trong giao thức MAC-in-UDP, gói tin L2 frame cần gửi sẽ được đóng thêm VXLAN header để định danh mạng nội bộ, sau đó được đóng vào UDP header rồi vào IP packet để chuyển đi. Format gói tin của giao thức MAC-in-UDP như sau:
+
 ![VXLAN-packet-format.jpg](./img/VXLAN-packet-format.jpg)
+
 Để sử dụng thiết kế của mạng VXLAN, thì các switch trên mạng phải hỗ trợ một công nghệ mới, đó là công nghệ VTEP (VXLAN Tunnel Endpoint). Với việc sử dụng công nghệ này, các switch được coi là các thiết bị VTEP. Các thiết bị VTEP có chức năng xác định các máy tính kết nối tới nó, máy nào thuộc mạng cục bộ VXLAN nào, thực hiện việc chuyển dữ liệu giữa các máy cùng một mạng VXLAN, đóng gói L2 frame vào gói tin của giao thức MAC-in-UDP rồi chuyển đi và chức năng nhận và  mở gói các gói tin của giao thức MAC-in-UDP để lấy gói tin L2 frame ban đầu và gửi tới máy đích.
 
 Để thực hiện các chức năng trên, một thiết bị VTEP bao gồm 2 thành phần chính: thành phần thứ nhất là một switch kết nối và chuyển tiếp dữ liệu giữa các máy tính trong một mạng VXLAN cùng kết nối trực tiếp tới thiết bị VTEP, thành phần thứ 2 là thiết bị đóng gói, mở gói và truyền gói tin MAC-in-UDP thông qua giao thức IP. Thiết bị VTEP có địa chỉ IP xác định, do đó các thiết bị VTEP có thể gửi gói tin IP đến các thiết bị VTEP khách thông qua mạng IP để thực hiện chức năng gửi-nhận các gói tin IP.
+
 ![VTEP-device.jpg](./img/VTEP-device.jpg)
+
 #### Phương thức hoạt động của mạng VXLAN
 Sau khi tìm hiểu được các thành phần và đơn vị dữ liệu của mạng VXLAN, chúng ta sẽ tìm hiểu cách mà các thiết bị trong mạng VXLAN thực hiện chức năng chuyển tiếp dữ liệu giữa 2 máy trong cùng 1 mạng nội bộ. Chúng ta xét ví dụ sau đây:
+
 ![VXLAN-data-flow.png.jpg](./img/VXLAN-data-flow.png)
+
 Ta có 3 máy A, B, C cùng thuộc một mạng cục bộ VXLANID 10. Ta xét 2 trường hợp:
 
 Trường hợp 1, máy A muốn gửi cho máy C một gói tin L2 frame. Lúc này máy A sẽ đẩy lên thiết bị VTEP 1 gói tin L2 frame này với địa chỉ đích là MAC của máy C, thiết bị VTEP-1 nhận được gói tin từ A, xác định được địa chỉ đích của gói tin là C cũng kết nối trực tiếp vào thiết bị và cùng nằm trên 1 mạng cục bộ  VXLAN10 với A, do đó nó chuyển trực tiếp gói tin tới C. Trong trường hợp này chúng ta không cần phải đóng gói và mở gói  gói tin MAC-in-UDP. Thiết bị VTEP đóng vai trò như là 1 switch (mà thật ra thiết bị này là Switch hỗ trợ VXLAN mà thôi).
