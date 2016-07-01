@@ -51,7 +51,7 @@ Các thành phần của nova được liên kết với nhau bằng Queue Serve
 </br>
 Compute điểu khiển ảo hóa thông qua 1 máy chủ API. Để chọn hypervisor tốt nhất để sử dụng khá khó khăn, bạn phải lấy tài nguyên, các tính năng được hỗ trợ, và yêu cầu thông số kỹ thuật trong tài khoản. Tuy nhiên, phần lớn các phát triển của OpenStack sử dụng KVM và Xen-based.
 </br></br>
-<b>Projects, users và roles</b>
+<b>Projects, users và roles</b> </br>
 Hệ thống Compute được thiết kế để phục vụ nhiều người dùng khác nhau trong các project trên 1 hệ thống được chia sẻ, và dựa trên các vai trò truy cấp. Các role kiểm soát các hoạt động mà 1 user được phép thực hiện.
 </br>
 Các project bao gồm một VLAN riêng, và các volume, instance, images, keys, và các user. Một user có thể chỉ định project bằng cách gắn thêm project_id để khóa truy cập của họ. Nếu không có project nào được chỉ định trong API request, Compute sẽ chọn 1 project có ID tương tự như user.
@@ -185,17 +185,38 @@ Về mặt lý thuyết, OpenStack Compute có thể hỗ trợ bất kỳ cơ s
 
 <h2><a name="request">5.3. Xử lý khi nhận được request</a></h2>
 </br>
-<img src="https://github.com/cloudcomputinghust/openstack-manual/blob/master/img_Glance/handle%20request.jpg"/>
+<img src="https://ilearnstack.files.wordpress.com/2013/04/request-flow1.png"/>
 </br>
-link: https://prosuncsedu.wordpress.com/tag/nova/</br>
-1. Nova client thông báo với nova API khi user yêu cầu</br>
-2a. Nova API lấy các yêu cầu tạo máy ảo và các chính sách thực thi</br>
+link: https://ilearnstack.com/2013/04/26/request-flow-for-provisioning-instance-in-openstack/</br>
+1. Từ Dashboard hoặc CLI, user nhập các thông tin chứng thực (ví dụ như user name và password) và thực hiện lời gọi REST tới Keystone để xác thực.</br>
+2. Keystone sẽ xác thực thông tin người dùng và tạo ra 1 token, gửi trở lại cho user để user có thể sử dụng nó để xác thực sử dụng các dịch vụ khác thông qua REST</br>
 2b. Nova API tạo 1 entry trong nova db</br>
-2c. Nova API gửi messag yêu cầu tạo máy ảo tới message queue cho nova scheduler</br>
-3a. Nova scheduler nhận rpc message (thực chất bên trong message queue là rpc message), sau đó chọn chủ quyền và tính toán các yêu cầu tạo và chạy máy ảo </br>
-3b. Cập nhật lại nova db, đặt lại trạng thái là ACTIVE (sẵn sàng để sử dụng) hoặc Error cho máy ảo đó.</br>
-4. Scheduler sử dụng notifier để gửi event message tới hàng đợi</br>
-5. Event message được gửi đến hàng đợi thông qua notifier
+3. Dashboard/CLI chuyển yêu cầu tạo máy ảo tới nova-api thông qua REST API request</br>
+4. Nova-api nhận yêu cầu và hỏi lại keystone xem auth-token mang theo yêu cầu tạo máy ảo của user có hợp lệ không và quyền hạn truy cập của user đó khi auth-token hợp lệ</br>
+5. Keystone xác nhận token và update lại trong header xác thực với roles và quyền hạn truy cập dịch vụ lại cho nova-api </br>
+6. Nova-api tương tác với nova-database để yêu cầu tạo ra 1 entry lưu các thông tin về máy cảo mới cần tạo </br>
+7. Database tạo entry lưu thông ti máy ảo mới </br>
+8. Nova-api gửi rpc.call request tới nova-scheduler để cập nhật entry của máy ảo mới với giá trị hostID (ID của máy compute mà máy ảo sẽ được triển khai trên đó). </br>
+9. Nova-scheduler lấy yêu cầu từ hàng đợi </br>
+10. Nova-scheduler tương tác với database để tìm host compute phù hợp thông qua các yêu cầu về cấu hình của máy ảo </br>
+11. Nova-database cập nhật lại entry của máy ảo với host ID phù hợp tìm được sau khi lọc </br>
+12. Nova-scheduler gửi rpc.cast request tới nova-compute chứa yêu cầu tạo máy ảo mới với host phù hợp.</br>
+13. Nova-compute lấy message từ hàng đợi </br>
+14. Nova-compute gửi rpc.call request tới nova-conductor để lấy thông tin như host ID và flavor (các thông tim về RAM, CPU, disk) </br>
+15. Nova-conductor lấy message từ hàng đợi </br>
+16. Nova-conductor tương tác với database để lấy thông tin mà nova-compute yêu cầu</br>
+17. Nova-database trẻ lại thông tin của máy ảo mới cho nova-conductor và nova-conductor gửi thông tin này lên hàng đợi cho nova-compute </br>
+18. Nova-compute lấy mesage chứa thông tin về máy ảo từ hàng đợi </br>
+19. Nova-compute thực hiện lời gọi REST bằng việc gửi token xác thực tới glance-api để lấy Image URI, Image ID và upload image từ image store </br>
+20. Glance-api xác thực auth-token với keystone </br>
+21. Nova-compute lấy metadata của image (bao gồm image type, size, etc...) </br>
+22. Nova-compute thực hiện REST-call bằng việc gửi token xác thực tới Netword APU để xin cấp phát IP và cấu hình mạng cho máy ảo </br>
+23. Neutron server (tên gọi mới của quantum) xác thực token với keystone </br>
+24. Nova-compute lấy các thông tin về network </br>
+25. Nova-compute thực hiện REST-call bằng việc gửi token tới Volume API để yêu cầu volumes cho máy ảo </br>
+26. Cinder-api xác thực token với Keystone </br>
+27. Nova-compute lấy thông tin bloock storage cấp cho máy ảo </br>
+28. Nova-compute tạo ra dữ liệu cho hypervisor drriver và thực thi yêu cầu tạo máy ảo trên Hypervisor
 </br></br>
 
 <h2><a name="install_nova">5.4. Cài đặt và cấu hình nova</a></h2>
