@@ -28,7 +28,7 @@
   <li><a href="#authen_token">1.3.2.	Token</a></li>
 </ul>
 
-<a href="#tq_author">1.4.	Access Management và Authorization</a>
+<a href="#tq_author">1.4.	Access Management và Authorization</a></br>
 <a href="#tq_format">1.5.	Các định dạng Token</a>
 <ul>
   <li><a href="#format_uuid">1.5.1.	UUID	</a></li>
@@ -322,7 +322,7 @@
 <b>Token Validation Workflow</b></br>
 &emsp;Tương tự UUID và PKI/ PKIZ </br>
 <b>Multiple Data Center</b></br>
-<img src="img_KeyStone/fernet-multiple_data_center.png"/><br><br>
+<img src="img_KeyStone/fernet-multiple_data_center.jpg"/><br><br>
 &emsp;Giả sử triển khai hệ thống cloud với keystone ở cả hai bên US-WEST và US-EAST. Cả hai bên này đều có LDAP và Database luôn luôn được đồng bộ. Hoạt động của keystone khi user muốn thực hiện tạo một máy ảo VM như sau:</br>
 <ul>
     <li>User sử dụng Nova ở US-WEST:
