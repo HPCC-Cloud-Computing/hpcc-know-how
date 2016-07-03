@@ -236,7 +236,7 @@
     <li>Kiểm tra xem Token đã bị thu hồi hay chưa? Nếu đã bị thu hồi, thì trả về “Token Not Found”. Nếu đúng, trả về “HTTP/1.1 200 OK” (có nghĩa là token sử dụng được)</li>
 </ol>
 <b>UUID Token Revocation Workflow</b></br> 
-<img src="img_KeyStone/uuid-token_revocation.png"/><br><br>
+<img src="img_KeyStone/uuid - token_revocation.png"/><br><br>
 &emsp;Quá trình thu hồi một token thực hiện như sau:</br>
 <ol>
     <li>Gửi request “DELETE v3/auth/tokens” đến Keystone để yêu cầu thu hồi token. Trước khi thu hồi token, thì phải thực hiện xác minh token (thực hiện các bước như trên)</li>
