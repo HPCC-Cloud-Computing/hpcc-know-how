@@ -328,7 +328,7 @@ $ openstack endpoint create --region RegionOne \
   ```sh
 # cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
   ```
-  Chỉnh sửa file /etc/nova/nova.conf như dưới:
+  Chỉnh sửa file /etc/nova/nova.conf như dưới: </br>
 <b>Lưu ý:</b> Trong trường hợp nếu có dòng khai bao trước đó thì tìm và thay thế, chưa có thì khai báo mới hoàn toàn.
 Khai báo trong section [api_database] dòng dưới, do section [api_database] chưa có nên ta khai báo thêm
  ```sh
@@ -451,20 +451,20 @@ Cài đặt gói nova-compute </br>
 apt-get -y install nova-compute
  ```
 <b>Cấu hình nova-comupte</b> </br>
-	Sao lưu file /etc/nova/nova.conf </br>
++ Sao lưu file /etc/nova/nova.conf </br>
 	```sh
 	cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
 	 ```
-	Trong section [DEFAULT] khai báo các dòng sau: </br>
-	 ```sh
-	rpc_backend = rabbit
-	auth_strategy = keystone
-	my_ip = 10.10.10.41
++ Trong section [DEFAULT] khai báo các dòng sau: </br>
+  ```sh
+pc_backend = rabbit
+auth_strategy = keystone
+my_ip = 10.10.10.41
 	
-	use_neutron = True
-	firewall_driver = nova.virt.firewall.NoopFirewallDriver
-	 ```
-Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới: </br>
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+ ```
++ Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới: </br>
   ```sh
 [oslo_messaging_rabbit]
 rabbit_host = controller
@@ -472,7 +472,7 @@ rabbit_userid = openstack
 rabbit_password = Welcome123
  ```
 
- Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
++ Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
  ```sh
 [keystone_authtoken]
 auth_uri = http://controller:5000
@@ -485,7 +485,7 @@ project_name = service
 username = nova
 password = Welcome123
  ```
-Khai báo thêm section [vnc] và các dòng dưới: </br>
++ Khai báo thêm section [vnc] và các dòng dưới: </br>
  ```sh
 [vnc]
 enabled = True
@@ -493,17 +493,17 @@ vncserver_listen = 0.0.0.0
 vncserver_proxyclient_address = $my_ip
 novncproxy_base_url = http://172.16.69.40:6080/vnc_auto.html
  ```
-Khai báo thêm section [glance] và các dòng dưới: </br>
++ Khai báo thêm section [glance] và các dòng dưới: </br>
  ```sh
 [glance]
 api_servers = http://controller:9292
  ```
- Khai báo thêm section [oslo_concurrency] và các dòng dưới: </br>
++ Khai báo thêm section [oslo_concurrency] và các dòng dưới: </br>
  ```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
  ```
- Khai báo thêm section [neutron] và các dòng dưới: </br>
++ Khai báo thêm section [neutron] và các dòng dưới: </br>
  ```sh
 [neutron]
 url = http://controller:9696
