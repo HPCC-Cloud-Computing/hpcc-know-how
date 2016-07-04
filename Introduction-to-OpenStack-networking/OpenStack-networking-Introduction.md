@@ -118,6 +118,7 @@ Như vậy có thể thấy ở VXLAN có 2 đặc điểm chính sau:
 
 - Sử dụng VXLAN ID để xác định các mạng VXLAN cục bộ có trong hệ thống mạng. VLANID có độ dài là 24 bit, do đó có tối đa 16 triệu mạng VXLAN trong một hệ thống mạng. 
 - Việc truyền bản tin L2 Frame giữa 2 máy cùng một mạng cục bộ nằm ở xa nhau sử dụng truyền tin trên mạng IP + UDP, có thực hiện việc đóng gói và mở gói ở các thiết bị đầu và cuối.
+
 ###1.2.4 Mạng GRE
 Để hiểu được nguyên tắc hoạt động của Mạng GRE, trước tiên chúng ta cần hiểu về khái niệm GRE. Theo tài liệu ```rfc2784```, thì GRE - Generic Routing Encapsulation là một giao thức (protocol) cho phép đóng gói một gói tin của giao thức A cùng với GRE header vào trong một gói tin của giao thức B, sau đó vận chuyển đến một thiết bị đích có khả năng giải nén gói tin giao thức B, giải mã GRE header rồi chuyển tiếp gói tin của giao thức A đến đích. Format của giao thức GRE như sau:
 
