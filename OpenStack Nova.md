@@ -11,12 +11,12 @@
 <li><h5><a href="#other_component">5.2.6. Other components</a></h5></li>
 </ul>
 <h4><a href="#request">5.3. Xử lý khi nhận được request</a></h4>
-<h4><a href="#install_nova">5.4. Cài đặt và cấu hình nova</a></h4>
+<h4><a href="#install_nova_controller">5.4. Cài đặt và cấu hình nova trên node Controller</a></h4>
 <ul>
 <li><h5><a href="#create_db_enpoint">5.4.1. Tạo database và endpoint cho nova</a></h5></li>
 <li><h5><a href="#end">5.4.2. Kết thúc bước cài đặt và cấu hình nova</a></h5></li>
 </ul>
-
+<h4><a href="#install_nova_compute">5.4. Cài đặt và cấu hình nova trên node Compute</a></h4>
 
 ---
 
@@ -219,7 +219,7 @@ link: https://ilearnstack.com/2013/04/26/request-flow-for-provisioning-instance-
 28. Nova-compute tạo ra dữ liệu cho hypervisor drriver và thực thi yêu cầu tạo máy ảo trên Hypervisor
 </br></br>
 
-<h2><a name="install_nova">5.4. Cài đặt và cấu hình nova</a></h2>
+<h2><a name="install_nova_controller">5.4. Cài đặt và cấu hình nova trên node Controller</a></h2>
 <h3><a name="create_db_enpoint">5.4.1. Tạo database và endpoint cho nova</a></h3>
 Đăng nhập vào database với quyền root
 </br>
@@ -445,5 +445,113 @@ Xóa database mặc định của nova
 |  7 | nova-metadata      | 0.0.0.0    | internal | enabled | down  | None                       |
 +----+--------------------+------------+----------+---------+-------+----------------------------+
   ```
+<h2><a name="install_nova_compute">5.4. Cài đặt và cấu hình nova trên node Compute</a></h2> </br>
+Cài đặt gói nova-compute </br>
+```sh
+apt-get -y install nova-compute
+ ```
+<b>Cấu hình nova-comupte</b> </br>
+	Sao lưu file /etc/nova/nova.conf </br>
+	```sh
+	cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
+	 ```
+	Trong section [DEFAULT] khai báo các dòng sau: </br>
+	 ```sh
+	rpc_backend = rabbit
+	auth_strategy = keystone
+	my_ip = 10.10.10.41
+	
+	use_neutron = True
+	firewall_driver = nova.virt.firewall.NoopFirewallDriver
+	 ```
+Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới: </br>
+  ```sh
+[oslo_messaging_rabbit]
+rabbit_host = controller
+rabbit_userid = openstack
+rabbit_password = Welcome123
+ ```
+
+ Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
+ ```sh
+[keystone_authtoken]
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = nova
+password = Welcome123
+ ```
+Khai báo thêm section [vnc] và các dòng dưới: </br>
+ ```sh
+[vnc]
+enabled = True
+vncserver_listen = 0.0.0.0
+vncserver_proxyclient_address = $my_ip
+novncproxy_base_url = http://172.16.69.40:6080/vnc_auto.html
+ ```
+Khai báo thêm section [glance] và các dòng dưới: </br>
+ ```sh
+[glance]
+api_servers = http://controller:9292
+ ```
+ Khai báo thêm section [oslo_concurrency] và các dòng dưới: </br>
+ ```sh
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+ ```
+ Khai báo thêm section [neutron] và các dòng dưới: </br>
+ ```sh
+[neutron]
+url = http://controller:9696
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = Welcome123
+ ```
+
+Khởi động lại dịch vụ nova-compute
+```sh
+service nova-compute restart
+ ```
+Xóa database mặc định của hệ thống tạo ra
+```sh
+rm -f /var/lib/nova/nova.sqlite
+ ```
+Dùng lệnh nano để thêm file admin-openrc chứa nội dung dưới:
+```sh
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=Welcome123
+export OS_AUTH_URL=http://controller:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+ ```
+Thực thi file admin-openrc
+```sh
+source admin-openrc
+ ```
+Kiểm tra lại các dịch vụ của nova đã được cài đặt thành công hay chưa:
+```sh
+root@compute1:~# openstack compute service list
++----+------------------+------------+----------+---------+-------+----------------------------+
+| Id | Binary           | Host       | Zone     | Status  | State | Updated At                 |
++----+------------------+------------+----------+---------+-------+----------------------------+
+|  3 | nova-cert        | controller | internal | enabled | up    | 2016-04-15T15:10:30.000000 |
+|  4 | nova-consoleauth | controller | internal | enabled | up    | 2016-04-15T15:10:30.000000 |
+|  5 | nova-scheduler   | controller | internal | enabled | up    | 2016-04-15T15:10:31.000000 |
+|  6 | nova-conductor   | controller | internal | enabled | up    | 2016-04-15T15:10:32.000000 |
+|  7 | nova-compute     | compute1   | nova     | enabled | up    | 2016-04-15T15:10:25.000000 |
++----+------------------+------------+----------+---------+-------+----------------------------+
+ ```
 
 
