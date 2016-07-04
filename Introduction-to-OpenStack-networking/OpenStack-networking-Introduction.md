@@ -13,12 +13,14 @@ Phần 3: Giới thiệu về Open vSwitch và cách xây dựng các mạng c�
 
 #1 Mạng cục bộ
 ##1.1 Giới thiệu về mạng cục bộ
+###1.1.1 Mạng cục bộ là gì ?
 Như chúng ta đã biết, mạng là khái niệm để chỉ một hệ thống các máy tính kết nối với nhau thông qua các phương tiện truyền dẫn. Trong mô hình phân Lớp của OSI, các máy tính kết nối với nhau chủ yếu thông qua 2 layer là layer 2 và layer 3. Mạng cục bộ là mạng được triển khai thông qua Layer 2, trong đó các máy tính được kết nối với nhau thông qua các switch.
 ![Lan diagram.png](./img/LAN-diagram.png)
 
 Trong mạng cục bộ, các máy tính gửi nhận các gói tin thông qua địa chỉ MAC chứ không phải là địa chỉ IP. Để gửi một gói tin tới một máy tính khác, máy gửi cần phải biết được địa chỉ vật lý (MAC) của máy nhận. Sau đó máy gửi sẽ đóng gói bản tin vào một MAC frame và gửi đi. Các switch trong mạng có nhiệm vụ chuyển tiếp MAC frame này tới máy đích dựa trên địa chỉ MAC đích, việc chuyển tiếp này được thực hiện ở Layer 2 thông qua các công nghệ chuyển tiếp khác nhau. Các công nghệ chuyển tiếp này sẽ dẫn tới các loại mạng cục bộ khác nhau. 
 
 Ở đây, chúng ta có thể hiểu, trong mạng cục bộ, máy gửi chỉ có trách nhiệm đánh địa chỉ gửi và địa chỉ nhận rồi gửi gói tin thông qua cổng mạng tới node tiếp theo trong mạng (thường là 1 switch). Còn phương pháp để gói tin đó gửi tới đích, hoặc làm thế nào để phân chia một hệ thống mạng vật lý ra thành nhiều mạng cục bộ  (multi segment local network), điều đó là phụ thuộc vào cách chúng ta sử dụng loại mạng cục bộ nào.
+###1.1.2 Nguyên tắc chuyển tiếp dữ liệu trong mạng cục bộ
 ##1.2 Các loại mạng cục bộ
 ###1.2.1 Mạng Flat
 Mạng flat là loại mạng cục bộ mà các switch truyền nhận gói tin mà không phải đóng gói thêm các thông tin chuyển tiếp. Gói tin được chuyển tiếp qua hệ thống switch mà không bị biến đổi, vẫn giữ nguyên trạng thái là một gói tin L2 frame.
@@ -92,9 +94,80 @@ Trường hợp 1, máy A muốn gửi cho máy C một gói tin L2 frame. Lúc 
 
 Trường hợp 2, máy A muốn gửi cho máy B một gói tin L2 frame. Lúc này máy A cũng đấy gói tin L2 frame với địa chỉ đích là MAC của máy B lên thiết bị VTEP 1. Tuy nhiên lúc này máy B không kết nối trực tiếp với VTEP 1, nên quá trình chuyển gói tin tới máy B xảy ra như sau:
 
-Gói tin L2 frame nguyên bản (orginial) được máy A chuyển tới VTEP 1 thông qua mạng vật lý. VTEP 1 nhận được gói tin L2 frame này, nó hiểu được địa chỉ đích là máy B. Lúc này, tại VTEP 1, nó xác định xem máy B được kết nối trực tiếp với thiết bị VTEP nào bằng cách tra trong cơ sở dữ liệu của nó. Sau khi VTEP 1 biết được VTEP 2 là thiết bị kết nối trực tiếp với máy B, nó tiến hành đóng gói dữ liệu. Gói tin L2 frame ban đầu được thêm vào VXLAN header để định danh mạng cục bộ, Sau đó đóng gói vào UDP packet với UDP port tương ứng với UDP port dành cho VXLAN. Tiếp đó UDP packet này được đóng gói vào IP packet với địa chỉ IP đích là địa chỉ IP của VTEP 2. Sau đó VTEP 1 thực hiện việc truyền gói tin IP này tới VTEP 2 thông qua hệ thống mạng bằng giao thức IP. 
-Sau khi được chuyển tiếp, định tuyến, gói tin tới được VTEP 2. Tại VTEP 2, thiết bị này thực hiện việc mở gói tin IP mà nó nhận được ( vì địa chỉ đích là địa chỉ của nó), nó nhận được gói tin UDP. Kiểm tra port của gói tin UDP, gói tin UDP này có UDP port là port dành cho VXLAN, đo đó  nó tiếp tục mở gói tin UDP và xử lý gói tin nhận được theo phương thức xử lý gói tin VXLAN. Sau khi mở gói tin UDP, dữ liệu nhận được bao gồm bản tin L2 nguyên bản và phần VXLAN header. Dựa vào VXLAN header, VTEP 2 biết được máy đích thuộc mạng VXLAN nào nhờ vào VXLAN ID chứa trong VXLAN header (VNID). Đồng thời dựa vào địa chỉ đích của gói tin L2 nguyên bản, VTEP 2 biết được máy đích kết nối với nó ở cổng nào. Tổng hợp 2 thông tin này, VTEP 2 chuyển tiếp gói tin L2 nguyên bản của máy A tới máy B thông qua port mà máy B kết nối với nó. Lúc này máy B nhận được bản tin L2 từ máy A gửi tới ban đầu. Quá trình truyền tin kết thúc.Như vậy có thể thấy ở VXLAN có 2 đặc điểm chính sau:
+Gói tin L2 frame nguyên bản (orginial) được máy A chuyển tới VTEP 1 thông qua mạng vật lý. VTEP 1 nhận được gói tin L2 frame này, nó hiểu được địa chỉ đích là máy B. Lúc này, tại VTEP 1, nó xác định xem máy B được kết nối trực tiếp với thiết bị VTEP nào bằng cách tra trong cơ sở dữ liệu của nó. Sau khi VTEP 1 biết được VTEP 2 là thiết bị kết nối trực tiếp với máy B, nó tiến hành đóng gói dữ liệu:
+
+- Gói tin L2 frame ban đầu được thêm vào VXLAN header để định danh mạng cục bộ.
+
+-  Sau đó đóng gói vào UDP packet với UDP port tương ứng với UDP port dành cho VXLAN.
+
+-   Tiếp đó UDP packet này được đóng gói vào IP packet với địa chỉ IP đích là địa chỉ IP của VTEP 2. 
+
+Sau khi tiến hành đóng gói xong, VTEP 1 thực hiện việc truyền gói tin IP này tới VTEP 2 thông qua hệ thống mạng bằng giao thức IP. 
+
+Sau khi được chuyển tiếp, định tuyến, gói tin tới được VTEP 2. Tại VTEP 2, thiết bị này thực hiện giải nén theo các bước sau:
+
+- Thực hiện việc mở gói tin IP mà nó nhận được ( vì địa chỉ đích là địa chỉ của nó), nó nhận được gói tin UDP. 
+
+- Kiểm tra port của gói tin UDP, gói tin UDP này có UDP port là port dành cho VXLAN, đo đó  nó tiếp tục mở gói tin UDP và xử lý gói tin nhận được theo phương thức xử lý gói tin VXLAN.
+
+-  Dữ liệu nhận trong gói tin UDP bao gồm bản tin L2 nguyên bản và phần VXLAN header. Dựa vào VXLAN header, VTEP 2 biết được máy đích thuộc mạng VXLAN nào nhờ vào VXLAN ID chứa trong VXLAN header (VNID). Đồng thời dựa vào địa chỉ đích của gói tin L2 nguyên bản, VTEP 2 biết được máy đích kết nối với nó ở cổng (port) nào. 
+
+- VTEP 2 chuyển tiếp gói tin L2 nguyên bản của máy A tới máy B thông qua port mà máy B kết nối với nó. Lúc này máy B nhận được bản tin L2 từ máy A gửi tới ban đầu. Quá trình truyền tin kết thúc.
+
+Như vậy có thể thấy ở VXLAN có 2 đặc điểm chính sau:
 
 - Sử dụng VXLAN ID để xác định các mạng VXLAN cục bộ có trong hệ thống mạng. VLANID có độ dài là 24 bit, do đó có tối đa 16 triệu mạng VXLAN trong một hệ thống mạng. 
 - Việc truyền bản tin L2 Frame giữa 2 máy cùng một mạng cục bộ nằm ở xa nhau sử dụng truyền tin trên mạng IP + UDP, có thực hiện việc đóng gói và mở gói ở các thiết bị đầu và cuối.
- 
+###1.2.4 Mạng GRE
+Để hiểu được nguyên tắc hoạt động của Mạng GRE, trước tiên chúng ta cần hiểu về khái niệm GRE. Theo tài liệu ```rfc2784```, thì GRE - Generic Routing Encapsulation là một giao thức (protocol) cho phép đóng gói một gói tin của giao thức A cùng với GRE header vào trong một gói tin của giao thức B, sau đó vận chuyển đến một thiết bị đích có khả năng giải nén gói tin giao thức B, giải mã GRE header rồi chuyển tiếp gói tin của giao thức A đến đích. Format của giao thức GRE như sau:
+
+```sh
+   ---------------------------------
+    |                               |
+    |       Delivery Header         |
+    |                               |
+    ---------------------------------
+    |                               |
+    |       GRE Header              |
+    |                               |
+    ---------------------------------
+    |                               |
+    |       Payload packet          |
+    |                               |
+    ---------------------------------
+```
+Trong đó, format của GRE Header như sau:
+```sh
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |C|       Reserved0       | Ver |         Protocol Type         |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |      Checksum (optional)      |       Reserved1 (Optional)    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+(Lưu ý là các trường optional có thể được thay đổi tùy vào mục đích sử dụng của GRE. Ở đây chúng ta quan tâm nhất đến trường Protocol Type. Trường này cho biết giao thức được đóng gói (Giao thức A đã nói ở trên) vào trong gói tin của giao thức bên ngoài (Giao thức B) là giao thức nào.
+
+Như vậy, chúng ta có thể hiểu mục đích của giao thức GRE là sử dụng một giao thức B để vận chuyển gói tin của giao thức A bằng các thiết bị phù hợp. Điều này giúp cho việc vận chuyển các gói tin trên một giao thức có thể trở nên linh hoạt hơn mà không phụ thuộc vào các đặc điểm của giao thức A. Chính ứng dụng này cho phép chúng ta sử dụng giao thức GRE để vận chuyển một bản tin MAC Frame ở layer2 thông qua giao thức IP, đây chính là phương thức mà mạng GRE hoạt động, điều mà chúng ta sẽ tìm hiểu ngay ở phần dưới.
+####Sử dụng giao thức GRE để xây dựng mạng nội bộ GRE trong OpenStack
+Mục tiêu chính của mạng nội bộ là chuyển tiếp được các gói tin MAC Frame giữa các thiết bị với nhau. Bằng việc sử dụng giao thức GRE, chúng ta có thể xây dựng mạng nội bộ  phân bố ở trên các miền quảng bá khác nhau bằng cách sử dụng GRE protocol để vận chuyển bản tin L2 Frame giữa các miền quảng bá khác nhau này. Mạng GRE trong OpenStack được xây dựng trên kiến trúc như sau:
+
+Như đã nói ở phần trước, việc phân loại các mạng nội bộ là dựa trên cách các thiết bị trung gian (switch) phân chia các máy tính trong mạng vật lý thành các mạng nội bộ như thế nào, và cách chuyển tiếp L2 frame giữa các thiết bị trung gian này như thế nào. Ở mạng GRE, các vấn đề này được giải quyết bằng cách cụ thể hóa format của GRE protocol: Các mạng cục bộ trong cùng 1 hệ thống mạng vật lý được phân biệt với nhau bằng ID nằm trong GRE Header. Payload cần truyền đi là L2 Frame và giao thức được sử dụng để vận chuyển là IP protocol.Format của GRE Protocol như sau:
+
+![GRE-Protocol-Format.png](./img/GRE-Protocol-Format.png)
+
+Quá trình chuyển tiếp gói tin L2 frame giữa 2 máy client ở 2 vùng mạng khác nhau diễn ra như sau:
+![GRE-Data-Flow.png](./img/GRE-Data-Flow.png)
+Giả sử máy A cần gửi một L2 Frame tới máy B. Máy A sẽ đánh địa chỉ gửi là MAC của A, địa chỉ đích của Frame là MAC của B rồi gửi L2 Frame này qua đường truyền vật lý tới Swich kết nối trực tiếp với nó là Switch C. Tại Switch C, phân tích MAC đích cho thấy Máy B không kết nối trực tiếp tới Switch, nó đóng gói bản tin L2 Frame của A gửi tới theo các bước sau:
+
+- Thêm GRE Header vào với ID của mạng nội bộ mà A và B là thành viên.
+- Đóng gói dữ liệu vào IP packet với địa chỉ IP đích là địa chỉ của Switch D là Switch kết nối trực tiếp với máy B bằng cách tra trong cơ sở dữ liệu.
+
+Sau đó, gói tin được gửi đi thông qua hệ thống mạng bằng giao thức IP tới Switch D. Tại Switch D thực hiện quá trình mở gói gói tin IP như sau:
+
+- Sau khi mở gói tin IP Packet, Switch D kiểm tra ID của mạng nội bộ của gói tin và địa chỉ đích của L2 Frame, sau đó tra trong cơ sở dữ liệu để xác định cổng kết nối với máy B.
+
+- Switch D tiến hành loại bỏ GRE Header, sau đó chuyển tiếp L2 Frame nguyên gốc từ Máy A qua cổng kết nối với Máy B. Gói tin được chuyển tới Máy B, quá trình chuyển gói tin kết thúc.
+
+Có thể thấy mạng GRE rất giống với mạng VXLAN. Cả 2 loại mạng này đều sử dụng giao thức IP để chuyển tiếp các gói tin giữa các switch thuộc các miền mạng khác nhau, đồng thời cả 2 loại mạng này đều hỗ trợ tối đa 2^24 = 16 triệu mạng nội bộ. Sự khác biệt nằm ở chỗ, mạng VXLAN sử dụng 3 lớp VXLAN Header + UDP + IP để đóng gói gói tin, trong khi đó mạng GRE chỉ sử dụng 2 lớp là GRE Header + IP để đóng gói, do đó các thiết bị đầu cuối mạng GRE không phải đóng gói và mở gói tầng UDP, đồng thời kích thước gói tin chuyển tiếp mạng GRE sẽ nhỏ hơn kích thước gói tin chuyển tiếp của mạng VXLAN.
+
+Sau khi đã tìm hiểu xong các loại mạng nội bộ, chúng ta cùng tìm hiểu xem cách thức các loại mạng này triển khai trên OpenStack như thế nào trên các nền tảng sử dụng Linux Bridge và Open vSwitch
