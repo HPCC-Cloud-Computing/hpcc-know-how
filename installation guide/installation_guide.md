@@ -316,7 +316,7 @@ Khởi động lại dịch vụ NTP
 <h3><a name="khaiNiem_user_group">3.1.1.3	 User và User Group (Actor)</a></h3></br>
 &emsp;Trong Keystone, user và user group là các thực thể được cấp quyền truy cập đến các tài nguyên trong các project. Group là một tập hợp của nhiều user. User là đại diện cho một người, hay một dịch vụ sử dụng các dịch vụ OpenStack và được chứa trong một Domain cụ thể.</br>
 &emsp;Mối quan hệ của Domain, project, user và group được thể hiện trong hình sau:</br>
-<img src="img_KeyStone/relationship.png"/><br><br>
+<img src="img/relationship.png"/><br><br>
 &emsp;Các user, group và project luôn luôn nằm trong phạm vi của Domain. Điều này dẫn đến, một tên của user hay groups hay project có thể được sử dụng trên các Domain khác nhau. Ví dụ như user “Alice” hoặc groups “Adminstrator” đều có ở cả IBM và Acme Inc.</br>
 <h3><a name="khaiNiem_role">3.1.1.4	 Role</a></h3></br>
 &emsp;Role được sử dụng trong Keystone để xác định những quyền mà môt user hay group có thể thực hiện với một tài nguyên OpenStack.</br>
@@ -324,13 +324,13 @@ Khởi động lại dịch vụ NTP
 <h3><a name="khaiNiem_token">3.1.1.5	 Token</a></h3></br>
 &emsp;Khi người dùng gọi đến bất kỳ một API OpenStack thì họ phải chứng minh được rằng họ là ai và họ phải được cho phép để gọi đến các API. Thực hiện việc này bằng cách truyền một token OpenStack vào trong lời gọi API. Keystone là dịch vụ duy nhất chịu trách nhiệm tạo ra token. Người dùng nhận một token khi xác thực thành công với Keystone. Token chứa quyền của một user trong cloud. Nó bao gồm một ID và một payload. ID đảm bảo tính duy nhất của token trên mỗi cloud và payload chứa dữ liệu về người dùng.</br>
 &emsp;Ví dụ: một token sẽ chứa nhiều trường thể hiện các thuộc tính Identity và Authorization về một user trong một project.</br>
- <img src="img_KeyStone/exTokenV3.png"/><br><br>
+ <img src="img/exTokenV3.png"/><br><br>
 &emsp;Token trên chứa những thông tin sau: Khi nào token được tạo ra; Khi nào token hết hạn, user nào đã được xác thực- do đó, được phép sử dụng token này; xác định project nào token này có giá trị; Và cuối cùng là Catalog chứa các dịch vụ trong OpenStack.</br>
 <h3><a name="khaiNiem_catalog">3.1.1.6	 Catalog</a></h3></br>
 &emsp;Catalog là danh mục chứa các URL và các endpoint của các dịch vụ OpenStack khác nhau. Nó rất cần thiết cho OpenStack, thiếu catalog thì các user, và các ứng dụng sẽ không biết địa chỉ để gửi request tạo một máy ảo hoặc là lưu trữ một đối tượng.</br>
 &emsp;Catalog được chứa các endpoint và mỗi endpoints chứa một admin URL, enternal URL và public URL.</br>
 &emsp;Ví dụ về một Catalog chỉ chứa hai dịch vụ Object Storage và Identity</br>
-  <img src="img_KeyStone/exCatolog.png"/><br><br>
+  <img src="img/exCatolog.png"/><br><br>
 &emsp;Trên đây là các khái niệm trong OpenStack, tiếp theo sẽ đi vào chi tiết các tính năng của Keystone.</br>
 <h3><a name="tq_identity">3.1.2	Identity</a></h3></br>
 &emsp;Dịch vụ Identity trong Keystone cung cấp các Actor (user hay group). Identity trong Openstack có thể đến từ các vị trí khác nhau như SQL, LDAP hay Federated Identity Provider.</br>
@@ -374,7 +374,7 @@ Khởi động lại dịch vụ NTP
 <h3><a name="iden_backends">3.1.2.3 Multiple Backend</a></h3></br>
 &emsp;Keystone hỗ trợ sử dụng multiple backend, nghĩa là mỗi domain có thể sử dụng một backend</br>
 &emsp;Ví dụ: Trong ví dụ sau, Identity sử dụng LDAP cho Domain A và Domain B, một SQL để lưu trữ các service account và các Assignment</br>
-<img src="img_KeyStone/multiple_backend.png"/><br><br>
+<img src="img/multiple_backend.png"/><br><br>
 &emsp;Ưu, nhược điểm khi sử dụng multiple backend:</br>
 <ul>
     <li>Ưu điểm:
@@ -442,21 +442,21 @@ Khởi động lại dịch vụ NTP
 &emsp;Keystone sử dụng hai cách để xác thực là cung cấp password hoặc sử dụng một token.</br>
 <h3><a name="authen_pass">3.1.3.1	Password</a></h3></br>
 &emsp;Cách phổ biến là các user hay service có thể xác thực là cung cấp một password. Ví dụ dưới đây là payload request đến keystone. Nó thể hiện tất cả thông tin cần thiết cho việc xác thực bao gồm thông tin user và scope của user đó</br>
-  <img src="img_KeyStone/password.png"/><br><br>
+  <img src="img/password.png"/><br><br>
 &emsp;Phần scope là không bắt buộc,nhưng nó thường xuyên được dùng. Bởi vì, thiếu scope user sẽ không lấy được một catalog các service. Scope được sử dụng để chỉ ra những project mà người dùng muốn làm việc. Nếu người dùng không có role trong project này, thì yêu cầu bị hủy bỏ. Cũng giống như phần user, phần scope cũng phải có đầy đủ thông tin về project mà user muốn tìm. Việc này để tránh trương hợp va chạm tên Project.</br>
 <h3><a name="authen_token">3.1.3.2	Token</a></h3></br>
 &emsp;Tương tự như password, user yêu cầu một token mới bằng cách cung cấp token hiện tại. Dưới đây là một ví dụ về một request token mới</br> 
- <img src="img_KeyStone/exToken.png"/><br><br>
+ <img src="img/exToken.png"/><br><br>
  <h3><a name="tq_author">3.1.4	Access Management và Authorization </a></h3></br>
 &emsp;KeyStone tạo ra một chính sách Role-Based Access Control (RBAC), thực thi tại mỗi public API endpoint. Các chính sách được lưu trong file policy.json, nó bao gồm mục tiêu và quy tắc. Mỗi luật bắt đầu với " identity:" </br>
-<img src="img_KeyStone/password_diagram.png"/><br><br>
+<img src="img/password_diagram.png"/><br><br>
 <h3><a name="tq_format">3.1.5	Các định dạng Token </a></h3></br>
 <h3><a name="format_uuid">3.1.5.1	UUID </a></h3></br>
 &emsp;Trong những ngày đầu tiên, định dạng token của Keystone là UUID format. UUID format đơn giản chỉ lại một chuỗi 32 ký tự được sinh ngẫu nhiên. Token này được cung cấp và được xác thực bởi dịch vụ identity. </br>
 &emsp;Lợi ích của Token format này là token nhỏ (ngắn) và dễ sử dụng, đủ đơn giản để có thể thêm vào trong các lệnh cURL. </br>
 &emsp;Tuy nhiên nhược điểm của nó là không mang đủ những thông tin để có thể xác thực một cách trực tiếp các dữ liệu và request. Các dịch vụ của openstack cứ liên tục phải gửi lại token về phía keystone server để xác thực các request đến các service đó. Dẫn đến bất kì hành động nào trong Openstack đều phải thông qua keystone server.</br>
 <b>UUID Token Generation Workflow</b></br>
-<img src="img_KeyStone/uuid-token_generation.png"/><br><br>
+<img src="img/uuid-token_generation.png"/><br><br>
 &emsp;Khi user gửi yều cầu tạo token đến Keystone với các thông tin Username, password và Project Name, Keystone sẽ thực hiện các bước sau để tạo ra UUID Token</br>
 <ol>
     <li>Xác nhận user và lấy user ID</li>
@@ -467,7 +467,7 @@ Khởi động lại dịch vụ NTP
 &emsp;Lưu giữ các thông tin Token ID, Expiration, Valid, User ID, Extra vào backend.</br>
 </ol>
 <b>UUID Token Validation Workflow</b></br>
-<img src="img_KeyStone/uuid-token_validation.png"/><br><br>
+<img src="img/uuid-token_validation.png"/><br><br>
 &emsp;Quá trình xác minh UUID Token như sau:</br>
 <ol>
     <li>Sử dụng câu lệnh “GET v3/auth/tokens” để gửi token đến Keystone </li>
@@ -477,7 +477,7 @@ Khởi động lại dịch vụ NTP
     <li>Kiểm tra xem Token đã bị thu hồi hay chưa? Nếu đã bị thu hồi, thì trả về “Token Not Found”. Nếu đúng, trả về “HTTP/1.1 200 OK” (có nghĩa là token sử dụng được)</li>
 </ol>
 <b>UUID Token Revocation Workflow</b></br> 
-<img src="img_KeyStone/uuid - token_revocation.png"/><br><br>
+<img src="img/uuid - token_revocation.png"/><br><br>
 &emsp;Quá trình thu hồi một token thực hiện như sau:</br>
 <ol>
     <li>Gửi request “DELETE v3/auth/tokens” đến Keystone để yêu cầu thu hồi token. Trước khi thu hồi token, thì phải thực hiện xác minh token (thực hiện các bước như trên)</li>
@@ -503,7 +503,7 @@ Khởi động lại dịch vụ NTP
     <li>Keystone phải lưu các token với rất nhiều thông tin trong backend database với nhiều mục đích, chẳng hạn như tạo danh sách các token đã bị thu hồi. Hệ quả là người dùng phải lo về việc phải flush Keystone token database định kì tránh ảnh hưởng hiệu suất.</li>
 </ul>
 <b>Token PKI/PKIZ Generation Workflow</b></br>
-<img src="img_KeyStone/pki-token_generation.png"/><br><br>
+<img src="img/pki-token_generation.png"/><br><br>
 <ol>
     <li>User gửi request đến Keystone.</li>
     <li>Xác minh identity, resource (project và domain), assignment</li>
@@ -528,7 +528,7 @@ Khởi động lại dịch vụ NTP
 </ul>
 &emsp;Fernet key có một chu kỳ, được bắt đầu từ Staged key, sau đó được nâng lên Primary key và cuối cùng giảm xuống Secondary key. Fernet key được lưu trữ trong file “/etc/keystone/fernet-keys”</br>
 <b>Fernet key rotation</b></br>
-<img src="img_KeyStone/fernet_key_rotation.png"/><br><br>
+<img src="img/fernet_key_rotation.png"/><br><br>
 &emsp;Quá trình rotate key cụ thể như sau:</br>
 <ul>
     <li>Ban đầu: Key reponsitory sẽ có Staged key và primary key. Không có secondary key.</li>
@@ -538,7 +538,7 @@ Khởi động lại dịch vụ NTP
 </ul>
 &emsp;Vậy thì key reponsitory sẽ bị quá tải khi số lượng secondary key tăng lên? Không, key reponsitory sẽ có số lượng key cố định, khi vượt mức thì nó sẽ xóa secondary key xuất hiện sớm nhất.</br>
 <b>Token Generation Workflow</b></br>
-<img src="img_KeyStone/fernet-token_generation.png"/><br><br>
+<img src="img/fernet-token_generation.png"/><br><br>
 &emsp;Sau khi nhận được yêu cầu tạo token từ user Keystone sẽ thực hiện quá trình tạo token:</br>
 &emsp;Như hình trên, token bao gồm các trường sau:</br>
 <ol>
@@ -549,7 +549,7 @@ Khởi động lại dịch vụ NTP
     <li>HMAC: là tổng hợp tất cả các trường trên và “ký” sử dụng signing key mà user cung cấp </li>
 </ol>
 <b>Token Validation Workflow</b></br>
-<img src="img_KeyStone/fernet-token_validation.png"/><br><br>
+<img src="img/fernet-token_validation.png"/><br><br>
 &emsp;Quá trình validation token cụ thể như sau:</br>
 <ol>
     <li>User gửi yêu cầu validation đến keystone với phương thức: GET v3/auth/tokens</li>
@@ -563,7 +563,7 @@ Khởi động lại dịch vụ NTP
 <b>Token Validation Workflow</b></br>
 &emsp;Tương tự UUID và PKI/ PKIZ </br>
 <b>Multiple Data Center</b></br>
-<img src="img_KeyStone/fernet-multiple_data_center.jpg"/><br><br>
+<img src="img/fernet-multiple_data_center.jpg"/><br><br>
 &emsp;Giả sử triển khai hệ thống cloud với keystone ở cả hai bên US-WEST và US-EAST. Cả hai bên này đều có LDAP và Database luôn luôn được đồng bộ. Hoạt động của keystone khi user muốn thực hiện tạo một máy ảo VM như sau:</br>
 <ul>
     <li>User sử dụng Nova ở US-WEST:
@@ -584,7 +584,7 @@ Khởi động lại dịch vụ NTP
 </ul>
 <h3><a name="tq_activity">3.1.6	Hoạt động của Keystone</a></h3></br>
 &emsp;Biểu đồ tuẩn tự dưới đây sẽ mô tả quá trình hoạt động của Keystone trong ví dụ cụ thể là tạo một máy ảo VM.</br>
-<img src="img_KeyStone/keystone_process_flow.png"/><br><br>
+<img src="img/keystone_process_flow.png"/><br><br>
 &emsp;Cụ thể các bước như sau :</br>
 <ol>
     <li>User gửi thông tin username và password đến keystone.</li>
