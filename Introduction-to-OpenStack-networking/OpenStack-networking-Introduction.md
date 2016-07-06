@@ -1,7 +1,9 @@
-#Giới thiệu về networking trong OpenStack
-OpenStack Networking có vai trò quản lý các dịch vụ về hệ thống mạng trong môi trường OpenStack. Khi xây dựng nên hệ thống OpenStack, chúng ta quan tâm nhiều tới Việc triển khai hạ tầng mạng trên Layer2 và Layer3. Trong đó, ở Layer 2, thì vấn đề quan trọng nhất mà chúng ta quan tâm là xây dựng được các mạng cục bộ (Local Area Network -LAN). Có nhiều loại mạng cục bộ khác nhau có thể triển khai đồng thời trong OpenStack: VLAN, VXLAN, GRE, Flat. 
+#Giới thiệu về Layer 2 networking deployment trong OpenStack
+Trong hệ thống OpenStack, các dịch vụ về OpenStack Networking có trách nhiệm xây dựng và quản lý hệ thống mạng ảo cho. Khi triển khai hạ tầng mạng ảo, chúng ta quan tâm tới việc triển khai hệ thống mạng ở Layer 2 và Layer 3. Ở bài viết này chúng ta sẽ tập trung tìm hiểu vấn đề triển khai Layer 2 với OpenStack Networking.
 
-Tuy cách thức hoạt động và khả năng của từng loại mạng là khác nhau, tuy nhiên về cơ bản thì các mạng cục bộ đều bao gồm các thành phần là các switch, dây dẫn và các máy khách kết nối vào mạng. Trong mạng cục bộ, thì switch là thành phần trung tâm, là thiết bị mà các máy khách kết nối đến, và kết nối với các switch khác để tạo thành một mạng lưới hoàn chỉnh. Vì vậy, khi xây dựng môi trường mạng ảo trong OpenStack, một điểm mà chúng ta cần chú trọng là việc lựa chọn công nghệ để xây dựng các switch ảo và lên kế hoạch cấu hình các switch ảo đó trong môi trường vật lý. Hiện tại OpenStack hỗ trợ rất nhiều plugin ảo hóa switch, tuy nhiên do thời gian tìm hiểu có hạn, trong bài viết này chúng ta sẽ tìm hiểu 2 plugin phổ biến là Linux-bridge plugin và Open vSwitch plugin
+Ở Layer 2, vấn đề quan trọng nhất mà chúng ta quan tâm là xây dựng được hệ thống các mạng cục bộ (Local Area Network -LAN).Trên cloud có thể tồn tại nhiều mạng cục bộ, bao gồm mạng công khai chia sẻ, tất cả mọi project đều có thể sử dụng và mạng nội bộ mang tính riêng biệt, chỉ có project sở hữu mới có thể sử dụng. Các loại mạng cục bộ khác nhau có thể triển khai trên OpenStack cloud là: VLAN, VXLAN, GRE, Flat. 
+
+Tuy cách thức hoạt động và khả năng của từng loại mạng là khác nhau, nhưng về cơ bản thì các mạng cục bộ đều có thành phần là các switch, dây dẫn và các máy khách kết nối vào mạng. Trong mạng cục bộ, thì switch là thành phần trung tâm, là thiết bị mà các máy khách kết nối đến, và kết nối với các switch khác để tạo thành một mạng lưới hoàn chỉnh. Vì vậy, khi xây dựng môi trường mạng ảo trong OpenStack, một điểm mà chúng ta cần chú trọng là việc lựa chọn công nghệ để xây dựng các switch ảo và lên kế hoạch cấu hình các switch ảo đó trong môi trường vật lý. Hiện tại OpenStack hỗ trợ rất nhiều plugin ảo hóa switch, tuy nhiên do thời gian tìm hiểu có hạn, trong bài viết này chúng ta sẽ tìm hiểu 2 plugin phổ biến là Linux-bridge plugin và Open vSwitch plugin
 
 Nội dung bài viết gồm có 3 phần:
 
@@ -30,7 +32,19 @@ Trên một miền quảng bá vật lý, không thể triển khai nhiều hơn
 
 Quá trình gửi tin trong mạng flat network được mô tả thông qua ví dụ sau:
 
-Như trong hình vẽ, ta có 2 mạng ```flat network 1``` và ```flat network 2``` được xây dựng trên 2 miền quảng bá khác nhau. Trong mạng flat network 1, Máy ```Computer 1``` muốn gửi một gói tin L2 frame tới máy ```Computer 2``` thông qua layer 2. Khi đó máy computer 1 sẽ cấu hình L2 frame với địa chỉ nguồn là MAC của máy 1, địa chỉ đích là MAC của máy 2 rồi gửi tới node kế tiếp thông qua card mạng nối nó tới mạng  flat network 1. Sau đó, gói tin tới  ```Switch 1```. Switch 1 kiểm tra địa chỉ của gói tin và tìm kiếm trong bảng định tuyến của nó, nó sẽ biết được phải chuyển tiếp gói tin tới ```Switch 2```. Khi gói tin tới Switch 2, nó tiếp tục tra bảng định tuyến để tìm đích kế tiếp cho gói tin, vì vậy sau đó nó gửi gói tin tới ```Switch 4```. Khi gói tin tới Switch 4, vì Switch 4 kết nối trực tiếp với máy 2 nên sau khi tra bảng định tuyến, nó gửi gói tin tới Computer 2. Việc truyền gói tin L2 frame từ máy Computer 1 tới máy Computer 2 hoàn tất. Có thể thấy trong quá trình chuyển tiếp gói tin giữa các switch, gói tin được giữ nguyên, không thêm thông tin định dang mạng nào đính kèm vào gói tin. 
+Như trong hình vẽ, ta có 2 mạng ```flat network 1``` và ```flat network 2``` được xây dựng trên 2 miền quảng bá khác nhau. Trong mạng flat network 1, Máy ```Computer 1``` muốn gửi một gói tin L2 frame tới máy ```Computer 2``` thông qua layer 2. Quá trình chuyển tin xảy ra như sau:
+- Computer 1 cấu hình L2 frame với địa chỉ nguồn là MAC của máy 1, địa chỉ đích là MAC của máy 2 
+- Computer 1 gửi tới node kế tiếp (Switch 1) thông qua card mạng nối nó tới mạng  flat network 1. 
+
+- Khi nhận được gói tin, Switch 1 kiểm tra địa chỉ của gói tin và tìm kiếm trong bảng định tuyến của nó. Sau đó nó chuyển tiếp gói tin tới ```Switch 2```.
+
+-  Khi gói tin tới Switch 2, Switch 2 tra bảng định tuyến để tìm đích kế tiếp cho gói tin, vì vậy sau đó nó gửi gói tin tới ```Switch 4```. 
+
+-  Khi gói tin tới Switch 4, vì Switch 4 kết nối trực tiếp với máy 2 nên sau khi tra bảng định tuyến, nó gửi gói tin tới Computer 2.
+
+-  Gói tin tới Computer 2. Việc truyền gói tin L2 frame từ máy Computer 1 tới máy Computer 2 hoàn tất. 
+
+Có thể thấy trong quá trình chuyển tiếp gói tin giữa các switch, gói tin được giữ nguyên, không thêm thông tin định dang mạng nào đính kèm vào gói tin. 
 ###1.2.2 Mạng VLAN
 Một vấn đề thường xuyên gặp phải khi thiết kế hệ thống mạng là, cần phân chia một miền quảng bá lớn ra thành nhiều mạng cục bộ độc lập với nhau. Chúng ta có thể sử dụng công nghệ VLAN để giải quyết vấn đề này.
 ![VLAN network.png](./img/VLAN-network.png)
