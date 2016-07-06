@@ -234,4 +234,228 @@ Trên một địa chỉ IP của một card mạng vật lý có thể triển 
 Linux-bridge plugin hiện thời không hỗ trợ mạng GRE.
 #Phần 3: Open vSwitch và triển khai của các loại mạng sử dụng Open vSwitch plugin trong OpenStack
 ##3.1 Giới thiệu về Open vSwitch
-Open vSwitch là một service cho phép tạo ra và quản lý 1 loại switch ảo trên môi trường Linux.
+Open vSwitch là một service cho phép tạo ra và quản lý các đối tượng switch ảo trên môi trường Linux. Tuy cũng sử dụng các switch ảo kết nối với các máy ảo và hệ thống mạng vật lý để thiết lập hệ thống mạng ảo, tuy nhiên cách triển khai mạng ảo bằng Open vSwitch plugin có sự khác biệt so với sử dụng Linux Bridge plugin để triển khai mạng ảo. Chúng ta sẽ thấy sự khác biệt này khi nhìn vào cách sơ đồ chi tiết của các loại mạng khi sử dụng Open vSwitch để triển khai.
+Chi tiết về Open vSwitch có thể được tìm thấy ở ```http://openvswitch.org/```
+##3.2 Triển khai các loại mạng cục bộ với Open vSwitch plugin
+Khi triển khai các loại mạng cục bộ với Open vSwitch plugin, mô hình chung của các mạng này sẽ là: Ở mỗi một node sẽ có 1 open vswitch ảo đóng vai trò switch trung tâm trong node đó, được đặt tên là br-int. Để kết nối với hệ thống mạng bên ngoài, mỗi một card vật lý sẽ được kết nối với một open vswitch, các switch  này lại nối với switch trung tâm. Node trung tâm kết nối với các máy ảo trong node thông qua một switch ảo khác thuộc loại linux bridge. Như vậy, chúng ta cần hiểu, khi sử dụng Open vSwitch plugin, trong hệ thống mạng ảo sẽ sử dụng 2 loại switch ảo là linux bridge và Open vSwitch. Ở đây, linux  bridge được sử dụng để triển khai các tường lửa cho các máy ảo trong node. Tuy cách thiết kế các mạng ảo đều theo mô hình như trên, nhưng cấu hình các switch sẽ khác nhau tùy thuộc vào loại mạng triển khai. 
+
+Để tìm hiểu xem các switch ảo trong hệ thống mạng ảo được cấu hình như thế nào, chúng ta cần hiểu được một số khái niệm sau:
+####Các openvswitch ảo có trong 1 node và các port của một openvswitch ảo
+Để kiểm tra được mô hình mạng ảo trong 1 node, bước đầu tiên chúng ta cần kiểm tra được những switch nào đang được triển khai trên node đó.
+Ta xét một mô hình mạng trên 1 node, node này có 3 card mạng eth0, eth1, eth2. Trên node triển khai 5 máy ảo, mỗi máy ảo kết nối với switch trung tâm qua 1 linux bridge. Khi đó ta có mô hình của node như sau
+![Ovs-3Physic.png](./img/Ovs-3Physic.png)
+Kiểm tra các switch ảo, ta thấy được các switch kết nối với các thiết bị khác qua các cổng nào:
+```sh
+root@compute:/home/cong# ovs-vsctl show
+    Bridge br-tun
+        fail_mode: secure
+        Port br-tun
+            Interface br-tun
+                type: internal
+        Port patch-int
+            Interface patch-int
+                type: patch
+                options: {peer=patch-tun}
+        Port "vxlan-0a0a0a0a"
+            Interface "vxlan-0a0a0a0a"
+                type: vxlan
+                options: {df_default="true", in_key=flow, local_ip="10.10.10.11", out_key=flow, remote_ip="10.10.10.10"}
+    Bridge br-vlan
+        Port "eth2"
+            Interface "eth2"
+        Port br-vlan
+            Interface br-vlan
+                type: internal
+        Port phy-br-vlan
+            Interface phy-br-vlan
+                type: patch
+                options: {peer=int-br-vlan}
+    Bridge br-ex
+        Port br-ex
+            Interface br-ex
+                type: internal
+        Port phy-br-ex
+            Interface phy-br-ex
+                type: patch
+                options: {peer=int-br-ex}
+        Port "eth1"
+            Interface "eth1"
+    Bridge br-int
+        fail_mode: secure
+        Port "qvo1fed3e27-84"
+            tag: 3
+            Interface "qvo1fed3e27-84"
+        Port int-br-provider
+            Interface int-br-provider
+                type: patch
+                options: {peer=phy-br-provider}
+        Port "qvo0fbe5cba-9e"
+            tag: 4
+            Interface "qvo0fbe5cba-9e"
+        Port br-int
+            Interface br-int
+                type: internal
+        Port "qvo7be3c33f-f4"
+            tag: 2
+            Interface "qvo7be3c33f-f4"
+        Port int-br-ex
+            Interface int-br-ex
+                type: patch
+                options: {peer=phy-br-ex}
+        Port "qvo28447704-dc"
+            tag: 3
+            Interface "qvo28447704-dc"
+        Port patch-tun
+            Interface patch-tun
+                type: patch
+                options: {peer=patch-int}
+        Port "qvob362bedf-c1"
+            tag: 1
+            Interface "qvob362bedf-c1"
+        Port int-br-vlan
+            Interface int-br-vlan
+                type: patch
+                options: {peer=phy-br-vlan}
+    ovs_version: "2.5.0"
+root@compute:/home/cong# brctl show
+bridge name			bridge id		STP enabled		interfaces
+qbr0fbe5cba-9e		8000.fe163e333534	no			qvb0fbe5cba-9e
+														tap0fbe5cba-9e
+qbr1fed3e27-84		8000.1207cb57696a	no			qvb1fed3e27-84
+														tap1fed3e27-84
+qbr28447704-dc		8000.9a6f234eba4f	no			qvb28447704-dc
+														tap28447704-dc
+qbr7be3c33f-f4		8000.62d8f048c2e5	no			qvb7be3c33f-f4
+														tap7be3c33f-f4
+qbrb362bedf-c1		8000.9686eedeba00	no			qvbb362bedf-c1
+														tapb362bedf-c1
+
+```
+Như đã nói ở trên, mỗi card vật lý được triển khai mạng ảo sẽ được triển khai một openvswitch, do đó khi chúng ta sử dụng lệnh ```ovs-vsctl show``` để kiểm tra, chúng ta có thể thấy trên node sẽ có 4 open vswitch, bao gồm 3 switch liên kết với 3 node vật lý và 1 openvswitch trung tâm. Sử dụng lệnh ```brctl show```, chúng ta có thể thấy trên hệ thống có 5 Linux Bridge, mỗi bridge phục vụ cho 1 máy ảo.
+1 switch có nhiều cổng để kết nối tới các máy khách, các card vật lý hoặc các switch khác. Khi kiểm tra xem một switch có các cổng nào, chúng ta đồng thời cũng có thể biết được switch đó đang kết nối với các thiết bị nảo qua cổng nào. Ví dụ như khi chúng ta sử dụng các câu lệnh trên để kiểm tra trên 1 node, chúng ta có thể thấy
+```sh
+ Bridge br-vlan
+        Port "eth2"
+            Interface "eth2"
+        Port br-vlan
+            Interface br-vlan
+                type: internal
+        Port phy-br-vlan
+            Interface phy-br-vlan
+                type: patch
+                options: {peer=int-br-vlan}
+```
+openvswitch này có 3 port, trong đó có một port là internal, 2 port còn lại, port ```br-vlan``` kết nối trực tiếp tới card vật lý eth2, port ```phy-br-vlan```
+nối với openvswitch br-int. Hoặc chúng ta xét openvswitch trung tâm
+```sh
+    Bridge br-int
+        fail_mode: secure
+        Port "qvo1fed3e27-84"
+            tag: 3
+            Interface "qvo1fed3e27-84"
+        Port int-br-provider
+            Interface int-br-provider
+                type: patch
+                options: {peer=phy-br-provider}
+        Port "qvo0fbe5cba-9e"
+            tag: 4
+            Interface "qvo0fbe5cba-9e"
+        Port br-int
+            Interface br-int
+                type: internal
+        Port "qvo7be3c33f-f4"
+            tag: 2
+            Interface "qvo7be3c33f-f4"
+        Port int-br-ex
+            Interface int-br-ex
+                type: patch
+                options: {peer=phy-br-ex}
+        Port "qvo28447704-dc"
+            tag: 3
+            Interface "qvo28447704-dc"
+        Port patch-tun
+            Interface patch-tun
+                type: patch
+                options: {peer=patch-int}
+        Port "qvob362bedf-c1"
+            tag: 1
+            Interface "qvob362bedf-c1"
+        Port int-br-vlan
+            Interface int-br-vlan
+                type: patch
+                options: {peer=phy-br-vlan}
+```
+chúng ta có thể thấy openvswitch này kết nối tới openvswitch br-vlan qua port ```int-br-vlan``` , kết nối với openvswitch br-tun qua port ```patch-tun```, kết nối với openvswitch br-ex qua port ```int-br-ex```. Đồng thời openvswitch trung tâm kết nối với các linux bridge thông qua các port ```qvoxxxx```, tương ứng với chúng là các linux bridge có tên là ```qbrxxxx```
+
+Để có thể xem rõ hơn về các port của một openvswitch, chúng ta có thể dùng lệnh ```ovs-ofctl show <tên openvSwitch>```, ví dụ
+```sh
+root@compute:/home/cong# ovs-ofctl show br-int
+OFPT_FEATURES_REPLY (xid=0x2): dpid:00008abe90f05b41
+n_tables:254, n_buffers:256
+capabilities: FLOW_STATS TABLE_STATS PORT_STATS QUEUE_STATS ARP_MATCH_IP
+actions: output enqueue set_vlan_vid set_vlan_pcp strip_vlan mod_dl_src mod_dl_dst mod_nw_src mod_nw_dst mod_nw_tos mod_tp_src mod_tp_dst
+ 1(int-br-provider): addr:12:78:40:51:11:b1
+     config:     0
+     state:      0
+     speed: 0 Mbps now, 0 Mbps max
+ 2(int-br-vlan): addr:6a:22:c4:28:8d:d1
+     config:     0
+     state:      0
+     speed: 0 Mbps now, 0 Mbps max
+ 3(int-br-ex): addr:86:0d:b4:1c:e7:83
+     config:     0
+     state:      0
+     speed: 0 Mbps now, 0 Mbps max
+ 4(patch-tun): addr:c2:dd:86:2f:7d:1c
+     config:     0
+     state:      0
+     speed: 0 Mbps now, 0 Mbps max
+ 5(qvob362bedf-c1): addr:22:f3:c9:17:20:10
+     config:     0
+     state:      0
+     current:    10GB-FD COPPER
+     speed: 10000 Mbps now, 0 Mbps max
+ 7(qvo7be3c33f-f4): addr:ca:c9:72:09:87:e6
+     config:     0
+     state:      0
+     current:    10GB-FD COPPER
+     speed: 10000 Mbps now, 0 Mbps max
+ 8(qvo1fed3e27-84): addr:5a:75:f5:84:81:30
+     config:     0
+     state:      0
+     current:    10GB-FD COPPER
+     speed: 10000 Mbps now, 0 Mbps max
+ 9(qvo0fbe5cba-9e): addr:4a:41:8f:03:d7:2a
+     config:     0
+     state:      0
+     current:    10GB-FD COPPER
+     speed: 10000 Mbps now, 0 Mbps max
+ 10(qvo28447704-dc): addr:46:9a:8c:4e:f8:48
+     config:     0
+     state:      0
+     current:    10GB-FD COPPER
+     speed: 10000 Mbps now, 0 Mbps max
+ LOCAL(br-int): addr:8a:be:90:f0:5b:41
+     config:     PORT_DOWN
+     state:      LINK_DOWN
+     speed: 0 Mbps now, 0 Mbps max
+OFPT_GET_CONFIG_REPLY (xid=0x4): frags=normal miss_send_len=0
+
+```
+
+Như vậy, chúng ta có thể nhìn thấy được các switch ảo có trong một node và sự kết nối giữa chúng với các thiết bị khác qua các port như thế nào. Điều tiếp theo chúng ta cần xem xét là các switch ảo trên xử lý các gói tin vào ra bằng cách nào với từng loại mạng cục bộ. Để giải quyết việc này, các openvswitch sử dụng một cơ chế để xử lý các gói dữ liệu tương ứng với các thông tin định danh của gói dữ liệu đó, được gọi là ```flow-rules```. Do cơ chế hoạt động của openVswitch, cách xử lý thông tin định danh của open vSwitch có sự khác biệt so với hoạt động của các switch thông thường. Chúng ta sẽ làm rõ điều này hơn khi đi vào flow rules của từng loại mạng cụ thể. Ở đây chúng ta thử xem xét xem flow rules của một open vSwitch có dạng như thế nào. Sử dụng câu lệnh ```ovs-ofctl dump-flows <bridge>``` để xem flow rule của một bridge nào đó. Ở đây chúng ta thử xem flow rule của br-int
+
+```sh
+ovs-ofctl dump-flows --rsort  br-int
+ cookie=0xb595b9f297d967e0, duration=476.373s, table=0, n_packets=78, n_bytes=8679, priority=3,in_port=2,dl_vlan=4 actions=mod_vlan_vid:1,NORMAL
+ cookie=0xb595b9f297d967e0, duration=472.277s, table=0, n_packets=83, n_bytes=9209, priority=3,in_port=2,dl_vlan=104 actions=mod_vlan_vid:2,NORMAL
+ cookie=0xb595b9f297d967e0, duration=471.938s, table=0, n_packets=61, n_bytes=6960, priority=3,in_port=3,dl_vlan=101 actions=mod_vlan_vid:3,NORMAL
+ cookie=0xb595b9f297d967e0, duration=532.100s, table=0, n_packets=33, n_bytes=4782, priority=2,in_port=2 actions=drop
+ cookie=0xb595b9f297d967e0, duration=529.854s, table=0, n_packets=610, n_bytes=42964, priority=2,in_port=3 actions=drop
+
+```
+Sau khi nắm được các khái niệm cơ bản trong một hệ thống mạng ảo sử dụng openvswitch plugin, chúng ta sẽ xem xem các khái niệm này được thể hiện như thế nào trong các loại mạng cục bộ.
+###3.2.1 Mạng VLAN
+
+###3.2.2
+Mạng Flat là mạng không sử dụng thêm bất kỳ thông tin gì để định danh gói tin khi truyền gói tin đi trong hệ thống mạng. Chính vì vậy mà một card mạng vật lý chỉ có thể triển khai nhiều nhất một mạng Flat. Tuy nhiên, sau khi triển khai mạng Flat, chúng ta vẫn có thể triển khai thêm nhiều mạng VLAN trên card mạng Flat đó. 
