@@ -1607,6 +1607,7 @@ connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
 	firewall_driver = nova.virt.firewall.NoopFirewallDriver
 	  ```
 - Khai báo trong section [oslo_messaging_rabbit] các dòng dưới. Do section[oslo_messaging_rabbit] chưa có nên ta khai báo thêm.
+
 ```sh
 [oslo_messaging_rabbit]
 rabbit_host = controller
@@ -1614,6 +1615,7 @@ rabbit_userid = openstack
 rabbit_password = Welcome123
   ```
 - Trong section [keystone_authtoken] khai báo các dòng dưới. Do section[keystone_authtoken] chưa có nên ta khai báo thêm.
+ 
  ```sh
 [keystone_authtoken]
 auth_uri = http://controller:5000
@@ -1627,22 +1629,29 @@ username = nova
 password = Welcome123
   ```
 - Trong section [vnc] khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section [vnc] chưa có nên ta khai báo thêm.
+
   ```sh
 [vnc]
 vncserver_listen = $my_ip
 vncserver_proxyclient_address = $my_ip
   ``` 
+  
 - Trong section [glance] khai báo dòng để nova kết nối tới API của glance. Do section [glance] chưa có nên ta khai báo thêm.
+
  ```sh
 [glance]
 api_servers = http://controller:9292
   ```
+  
 - Trong section [oslo_concurrency] khai báo dòng dưới. Do section [oslo_concurrency]chưa có nên ta khai báo thêm.
+  
    ```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
   ```
+  
 - Khai báo thêm section mới [neutron] để nova làm việc với neutron
+  
    ```sh
 [neutron]
 url = http://controller:9696
@@ -1658,7 +1667,9 @@ password = Welcome123
 service_metadata_proxy = True
 metadata_proxy_shred_secret = Welcome123
   ```
+  
   Tạo database cho nova:
+  
    ```sh
 # su -s /bin/sh -c "nova-manage api_db sync" nova
 # su -s /bin/sh -c "nova-manage db sync" nova
