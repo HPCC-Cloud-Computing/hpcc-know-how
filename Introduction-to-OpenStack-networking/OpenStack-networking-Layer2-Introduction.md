@@ -892,7 +892,9 @@ Trên đây là một số kiến thức về các loại mạng nội bộ và 
 
 - http://www.opencloudblog.com
 
-- OpenStack Networking Guide
+- OpenStack Networking Guide 
+
+- http://docs.openstack.org/mitaka/networking-guide/deploy.html
 
 - http://www.cisco.com/c/en/us/products/collateral/switches/nexus-9000-series-switches/white-paper-c11-729383.html
 
@@ -903,5 +905,7 @@ Trên đây là một số kiến thức về các loại mạng nội bộ và 
 - https://assafmuller.com/2013/10/14/gre-tunnels-in-openstack-neutron/
 
 - https://tools.ietf.org/html/rfc2784
+- 
+- http://docs.ocselected.org/openstack-manuals/kilo/networking-guide/content/section_networking-scenarios.html
 
 Và còn rất nhiều bài blog, bài viết về networking trong OpenStack trên internet...
