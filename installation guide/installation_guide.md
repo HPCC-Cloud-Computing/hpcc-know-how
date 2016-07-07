@@ -1250,49 +1250,47 @@ Khi máy ảo bị xóa, ephemeral storage (khối lưu trữ không bền vữn
 	root@controller:~#
 
 	```
-<h2><a name="overview">5.1. Tóm tắt về dịch vụ OpenStack Compute</a></h2>
+##5. OpenStack Compute và cấu hình cài đặt Nova
+<a name="overview"></a>
+##5.1. Tóm tắt về dịch vụ OpenStack Compute
 Sử dụng OpenStack Compute để lưu trữ và quản lý hệ thống điện toán đám mây. OpenStack compute là 1 phần quan trọng của hệ thống cung cấp dịch vụ hạ tầng điện toán đám mây IaaS (Infrestructure-as-a-Service). Các module chính được viết bằng Python.
-</br></br>
-<img src="https://github.com/cloudcomputinghust/openstack-manual/blob/master/img_Glance/os%20.png"/>
-</br>
+
+![](./img/os .png)
+
 OS Compute tương tác với OS Identity (Keystone) để xác thực người dùng, tương tác với dịch vụ OS Image (Glance & Cinder) để lấy đĩa cài hệ điều hành, và OS Dashboard  để cung cấp dịch vụ tương tác cho người sử dụng và giao diện quản trị. Truy cập vào Image bị giới hạn bởi các project và các người dùng, và qouta cung cấp bị giới hạn cho project. OpenStack Compute có thể scale lên phần cứng chuẩn (mở rộng phần cứng vật lý), và tải xuống image để chạy thực thể.
-</br>
-<img src="https://github.com/cloudcomputinghust/openstack-manual/blob/master/img_Glance/nova%20architecture%202.png"/>
-</br></br>
+
+![](./img/nova architecture 2.png)
+
 Một số thành phần chính của OpenStack Compute:
-</br>
 <b>+ Cloud controller:</b> biểu diễn trạng thái tổng thể và tương tác với các thành phần khác. Các máy chủ API đóng vai trò như các web service front-end cho Cloud Controller.
-</br>
 Compute controller cung cấp các máy chủ tính toán có chứa luôn cả dịch vụ Compute.
-</br>
 <b>+ Object storage:</b> là 1 thành phần cung cấp các dịch vụ lưu trữ, bạn có thể sử dụng OpenStack Object Storage để thay thế.
-</br>
 <b>+ Auth manager:</b> cung cấp dịch vụ xác thực và ủy quền khi sử dụng hệ thống Compute. Bạn cũng có thể sử dụng OpenStack Identity như 1 dịch vụ xác thực riêng biệt để thay thế.
-</br>
 <b>+ Volume controller:</b> cung cấp các khối lưu trữ 1 cách nhanh chóng và thường xuyên cho các máy chủ compute.
-</br>
+
 <b>+ Network controller:</b> cung cấp các mạng ảo để cho phép các máy chủ compute tương tác với nhau và với mạng công cộng. Bạn cũng có thể sử dụng OpenStack Networking để thay thế.
-</br>
+
 <b>+ Scheduler:</b> được sử dụng để lựa chọn máy compute phù hợp nhất để triển khai 1 instance.
-</br></br>
+
+
 Các thành phần của nova được liên kết với nhau bằng Queue Server.Ở đây, Queue Server dùng rabbitmq, một gói phần mềm chuyên làm nhiệm vụ chuyển request đến đích tương ứng. Do các thành phần của nova đều hoàn toàn độc lập với nhau, có thể chạy trên các máy khác nhau, và số lượng mỗi thành phần là không hạn chế, trong trường hợp có 1 máy bị hỏng, rabbitmq sẽ chọn ra 1 máy khác có cùng dịch vụ để gởi request. Trạng thái của toàn bộ hệ thống sẽ được lưu trong 1 csdl. Cloud controller giao tiếp với các internal object sử dụng HTTP, nhưng nó giao tiếp với các dịch vụ scheduler, network controller và volume controller sử dụng AMQP (Advance Message Queuing Protocol). Để tránh bị block 1 thành phần trong khi đợi 1 response thì Compute sử dụng các cuộc gọi không đồng bộ, với 1 callback sẽ được kích hoạt khi nhận được 1 response. Một hệ điều hành ảo có thể được format và mount 1 thiết bị lưu trữ như vậy.
-</br></br>
+
 <b>Ảo hóa (Hypervisor)</b>
-</br>
+
 Compute điểu khiển ảo hóa thông qua 1 máy chủ API. Để chọn hypervisor tốt nhất để sử dụng khá khó khăn, bạn phải lấy tài nguyên, các tính năng được hỗ trợ, và yêu cầu thông số kỹ thuật cần thiết trong tài khoản. Tuy nhiên, phần lớn các phát triển của OpenStack sử dụng KVM và Xen-based.
-</br></br>
-<b>Projects, users và roles</b> </br>
+
+<b>Projects, users và roles</b>
 Hệ thống Compute được thiết kế để phục vụ nhiều người dùng khác nhau trong các project trên 1 hệ thống được chia sẻ, và dựa trên các vai trò truy cấp. Các role kiểm soát các hoạt động mà 1 user được phép thực hiện.
 </br>
 Các project bao gồm một VLAN riêng, và các volume, instance, images, keys, và các user. Một user có thể chỉ định project bằng cách gắn thêm project_id vào khóa truy cập (access key) của họ. Nếu không có project nào được chỉ định trong API request, Compute sẽ chọn 1 project có ID tương tự như user.
 </br>
 Đối với các project, bạn có thể sử dụng quota control để hạn chế:
-<ul>
-<li>Số lượng volume có thể được triển khai </li>
-<li>Số nhân xử lý và dung lượng Ram có thể được phân bổ</li>
-<li>Glián địa chỉ IP cho bất kỳ instance nào khi nó được chạy. Điều này cho phép các instance có thể có cùng 1 địa chỉ IP được public</li>
-<li>Cố định các địa chỉ IP được giao cho các instance giống nhau khi nó chạy. Điều này cho phép các instance có thể có địa chỉ IP public hay private giống nhau.</li>
-</ul>
+
+- Số lượng volume có thể được triển khai 
+- Số nhân xử lý và dung lượng Ram có thể được phân bổ
+- Glián địa chỉ IP cho bất kỳ instance nào khi nó được chạy. Điều này cho phép các instance có thể có cùng 1 địa chỉ IP được public
+- Cố định các địa chỉ IP được giao cho các instance giống nhau khi nó chạy. Điều này cho phép các instance có thể có địa chỉ IP public hay private giống nhau.
+
 Các role kiểm soát các hành động của 1 user được phép thực hiện. Theo mặc định, hầu hết các hành động không yêu cầu 1 role đặc biệt, nhưng bạn có thể cấu hình chúng bằng cách sửa file policy.json để thêm role cho user. Ví dụ, 1 luật có thể được định nghĩa để 1 user phải có quyền admin để có thể phân bổ 1 địa chỉ IP public.
 </br> 
 Một project hạn chế người dùng truy cập đến các image cụ thể. Mỗi user được gán 1 tên sử dụng và mật khẩu. 1  keypair cấp quyền truy nhập đến 1 instance được kích hoạt cho mỗi user, nhưng quota được thiết lập để cho mỗi project có thể kiểm soát sự tiêu thụ tài nguyên trên phần cứng vật lý có sẵn.
@@ -1345,21 +1343,26 @@ root@controller:/home/hamanhdong# nova flavor-list
 +-----+-----------+-----------+------+-----------+------+-------+-------------+-----------+
 ```
 
-<h2><a name="service" >5.2. Các service của OpenStack Compute</a></h2>
-<h3><a name="api">5.2.1.  API</a></h3>
+<a name="service" ></a>
+##5.2. Các service của OpenStack Compute
+<a name="api"></a>
+###5.2.1.  API
 <b>Nova-api service:</b> chấp nhận và phản hồi với người dùng cuối yêu cầu API Compute. Nó hỗ trợ các dịch vụ OpenStack Compute API, Amazon EC2 API, và Admin API đặc biệt để cho người dùng có đặc quyền thực hiện các hành vi chính. Nó thực thi một số chính sách và khởi tạo các hoạt động cùng nhau, ví dụ như chạy 1 instance.
 Theo mặc định, nova-api lắng nghe trên cổng 8773 đối với EC2 API và trên cồng 8774 đối với OpenStack API.
-</br>
+
 <b>Nova-api-metadata service:</b> chấp nhận các yêu cầu metadata từ các instance. Nova-api-metadata service thường được sử dụng khi bạn chạy ở chế độ đa máy chủ (multi-host) với cài đăth nova-network
 
-<h3><a name="compute_core">5.2.2. Compute core</a></h3>
-<img src="https://github.com/cloudcomputinghust/openstack-manual/blob/master/img_Glance/nova%20compute.jpg"/></br>
+<a name="compute_core"></a>
+###5.2.2. Compute core
+
+![](./img/nova compute.jpg)
+
 <b>Nova-compute service:</b> là 1 daemon tạo ra và chấm dứt các thể hiện của máy ảo thông qua các API của công nghệ tạo máy ảo đó. Ví dụ
-<ul>
-<li>XenAPI cho XenServer/XCP</li>
-	<li>Libvirt cho KVM hay QEMU</li>
-	<li>VMwareAPI cho VMware</li>
-	</ul>
+
+- XenAPI cho XenServer/XCP
+- Libvirt cho KVM hay QEMU
+- VMwareAPI cho VMware
+
 Tiến trình này khá phức tạp, về cơ bản, các daemon chấp nhận các hoạt động từ hàng đợi và thực hiện một loạt các lệnh hệ thống như chạy 1 máy ảo KVM và cập nhật trạng thái của nó trong database.
 </br>
 <b>Nova-scheduler service:</b> lấy một yêu cầu tạo máy ảo từ hàng đợi và xác định máy chủ compute mà nó chạy.
@@ -1368,11 +1371,13 @@ Tiến trình này khá phức tạp, về cơ bản, các daemon chấp nhận 
 </br>
 <b>Nova-cert module:</b> Một máy chủ daemon phục vụ dịch vụ Nova Cert cho chuẩn X509. Được sử dụng để tạo ra các giấy chứng nhận cho euca-bundle-image. Nó chỉ cần thiết cho EC2 API.
 
-<h3><a name="network">5.2.3. Networking for VMs</a></h3>
+<a name="network"></a>
+###5.2.3. Networking for VMs
 <b>Nova-network worker daemon:</b> tương tự như nova-compute, nó chấp nận nhiệm vụ kết nối mạng từ hàng đợi và điều khiển mạng. Nhiệm vụ thực hiện là thiet lập các giao diện cầu nối hoặc thay đổi các luật IPtables.
 </br>
 
-<h3><a name="console">5.2.4. Console interface </a></h3>
+<a name="console"></a>
+###5.2.4. Console interface 
 <b>Nova-consoleauth daemon: </b>dịch vụ này phải chạy trong giao diện proxy để hoạt động. Bạn có thể chạy các proxy của 1 trong 2 loại đối với 1 dịch vụ nova-consoleauth trong 1 cấu hình cluster duy nhất.
 </br>
 <b>Nova-novncproxy daemon:</b> cung cấp 1 proxy để truy cập chạy các instance thông qua 1 kết nối VNC. Hỗ trợ các client trên nền web với novnc.
@@ -1384,15 +1389,19 @@ Tiến trình này khá phức tạp, về cơ bản, các daemon chấp nhận 
 <b>Nova-cert daemon:</b> chứng nhận X509 (trong nova-cert module)
 </br>
 
-<h3><a name="command_line">5.2.5. Command-line clients and other interfaces</a></h3>
+<a name="command_line"></a>
+###5.2.5. Command-line clients and other interfaces
 <b>Nova client:</b> cho phép người dùng thực thi các lệnh như 1 quản trị viên được ủy quyền hay người dùng cuối.
 </br>
 
-<h3><a name="other_component">5.2.6. Other components</a></h3>
+<a name="other_component"></a>
+###5.2.6. Other components
 <b>Hàng đợi:</b> một trung tâm để truyền các tin nhắn giữa các daemon. Thường được thực hiện với RabbitMQ, nhưng về mặt lý thuyết có thể được thực hiện với 1 hàng đợi tin nhắn AMQP chẳng hạn như Zero MQ.
 Nova tạo ra một số loại hàng đợi thông điệp để tạo điều kiện giao tiếp giữa các daemon khác nhau. Chúng bao gồm: topics queue, fanout queue, và host queue. Topics queue sẽ cấp số cho các tin nhắn truyền đi vào các class riêng ứng với topic tương ứng của các worker daemon. Ví dụ, Nova sử dụng chúng để truyền các tin nhắn tới tất cả (hoặc một số) các volume daemon hay compute. Điều này cho phép Nova sử dụng worker đầu tiên có sẵn để xử lý tin nhắn. Host queue cho phép Nova gửi tin nhắn tới các dịch vụ riêng biệt trên các máy chủ cụ thể nào đó. Fanout queues hiện đang được sử dụng cho các thông báo của các dịch vụ phục vụ cho nova-scheduler worker.
 Để xem các topic trong RabbitMQ, bạn sử dụng lệnh:
-<img src="https://github.com/cloudcomputinghust/openstack-manual/blob/master/img_Glance/topic%20rabbitmq.jpg"/>
+
+![](./img/topic rabbitmq.jpg);
+
 </br>
 Để xem các hàng đợi được tạo ra trong RabbitMQ cho 1 node được cài đặt đơn giản, các bạn có thể dùng lệnh:
 </br>
@@ -1402,20 +1411,23 @@ $ sudo rabbitmqctl list_queues
 </br>
 Kết quả:
 </br>
-<img src="https://github.com/cloudcomputinghust/openstack-manual/blob/master/img_Glance/list%20queues.jpg"/>
+![](./img/list queues.jpg)
+
 </br>
 <b>Cơ sở dữ liệu SQL: </b>lưu trữ tất cả các trạng thái build-time và run-time cho 1 cơ sở hạ thầng điện toán đám mây, bao gồm:
-	<ul>
-	<li>Các loại instance sẵn có</li>
-	<li>Các instance trong sử dụng</li>
-	<li>Các project</li>
-	</ul>
+
+- Các loại instance sẵn có
+- Các instance trong sử dụng
+- Các project
+
 Về mặt lý thuyết, OpenStack Compute có thể hỗ trợ bất kỳ cơ sở dữ liệu nào mà SQL-Alchemy hỗ trợ. Csdl phổ biến là SQLite3 để thử nghiệm và phát triển công việc, MySQL và PostgreSQL.
 </br></br>
 
-<h2><a name="request">5.3. Xử lý khi nhận được request</a></h2>
+<a name="request"></a>
+##5.3. Xử lý khi nhận được request
 </br>
-<img src="https://ilearnstack.files.wordpress.com/2013/04/request-flow1.png"/>
+![](./img/request-flow1.png)
+
 </br>
 link: https://ilearnstack.com/2013/04/26/request-flow-for-provisioning-instance-in-openstack/</br>
 1. Từ Dashboard hoặc CLI, user nhập các thông tin chứng thực (ví dụ như user name và password) và thực hiện lời gọi REST tới Keystone để xác thực.</br>
@@ -1449,8 +1461,11 @@ link: https://ilearnstack.com/2013/04/26/request-flow-for-provisioning-instance-
 28. Nova-compute tạo ra dữ liệu cho hypervisor drriver và thực thi yêu cầu tạo máy ảo trên Hypervisor
 </br></br>
 
-<h2><a name="install_nova_controller">5.4. Cài đặt và cấu hình nova trên node Controller</a></h2>
-<h3><a name="create_db_enpoint">5.4.1. Tạo database và endpoint cho nova</a></h3>
+<a name="install_nova_controller"></a>
+##5.4. Cài đặt và cấu hình nova trên node Controller
+<a name="create_db_enpoint"></a>
+###5.4.1. Tạo database và endpoint cho nova
+
 Đăng nhập vào database với quyền root
 </br>
 
@@ -1560,44 +1575,42 @@ $ openstack endpoint create --region RegionOne \
   ```
   Chỉnh sửa file /etc/nova/nova.conf như dưới: </br>
 <b>Lưu ý:</b> Trong trường hợp nếu có dòng khai bao trước đó thì tìm và thay thế, chưa có thì khai báo mới hoàn toàn.
-Khai báo trong section [api_database] dòng dưới, do section [api_database] chưa có nên ta khai báo thêm
+- Khai báo trong section [api_database] dòng dưới, do section [api_database] chưa có nên ta khai báo thêm
  ```sh
 [api_database]
 connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova_api
   ```
-  Khai báo trong section [database] dòng dưới. Do section [database] chưa có nên ta khai báo thêm.
+- Khai báo trong section [database] dòng dưới. Do section [database] chưa có nên ta khai báo thêm.
    ```sh
 [database]
 connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
   ``` 
-  Trong section [DEFAULT] :
-  <ul>
-  <li>Thay dòng:</br> logdir=/var/log/nova
-  </br>Bằng dòng:</br> log-dir=/var/log/nova</li>
-  <li>Thay dòng:</br> enabled_apis=ec2,osapi_compute,metadata
-  </br>Bằng dòng:</br> enabled_apis=osapi_compute,metadata</li>
-  <li>Bỏ dòng:</br> verbose = True</li>
-  <li>Khai báo thêm các dòng sau:</br>
-   ```sh
-rpc_backend = rabbit
-auth__strategy = keystone
-rootwrap_config = /etc/nova/rootwrap.conf
-#IP MGNT cua node Controller
-my_ip = 10.10.10.40
-</br>
-use_neutron = True
-firewall_driver = nova.virt.firewall.NoopFirewallDriver
-  ```
-  </li>
-  </ul>
-Khai báo trong section [oslo_messaging_rabbit] các dòng dưới. Do section[oslo_messaging_rabbit] chưa có nên ta khai báo thêm.
+- Trong section [DEFAULT] :
+
+	* Thay dòng:</br> logdir=/var/log/nova
+	</br>Bằng dòng:</br> log-dir=/var/log/nova>
+	* Thay dòng:</br> enabled_apis=ec2,osapi_compute,metadata
+	Bằng dòng:</br> enabled_apis=osapi_compute,metadata
+	* Bỏ dòng:</br> verbose = True
+	* Khai báo thêm các dòng sau:</br>
+	   ```sh
+	rpc_backend = rabbit
+	auth__strategy = keystone
+	rootwrap_config = /etc/nova/rootwrap.conf
+	#IP MGNT cua node Controller
+	my_ip = 10.10.10.40
+	</br>
+	use_neutron = True
+	firewall_driver = nova.virt.firewall.NoopFirewallDriver
+	  ```
+- Khai báo trong section [oslo_messaging_rabbit] các dòng dưới. Do section[oslo_messaging_rabbit] chưa có nên ta khai báo thêm.
 ```sh
 [oslo_messaging_rabbit]
 rabbit_host = controller
 rabbit_userid = openstack
 rabbit_password = Welcome123
   ```
-Trong section [keystone_authtoken] khai báo các dòng dưới. Do section[keystone_authtoken] chưa có nên ta khai báo thêm.
+- Trong section [keystone_authtoken] khai báo các dòng dưới. Do section[keystone_authtoken] chưa có nên ta khai báo thêm.
  ```sh
 [keystone_authtoken]
 auth_uri = http://controller:5000
@@ -1610,23 +1623,23 @@ project_name = service
 username = nova
 password = Welcome123
   ```
-  Trong section [vnc] khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section [vnc] chưa có nên ta khai báo thêm.
+- Trong section [vnc] khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section [vnc] chưa có nên ta khai báo thêm.
   ```sh
 [vnc]
 vncserver_listen = $my_ip
 vncserver_proxyclient_address = $my_ip
   ``` 
-Trong section [glance] khai báo dòng để nova kết nối tới API của glance. Do section [glance] chưa có nên ta khai báo thêm.
+- Trong section [glance] khai báo dòng để nova kết nối tới API của glance. Do section [glance] chưa có nên ta khai báo thêm.
  ```sh
 [glance]
 api_servers = http://controller:9292
   ```
-  Trong section [oslo_concurrency] khai báo dòng dưới. Do section [oslo_concurrency]chưa có nên ta khai báo thêm.
+- Trong section [oslo_concurrency] khai báo dòng dưới. Do section [oslo_concurrency]chưa có nên ta khai báo thêm.
    ```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
   ```
-  Khai báo thêm section mới [neutron] để nova làm việc với neutron
+- Khai báo thêm section mới [neutron] để nova làm việc với neutron
    ```sh
 [neutron]
 url = http://controller:9696
@@ -1648,7 +1661,9 @@ metadata_proxy_shred_secret = Welcome123
 # su -s /bin/sh -c "nova-manage db sync" nova
   ```
   
-  <h3><a name="end">5.4.2. Kết thúc bước cài đặt và cấu hình nova</a></h3>
+<a name="end"></a>
+###5.4.2. Kết thúc bước cài đặt và cấu hình nova
+
   Khởi động lại các dịch vụ của nova sau khi cài đặt & cấu hình nova
    ```sh
 # service nova-api restart
@@ -1675,17 +1690,19 @@ Xóa database mặc định của nova
 |  7 | nova-metadata      | 0.0.0.0    | internal | enabled | down  | None                       |
 +----+--------------------+------------+----------+---------+-------+----------------------------+
   ```
-<h2><a name="install_nova_compute">5.4. Cài đặt và cấu hình nova trên node Compute</a></h2> </br>
+<a name="install_nova_compute"></a>
+##5.4. Cài đặt và cấu hình nova trên node Compute
+
 Cài đặt gói nova-compute </br>
 ```sh
 apt-get -y install nova-compute
  ```
 <b>Cấu hình nova-comupte</b> </br>
-+ Sao lưu file /etc/nova/nova.conf </br>
+- Sao lưu file /etc/nova/nova.conf </br>
 	```sh
 	cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
 	 ```
-+ Trong section [DEFAULT] khai báo các dòng sau: </br>
+- Trong section [DEFAULT] khai báo các dòng sau: </br>
   ```sh
 pc_backend = rabbit
 auth_strategy = keystone
@@ -1694,7 +1711,7 @@ my_ip = 10.10.10.41
 use_neutron = True
 firewall_driver = nova.virt.firewall.NoopFirewallDriver
  ```
-+ Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới: </br>
+- Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới: </br>
   ```sh
 [oslo_messaging_rabbit]
 rabbit_host = controller
@@ -1702,7 +1719,7 @@ rabbit_userid = openstack
 rabbit_password = Welcome123
  ```
 
-+ Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
+- Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
  ```sh
 [keystone_authtoken]
 auth_uri = http://controller:5000
@@ -1715,7 +1732,7 @@ project_name = service
 username = nova
 password = Welcome123
  ```
-+ Khai báo thêm section [vnc] và các dòng dưới: </br>
+- Khai báo thêm section [vnc] và các dòng dưới: </br>
  ```sh
 [vnc]
 enabled = True
@@ -1723,17 +1740,17 @@ vncserver_listen = 0.0.0.0
 vncserver_proxyclient_address = $my_ip
 novncproxy_base_url = http://172.16.69.40:6080/vnc_auto.html
  ```
-+ Khai báo thêm section [glance] và các dòng dưới: </br>
+- Khai báo thêm section [glance] và các dòng dưới: </br>
  ```sh
 [glance]
 api_servers = http://controller:9292
  ```
-+ Khai báo thêm section [oslo_concurrency] và các dòng dưới: </br>
+- Khai báo thêm section [oslo_concurrency] và các dòng dưới: </br>
  ```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
  ```
-+ Khai báo thêm section [neutron] và các dòng dưới: </br>
+- Khai báo thêm section [neutron] và các dòng dưới: </br>
  ```sh
 [neutron]
 url = http://controller:9696
@@ -1787,7 +1804,7 @@ root@compute1:~# openstack compute service list
 
 
 
-#Cài đặt dịch vụ mạng của OpenStack
+#6. Cài đặt dịch vụ mạng của OpenStack
 ##6.1 Giới thiệu chung về dịch vụ mạng của OpenStack
 Một trong những yêu cầu quan trọng khi thiết lập một hệ thống đám mây là phải cung cấp cho các thành phần trong đám mây khả năng kết nối với nhau và kết nối ra bên ngoài, tức là cần thiết lập được một hệ thống mạng trong đám mây. Với đối tượng phục vụ kết nối mạng chính trong các đám mây là hệ thống máy ảo, đồng thời cùng với yêu cầu phải đảm bảo các tính chất của một đám mây- một hệ thống phân tán, OpenStack đã giải quyết bằng cách sử dụng một gói dịch vụ cho phép thiết lập một hệ thống mạng ảo trên đám mây. Gói dịch vụ cung cấp các dịch vụ mạng cho hệ thống OpenStack có tên là neutron.
 
