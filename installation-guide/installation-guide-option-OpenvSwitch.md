@@ -1046,3 +1046,77 @@ Khởi động lại apache2 service
 service apache2 restart
 ```
 Mở trang web ```192.168.2.10/horizon```để kiểm tra horizon service
+
+#7 Cài đặt máy ảo
+##7.1 Thiết lập mạng ảo
+Để thiết lập hệ thống mạng ảo, đầu tiên ta cần tạo ra 1 mạng external network để cung cấp cho tất cả các project khả năng kết nối internet
+- Ta tạo 1 mạng provider network:
+```sh
+neutron net-create --shared --provider:physical_network external  --provider:network_type flat  provider-net
+```
+-Cấp subnet cho provider network và cho phép cắm router lên provider network
+```sh
+neutron subnet-create --name provider-subnet --allocation-pool start=192.168.2.100,end=192.168.2.150 --dns-nameserver 8.8.4.4 --gateway 192.168.2.1 provider-net 192.168.2.0/24
+
+neutron net-update provider-net --router:external
+```
+Ip ở dải subnet nên là Ip lấy trong dải external network ở phần đầu
+
+- Tạo 1 mạng private cho project và cấp subnet cho mạng private đó
+```sh
+neutron net-create private-net1
+neutron subnet-create --name private-subnet1  --dns-nameserver 8.8.4.4 --gateway 10.10.60.1 private-net1 10.10.60.0/24
+```
+
+- Tạo router và kết nối router với provider network
+```sh
+neutron router-create private-router
+neutron router-gateway-set private-router provider-net
+```
+
+- Kết nối router với subnet vừa tạo ra trên mạng private-net1
+```sh
+neutron router-interface-add private-router private-subnet1
+```
+##7.2 Tạo máy ảo
+- Tạo flavor nano
+```sh
+openstack flavor create --id 0 --vcpus 1 --ram 64 --disk 1 m1.nano
+```
+- Thêm rule cho default security group
+```sh
+openstack security group rule create --proto icmp default
+openstack security group rule create --proto tcp --dst-port 22 default
+```
+Kiểm tra các mạng hiện tại có thể sử dụng trên project
+```sh
+openstack network list
++--------------------------------------+--------------+--------------------------------------+
+| ID                                   | Name         | Subnets                              |
++--------------------------------------+--------------+--------------------------------------+
+| ec45b68b-4927-461e-96f3-d68a4568be92 | provider-net | d0331e7d-cf89-49a9-ae3d-6ea3c8a39055 |
+| 98eab2e2-0f09-47d9-9265-eb5db901630f | private-net1 | b54062a8-5fff-4930-a97d-4cbc2fa20c91 |
++--------------------------------------+--------------+--------------------------------------+
+
+```
+- Tạo một máy ảo
+```
+openstack server create --flavor m1.nano --image cirros --nic net-id=98eab2e2-0f09-47d9-9265-eb5db901630f --security-group default test1
+```
+Lưu ý là ở đây net-id là id của private-net1, khi các bạn sử dụng câu lệnh trên cần sử dụng net-id trên máy của các bạn.
+
+- Kiểm tra trạng thái của máy ảo
+```
+openstack server list
++--------------------------------------+-------+--------+-------------------------+
+| ID                                   | Name  | Status | Networks                |
++--------------------------------------+-------+--------+-------------------------+
+| 84f53062-539b-4cec-932b-73d531624941 | test1 | ACTIVE | private-net1=10.10.60.3 |
++--------------------------------------+-------+--------+-------------------------+
+```
+- Chạy thử máy ảo
+
+Truy cập vào horizon->Compute->instance, click vào instance bạn vừa mới tạo ở bước trước và chọn console, bạn sẽ tương tác được với máy ảo thông qua trình duyệt
+![create-instance-success.png](./img/create-instance-success.png)
+
+End.
