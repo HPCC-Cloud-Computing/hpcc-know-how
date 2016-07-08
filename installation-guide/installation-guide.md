@@ -473,7 +473,10 @@ openstack service create \
 
 <h3>Kiểm tra hoạt động</h3>
 - Vì lý do bảo mật, vô hiệu hóa cơ chế thẻ token tạm thời bằng cách chỉnh sửa trong file `/etc/keystone/keystone-paste.ini`, xóa các dòng `admin_token_auth` từ các phần `[pipeline:public_api]`,`[pipeline:admin_api]` và `[pipeline:api_v3]`
-- Gỡ bỏ các biến môi trường đã thiết lập trong quá trình tạo service và endpoint cho dịch vụ Identity.
+- Gỡ bỏ các biến môi trường đã thiết lập trong quá trình tạo service và endpoint cho dịch vụ Identity:
+```sh
+unset OS_TOKEN OS_URL
+```
 - Kiểm tra hoạt động bằng cách yêu cầu token cho user “admin” đã tạo ở trên:
 ```sh
   openstack --os-auth-url http://controller:35357/v3 \
@@ -1129,13 +1132,13 @@ Ngoài các thành phần trên, Neutron còn có các thành phần khác như 
 
 - Đăng nhập vào MySQL
 ```sh
-	mysql -uroot -p1111
+	mysql -uroot -pbkcloud16
 ```
 - Tạo database và phân quyền
 ```sh
 	CREATE DATABASE neutron;
-	GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY '1111';
-	GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY '1111';
+	GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'bkcloud16';
+	GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'bkcloud16';
 		
 	FLUSH PRIVILEGES;
 	exit;
@@ -1146,7 +1149,7 @@ source admin.sh
 ```
 - Tạo tài khoản tên ```sh neutron```, thêm tài khoản ```sh neutron``` vào project ```sh service``` với quyền của tài khoản ```sh neutron``` đối với project ```sh service``` là ```sh admin```
 ```sh
-	openstack user create neutron --domain default --password 1111
+	openstack user create neutron --domain default --password bkcloud16
 	openstack role add --project service --user neutron admin
 ```
 - Tạo dịch vụ tên là neutron
@@ -1171,7 +1174,7 @@ Tiếp theo, ta cấu hình các dịch vụ của neutron
 ####Cấu hình để neutron sử dụng database
 Chỉnh sửa section [database] để neutron có thể sử dụng database neutron mà chúng ta vừa tạo ở phần trước:
 ```sh 
-	connection = mysql+pymysql://neutron:1111@controller/neutron
+	connection = mysql+pymysql://neutron:bkcloud16@controller/neutron
 ```
 Lưu ý: xóa cơ sở dữ liệu mặc định của neutron, comment dòng này ở section [database]
 ```sh
@@ -1198,7 +1201,7 @@ Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết 
 	...
 	rabbit_host = controller
 	rabbit_userid = openstack
-	rabbit_password = 1111
+	rabbit_password = bkcloud16
 ```
 ####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
@@ -1221,7 +1224,7 @@ Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới t
 	user_domain_id = default
 	project_name = service
 	username = neutron
-	password = 1111
+	password = bkcloud16
 ```
 
 ####Cấu hình neutron để thông báo các sự kiện cho nova
@@ -1241,7 +1244,7 @@ Neutron cần thông báo cho Nova khi cấu hình mạng (network topology) tha
 	region_name = RegionOne
 	project_name = service
 	username = nova
-	password = 1111
+	password = bkcloud16
 
 ```
 ####Cấu hình Modular Layer 2 (ML2) plug-in
@@ -1356,10 +1359,10 @@ metadata_proxy_shared_secret = 1111
 	region_name = RegionOne
 	project_name = service
 	username = neutron
-	password = NEUTRON_PASS
+	password = bkcloud16
 	
 	service_metadata_proxy = True
-	metadata_proxy_shared_secret = 1111	
+	metadata_proxy_shared_secret = bkcloud16	
 ```
 ###6.2.3 Kết thúc cài đặt trên controller node
 - Đồng bộ hóa cơ sở dữ liệu cho neutron
@@ -1398,7 +1401,7 @@ Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết 
 	...
 	rabbit_host = controller
 	rabbit_userid = openstack
-	rabbit_password = 1111
+	rabbit_password = bkcloud16
 ```
 ####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
@@ -1422,7 +1425,7 @@ Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới t
 	user_domain_name = default
 	project_name = service
 	username = neutron
-	password = 1111
+	password = bkcloud16
 ```
 ####Cấu hình linux-bridge agent
 - Cấu hình linux-bridge agent trên compute node để chuẩn bị hạ tầng mạng ảo trên compute node. Chỉnh sửa file ```/etc/neutron/plugins/ml2/linuxbridge_agent.ini ```, cấu hình để mapping - ánh xạ nhãn ```provider``` vào card vật lý eth1. Khi chúng ta muốn các máy ảo trên compute node có khả năng kết nối trực tiếp vào mạng external network, khi đó các máy ảo này sẽ kết nối vào mạng ảo flat này thông qua 1 bridge kết nối tới eth1.
@@ -1458,7 +1461,7 @@ Chỉnh sửa file cấu hình ```/etc/nova/nova.conf``` để nova-compute có 
 	region_name = RegionOne
 	project_name = service
 	username = neutron
-	password = 1111
+	password = bkcloud16
 ```
 ###6.3.3 Kết thúc cài đặt trên compute node
 - Khởi động lại dịch vụ nova-compute
