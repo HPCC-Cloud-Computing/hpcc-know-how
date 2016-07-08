@@ -853,7 +853,7 @@ $ openstack endpoint create --region RegionOne \
 | url          | http://controller:8774/v2.1/%(tenant_id)s |
 +--------------+-------------------------------------------+
   ```
-  Cài đặt xác gói và cấu hình:
+  Cài đặt các gói và cấu hình:
 ```sh
 # apt-get install nova-api nova-conductor nova-consoleauth \
   nova-novncproxy nova-scheduler
@@ -867,12 +867,12 @@ $ openstack endpoint create --region RegionOne \
 - Khai báo trong section [api_database] dòng dưới, do section [api_database] chưa có nên ta khai báo thêm
  ```sh
 [api_database]
-connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova_api
+connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
   ```
 - Khai báo trong section [database] dòng dưới. Do section [database] chưa có nên ta khai báo thêm.
    ```sh
 [database]
-connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
+connection = mysql+pymysql://nova:bkcloud16@controller/nova
   ``` 
 - Trong section [DEFAULT] :
 
@@ -887,7 +887,7 @@ connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
 	auth__strategy = keystone
 	rootwrap_config = /etc/nova/rootwrap.conf
 	#IP MGNT cua node Controller
-	my_ip = 10.10.10.40
+	my_ip = 10.10.10.10
 	</br>
 	use_neutron = True
 	firewall_driver = nova.virt.firewall.NoopFirewallDriver
@@ -898,7 +898,7 @@ connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
 [oslo_messaging_rabbit]
 rabbit_host = controller
 rabbit_userid = openstack
-rabbit_password = Welcome123
+rabbit_password = bkcloud16
   ```
 - Trong section [keystone_authtoken] khai báo các dòng dưới. Do section[keystone_authtoken] chưa có nên ta khai báo thêm.
  
@@ -912,7 +912,7 @@ project_domain_name = default
 user_domain_name = default
 project_name = service
 username = nova
-password = Welcome123
+password = bkcloud16
   ```
 - Trong section [vnc] khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section [vnc] chưa có nên ta khai báo thêm.
 
@@ -948,10 +948,10 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = Welcome123
+password = bkcloud16
 </br>
 service_metadata_proxy = True
-metadata_proxy_shred_secret = Welcome123
+metadata_proxy_shred_secret = bkcloud16
   ```
   
   Tạo database cho nova:
@@ -1006,7 +1006,7 @@ apt-get -y install nova-compute
   ```sh
 pc_backend = rabbit
 auth_strategy = keystone
-my_ip = 10.10.10.41
+my_ip = 10.10.10.11
 	
 use_neutron = True
 firewall_driver = nova.virt.firewall.NoopFirewallDriver
@@ -1016,7 +1016,7 @@ firewall_driver = nova.virt.firewall.NoopFirewallDriver
 [oslo_messaging_rabbit]
 rabbit_host = controller
 rabbit_userid = openstack
-rabbit_password = Welcome123
+rabbit_password = bkcloud16
  ```
 
 - Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
@@ -1030,7 +1030,7 @@ project_domain_name = default
 user_domain_name = default
 project_name = service
 username = nova
-password = Welcome123
+password = bkcloud16
  ```
 - Khai báo thêm section [vnc] và các dòng dưới: </br>
  ```sh
@@ -1061,7 +1061,7 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = Welcome123
+password = bkcloud16
  ```
 
 Khởi động lại dịch vụ nova-compute
@@ -1078,7 +1078,7 @@ export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
-export OS_PASSWORD=Welcome123
+export OS_PASSWORD=bkcloud16
 export OS_AUTH_URL=http://controller:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
