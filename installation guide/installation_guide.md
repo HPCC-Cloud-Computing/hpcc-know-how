@@ -444,7 +444,7 @@ Ngoài các thành phần trên, Neutron còn có các thành phần khác như 
 ```
 - Khai báo biến môi trường
 ```sh
-source admin-openrc
+source admin.sh
 ```
 - Tạo tài khoản tên ```sh neutron```, thêm tài khoản ```sh neutron``` vào project ```sh service``` với quyền của tài khoản ```sh neutron``` đối với project ```sh service``` là ```sh admin```
 ```sh
