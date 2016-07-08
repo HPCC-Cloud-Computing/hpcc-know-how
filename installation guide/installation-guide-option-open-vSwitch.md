@@ -77,7 +77,7 @@ OpenStack Client là services cho phép người dùng tương tác với hệ t
 Sau khi khởi động lại, ta kích hoạt repository Openstack:
 ```sh
 	# apt-get install software-properties-common
-	# add-apt-repository cloud-archive:liberty
+	# add-apt-repository cloud-archive:mitaka
 ```
 
 Sau đó cập nhật lại:
