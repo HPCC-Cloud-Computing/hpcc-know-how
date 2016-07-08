@@ -228,7 +228,7 @@ Khởi động lại máy tính.
 Sau khi khởi động lại, ta kích hoạt repository Openstack:
 ```sh
 	# apt-get install software-properties-common
-	# add-apt-repository cloud-archive:liberty
+	# add-apt-repository cloud-archive:mitaka
 ```
 Sau đó cập nhật lại:
 ```sh
