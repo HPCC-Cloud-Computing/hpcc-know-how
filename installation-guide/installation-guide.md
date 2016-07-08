@@ -70,11 +70,11 @@ Khởi động lại máy, sau đó thiết lập địa chỉ IP tĩnh cho eth0
 	
 	# NIC EXTERNAL
 	auto eth1
-	iface eth1 inet static
-	address 192.168.2.10
-	netmask 255.255.255.0
-	gateway 192.168.2.1
-	dns-nameservers 8.8.8.8
+	iface eth1 inet dhcp
+	#address 192.168.2.10
+	#netmask 255.255.255.0
+	#gateway 192.168.2.1
+	#dns-nameservers 8.8.8.8
 ```
 
 
@@ -97,8 +97,8 @@ OpenStack Client là services cho phép người dùng tương tác với hệ t
 
 Sau khi khởi động lại, ta kích hoạt repository Openstack:
 ```sh
-	# apt-get install software-properties-common
-	# add-apt-repository cloud-archive:liberty
+	# apt-get install software-properties-common -y
+	# add-apt-repository cloud-archive:mitaka -y
 ```
 
 Sau đó cập nhật lại:
@@ -110,6 +110,8 @@ Sau đó ta cài đặt OpenStack client:
 ```sh
 	# apt-get install python-openstackclient
 ```
+
+Khởi động lại máy, đăng nhập vào quyền ```root``` và thực hiện các bước tiếp theo
 ####Cài đặt hệ quản trị cơ sở dữ liệu SQL
 
 Sau khi cài đặt OpenStack client, chúng ta cần cài đặt cơ sở dữ liệu lên controller node, vì các dịch vụ của OpenStack sử dụng SQL để lưu trữ thông tin.
@@ -118,7 +120,7 @@ Ta cài đặt gói mariaDb:
 	# apt-get install mariadb-server python-pymysql
 ```
 
-Thiết lập mật khẩu: 1111
+Thiết lập mật khẩu: bkcloud16
 
 Tạo file /etc/mysql/conf.d/mysqld_openstack.cnf với nội dung sau:
 ```sh
@@ -171,9 +173,9 @@ Ta cài đặt gói rabbitmq-server lên controller node:
 	apt-get -y install rabbitmq-server
 ```
 
-Cấu hình RabbitMQ, tạo user openstack với mật khẩu là 1111:
+Cấu hình RabbitMQ, tạo user openstack với mật khẩu là ```bkcloud16```:
 ```sh
-	rabbitmqctl add_user openstack 1111
+	rabbitmqctl add_user openstack bkcloud16
 ```
 
 Gán quyền read, write cho tài khoản openstack trong RabbitMQ
@@ -213,7 +215,7 @@ Thiết lập hostname với tên là compute
 
 Khởi động lại máy.
 
-Sau đó thiết lập địa chỉ IP tĩnh cho eth0 và eth1:
+Sau đó thiết lập địa chỉ IP cho eth0 và eth1:
 Thiết lập địa chỉ IP, chỉnh sửa ```sh file /etc/network/interfaces ``` với nội dung sau:
 ```sh 
 	# NIC loopback
@@ -228,11 +230,11 @@ Thiết lập địa chỉ IP, chỉnh sửa ```sh file /etc/network/interfaces 
 	
 	# NIC EXTERNAL
 	auto eth1
-	iface eth1 inet static
-	address 192.168.2.11
-	netmask 255.255.255.0
-	gateway 192.168.2.1
-	dns-nameservers 8.8.8.8
+	iface eth1 inet dhcp
+	#address 192.168.2.11
+	#netmask 255.255.255.0
+	#gateway 192.168.2.1
+	#dns-nameservers 8.8.8.8
 ```
  
 Chỉnh sửa file  /etc/hosts để phân giải IP cho các node:
@@ -249,7 +251,7 @@ Khởi động lại máy tính.
 Sau khi khởi động lại, ta kích hoạt repository Openstack:
 ```sh
 	# apt-get install software-properties-common
-	# add-apt-repository cloud-archive:liberty
+	# add-apt-repository cloud-archive:mitaka
 ```
 Sau đó cập nhật lại:
 ```sh
@@ -283,14 +285,14 @@ Khởi động lại dịch vụ NTP
 <h3><a name="install_config">3. Cấu hình và cài đặt Keystone</a></h3>
 - Trước tiên, cần phải tạo ra một database cho dịch vụ keystone bằng các câu lệnh sau:
 ```sh
-mysql -u root –pWelcome123
+mysql -u root –pbkcloud16
 CREATE DATABASE keystone;
 
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
-IDENTIFIED BY 'Welcome123';
+IDENTIFIED BY 'bkcloud16';
 
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
-IDENTIFIED BY 'Welcome123';
+IDENTIFIED BY 'bkcloud16';
 flush privileges;
 exit;
 ```
@@ -307,13 +309,13 @@ apt-get install keystone apache2 libapache2-mod-wsgi
   ```sh
   [DEFAULT]
   ...
-  admin_token = Welcome123
+  admin_token = bkcloud16
   ```
  - Trong phần database, cấu hình truy cập đến database:
   ```sh
   [database]
   ...
-  connection = mysql+pymysql://keystone:Welcome123@controller/keystone
+  connection = mysql+pymysql://keystone:bkcloud16@controller/keystone
   ```
   - Trong phần [token], cấu hình nhà cung cấp thẻ Fernet:
   ```sh  
@@ -385,7 +387,7 @@ rm -f /var/lib/keystone/keystone.db
 - Vì ban đầu, database của Keystone không chứa thông tin xác thực và catalog sevices nên để tạo được các endpoint và các service thì phải có một token để cho phép thực hiện bước này. 
 - Truyền vào các biến môi trường để khởi tạo service và các endpoint indentity:
 ```sh
-export OS_TOKEN=ADMIN_TOKEN
+export OS_TOKEN=bkcloud16
 ```
 ADMIN_TOKEN ở đây là giá trị đã được khai báo trong file cấu hình ở bước trước.
 - Khai báo URL endpoint và version API identity:
@@ -417,28 +419,57 @@ openstack service create \
   identity public http://controller:5000/v3
  ```
 <h3>Tạo domain, user, project và role</h3>
-- Tạo domain `default`:
-```sh
-openstack domain create --description "Default Domain" default
-```
-- Tạo project `admin`:
-```sh
-openstack project create --domain default \
-  --description "Admin Project" admin
-```	
-- Tạo user `admin`:
-```sh
-openstack user create --domain default \
-  --password-prompt admin
-```
-- Và tạo role `admin`:
-```sh
-openstack role create admin
-```	
-- Gán role admin cho user `admin` đối với project `admin`:
-```sh
-openstack role add --project admin --user admin admin
-```
+- Tạo domain
+
+	```sh
+	openstack domain create --description "Default Domain" default
+	```
+
+- Tạo `admin` project
+
+	```sh
+	openstack project create --domain default  --description "Admin Project" admin
+	```
+
+- Tạo user `admin`
+	```sh
+	openstack user create admin --domain default --password bkcloud16
+	```
+
+- Tạo role `admin`
+	```sh
+	openstack role create admin
+	```
+
+- Gán user `admin` vào role `admin` thuộc project `admin`
+	```sh
+	openstack role add --project admin --user admin admin
+	```
+
+- Tạo project có tên là `service` để chứa các user service của openstack
+	```sh
+	openstack project create --domain default --description "Service Project" service
+	```
+
+- Tạo project tên là `demo`
+	```sh
+	openstack project create --domain default --description "Demo Project" demo
+	```
+
+- Tạo user tên là `demo`
+	```sh
+	openstack user create demo --domain default --password bkcloud16
+	```
+
+- Tạo role tên là `user`
+	```sh
+	openstack role create user
+	```
+
+- Gán tài khoản `demo` có role là `user` vào project `demo`
+	```sh
+	openstack role add --project demo --user demo user
+	```
 
 <h3>Kiểm tra hoạt động</h3>
 - Vì lý do bảo mật, vô hiệu hóa cơ chế thẻ token tạm thời bằng cách chỉnh sửa trong file `/etc/keystone/keystone-paste.ini`, xóa các dòng `admin_token_auth` từ các phần `[pipeline:public_api]`,`[pipeline:admin_api]` và `[pipeline:api_v3]`
@@ -470,7 +501,7 @@ export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
-export OS_PASSWORD=ADMIN_PASS
+export OS_PASSWORD=bkcloud16
 export OS_AUTH_URL=http://controller:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
@@ -502,14 +533,14 @@ openstack token issue
 #### 4.1.1 Tạo database cho `glance`
 - Đăng nhập vào mysql
   ```sh
-  mysql -uroot -pWelcome123
+  mysql -uroot -pbkcloud16
   ```
 
 - Tạo database và gán các quyền cho user trong database `glance`
 	```sh
 	CREATE DATABASE glance;
-	GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'Welcome123';
-	GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'Welcome123';
+	GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'bkcloud16';
+	GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'bkcloud16';
 	FLUSH PRIVILEGES;
 		
 	exit;
@@ -524,7 +555,7 @@ openstack token issue
   
 - Tạo user `glance`
 	```sh
-	openstack user create glance --domain default --password Welcome123
+	openstack user create glance --domain default --password bkcloud16
 	```
 
 - Gán quyền `admin` cho user `glance` và project `service` 
@@ -568,11 +599,6 @@ openstack token issue
 	```
 
 - Sửa các mục dưới đây trong hai file `/etc/glance/glance-api.conf`
-
- - Trong section `[DEFAULT]`  thêm hoặc tìm và thay thế dòng cũ bằng dòng dưới để cho phép chế độ ghi log với `glance`
-	 ```sh
-	 verbose = true
-	 ```
  
  - Trong section `[database]` :
  
@@ -582,7 +608,7 @@ openstack token issue
 	 ```
  - Thêm dòng dưới 
 	 ```sh
-	 connection = mysql+pymysql://glance:Welcome123@controller/glance
+	 connection = mysql+pymysql://glance:bkcloud16@controller/glance
 	 ```
  
  - Trong section `[keystone_authtoken]` sửa các dòng cũ thành dòng dưới để cấu hình dịch vụ xác thực với Keystone khi có yêu cầu từ user hoặc nova component
@@ -595,7 +621,7 @@ openstack token issue
 		user_domain_name = default
 		project_name = service
 		username = glance
-		password = Welcome123
+		password = bkcloud16
 		```
     <b>auth_uri:</b> chỉ đến dịch vụ Keystone. Thông tin này được sử dụng bởi các middleware để truy vấn Keystone về tính hợp lệ của thẻ xác thực.
     
@@ -621,7 +647,7 @@ openstack token issue
 	 ```
  - Thêm dòng dưới 
 	 ```sh
-	 connection = mysql+pymysql://glance:Welcome123@controller/glance
+	 connection = mysql+pymysql://glance:bkcloud16@controller/glance
 	 ```
 
  - Trong section `[keystone_authtoken]` sửa các dòng cũ thành dòng dưới
@@ -634,7 +660,7 @@ openstack token issue
 	 user_domain_name = default
 	 project_name = service
 	 username = glance
-	 password = Welcome123
+	 password = bkcloud16
 	 ```
 
  - Trong section ` [paste_deploy]` khai báo dòng dưới
@@ -733,7 +759,7 @@ Nova có các thành phần như sau:
 </br>
 
 ```sh
-$ mysql -u root -p
+$ mysql -uroot -pbkcloud16
 ```
 Tạo database
 </br>
@@ -741,29 +767,29 @@ Tạo database
 CREATE DATABASE nova_api;
 CREATE DATABASE nova;
 GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' \
-  IDENTIFIED BY 'NOVA_DBPASS';
+  IDENTIFIED BY 'bkcloud16';
 GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' \
-  IDENTIFIED BY 'NOVA_DBPASS';
+  IDENTIFIED BY 'bkcloud16';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
-  IDENTIFIED BY 'NOVA_DBPASS';
+  IDENTIFIED BY 'bkcloud16';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
-  IDENTIFIED BY 'NOVA_DBPASS';
+  IDENTIFIED BY 'bkcloud16';
 ```
 Khai báo biến môi trường
  ```sh
-$ . admin.sh
+$ . admin.openrc
   ```
 + Tạo user, phân quyền và tạo endpoint cho dịch vụ nova
 </br>
-Tạo user có tên là nova
+Tạo user có tên là nova
  ```sh
-openstack user create nova --domain default  --password Welcome123
+openstack user create nova --domain default  --password bkcloud16
   ```
 Phân quyền cho tài khoản nova
  ```sh
 $ openstack role add --project service --user nova admin
   ```
-  Tạo service có tên là nova
+  Tạo service có tên là nova
   ```sh
 $ openstack service create --name nova \
   --description "OpenStack Compute" compute
