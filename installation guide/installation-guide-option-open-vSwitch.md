@@ -121,10 +121,10 @@ apt-get install chrony
 Tiến hành chỉnh sửa file cấu hình ```/etc/chrony/chrony.conf```:
 Thay các dòng dưới
 ```sh
-	server 0.debian.pool.ntp.org offline minpoll 8
-	server 1.debian.pool.ntp.org offline minpoll 8
-	server 2.debian.pool.ntp.org offline minpoll 8
-	server 3.debian.pool.ntp.org offline minpoll 8
+server 0.debian.pool.ntp.org offline minpoll 8
+server 1.debian.pool.ntp.org offline minpoll 8
+server 2.debian.pool.ntp.org offline minpoll 8
+server 3.debian.pool.ntp.org offline minpoll 8
 ```
 bằng dòng
 ```sh
@@ -159,7 +159,7 @@ Dịch vụ xác thực sử dụng Memcached để làm bộ đệm lưu trữ 
 
 Ta cài đặt các gói cần thiết cho memcached
 ```sh
-	apt-get -y install memcached python-memcache
+apt-get -y install memcached python-memcache
 ```
 Dùng nano  sửa file ``` /etc/memcached.conf ```, thay dòng 
 ```-l 127.0.0.1 ``` 
@@ -169,7 +169,7 @@ Trong đó 10.10.10.10 là địa chỉ nic management của controller node
 
 Khởi động lại memcache
 ```sh 
-	service memcached restart
+service memcached restart
 ``` 
 ##1.3 Chuẩn bị môi trường cho compute node
 ###1.3.1 Thiết lập địa chỉ mạng
@@ -180,8 +180,8 @@ Sau đó ta thiết lập hostname và địa chỉ tĩnh cho các card mạng:
 
 Thiết lập hostname với tên là compute
 ```sh
-	echo "copmute" > /etc/hostname
-	hostname -F /etc/hostname
+echo "copmute" > /etc/hostname
+hostname -F /etc/hostname
 ```
 
 Khởi động lại máy.
@@ -189,30 +189,30 @@ Khởi động lại máy.
 Sau đó thiết lập địa chỉ IP tĩnh cho eth0 và eth1:
 Thiết lập địa chỉ IP, chỉnh sửa ```sh file /etc/network/interfaces ``` với nội dung sau:
 ```sh 
-	# NIC loopback
-	auto lo
-	iface lo inet loopback
+# NIC loopback
+auto lo
+iface lo inet loopback
 	
-	# NIC MGNG
-	auto eth0
-	iface eth0 inet static
-	address 10.10.10.11
-	netmask 255.255.255.0
+# NIC MGNG
+auto eth0
+iface eth0 inet static
+address 10.10.10.11
+netmask 255.255.255.0
 	
-	# NIC EXTERNAL
-	auto eth1
-	iface eth1 inet static
-	address 192.168.2.11
-	netmask 255.255.255.0
-	gateway 192.168.2.1
-	dns-nameservers 8.8.8.8
+# NIC EXTERNAL
+auto eth1
+iface eth1 inet static
+address 192.168.2.11
+netmask 255.255.255.0
+gateway 192.168.2.1
+dns-nameservers 8.8.8.8
 ```
  
 Chỉnh sửa file  /etc/hosts để phân giải IP cho các node:
 ```sh 
-	127.0.0.1   compute localhost
-	10.10.10.10    controller
-	10.10.10.11    compute
+127.0.0.1   compute localhost
+10.10.10.10    controller
+10.10.10.11    compute
 ```
 	
 Khởi động lại máy tính.
@@ -239,24 +239,24 @@ apt-get -y install chrony
 ```
 Chỉnh sửa file /etc/chrony/chrony.conf.Thay các dòng dưới
 ```sh
-	server 0.debian.pool.ntp.org offline minpoll 8
-	server 1.debian.pool.ntp.org offline minpoll 8
-	server 2.debian.pool.ntp.org offline minpoll 8
-	server 3.debian.pool.ntp.org offline minpoll 8
+server 0.debian.pool.ntp.org offline minpoll 8
+server 1.debian.pool.ntp.org offline minpoll 8
+server 2.debian.pool.ntp.org offline minpoll 8
+server 3.debian.pool.ntp.org offline minpoll 8
 ```
 bằng dòng
 ```sh
-	server controller iburst
+server controller iburst
 ```
 Khởi động lại dịch vụ NTP
 ```sh
-	service chrony restart
+service chrony restart
 ```
 #2 Cài đặt Keystone
 ##2.1 Chuẩn bị
 Thiết lập database cho keystone và gán các role lên database
 ```sh
-$ mysql -u root -p
+mysql -u root -p
 CREATE DATABASE keystone;
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
   IDENTIFIED BY '1111';
@@ -266,11 +266,11 @@ GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
 ##2.2 Cài đặt các thành phần
 Keystone được cài đặt trên controller node. Tiến hành ngăn keystone tự động bật lên bằng lệnh sau:
 ```sh
-# echo "manual" > /etc/init/keystone.override
+echo "manual" > /etc/init/keystone.override
 ```
 cài đặt các dịch vụ phục vụ cho keystone
 ```sh
-# apt-get install keystone apache2 libapache2-mod-wsgi
+apt-get install keystone apache2 libapache2-mod-wsgi
 ```
 cấu hình keystone ở file ```/etc/keystone/keystone.conf```
 ```
@@ -286,11 +286,11 @@ provider = fernet
 ```
 đồng bộ hóa dữ liệu cho keystone
 ```sh
-# su -s /bin/sh -c "keystone-manage db_sync" keystone
+su -s /bin/sh -c "keystone-manage db_sync" keystone
 ```
 tạo khóa fernet
 ```sh
-# keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
 ```
 cấu hình apache server, chỉnh sửa file ```/etc/apache2/apache2.conf```
 ```
@@ -333,22 +333,22 @@ Listen 35357
 ```
 kích hoạt dịch vụ xác thực thông qua apache
 ```sh
-# ln -s /etc/apache2/sites-available/wsgi-keystone.conf /etc/apache2/sites-enabled
+ln -s /etc/apache2/sites-available/wsgi-keystone.conf /etc/apache2/sites-enabled
 ```
 khởi động lại apache service
 ```sh
-# service apache2 restart
+service apache2 restart
 ```
 xóa bỏ file cơ sở dữ liệu đi kèm keystone
 ```sh
-# rm -f /var/lib/keystone/keystone.db
+rm -f /var/lib/keystone/keystone.db
 ```
 ##2.3 Tạo service và endpoint cho dịch vụ xác thực
 Để lấy được quyền đẻ tạo service và các endpoint, cần xác thực với keystone bằng token đã nạp vào file cấu hình trước đó. Nạp đoạn script sau vào hệ thống để lấy quyền tạm thời và lấy địa chỉ endpoint quản lý của keystone
 ```sh
-$ export OS_TOKEN=1111
-$ export OS_URL=http://controller:35357/v3
-$ export OS_IDENTITY_API_VERSION=3
+export OS_TOKEN=1111
+export OS_URL=http://controller:35357/v3
+export OS_IDENTITY_API_VERSION=3
 ```
 Sau khi nạp đoạn script trên, tiến hành tạo service cho dịch vụ xác thực và các endpoint cho service này
 ```sh
@@ -372,6 +372,10 @@ openstack role create user
 openstack role add --project demo --user demo user
 ```
 ##2.5 Kiểm tra cài đặt và tạo script biến môi trường cho client
+loại bỏ script lúc trước ta sử dụng
+```sh
+unset OS_TOKEN OS_URL
+```
 tạo file admin.sh với nội dung sau
 ```sh
 export OS_PROJECT_DOMAIN_NAME=default
@@ -414,7 +418,7 @@ Glance được cài đặt trên controller node. Các cài đặt sau được
 ##3.1 Chuẩn bị cơ sở dữ liệu, endpoint, user và service
 Thiết lập database cho glance và gán các role lên database
 ```sh
-$ mysql -u root -p
+mysql -u root -p
 CREATE DATABASE glance;
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
   IDENTIFIED BY '1111';
@@ -465,7 +469,7 @@ Cấu hình glance-registry ở file ```/etc/glance/glance-registry.conf```
 ```sh
 [database]
 ...
-connection = mysql+pymysql://glance:111@controller/glance
+connection = mysql+pymysql://glance:1111@controller/glance
 [keystone_authtoken]
 ...
 auth_uri = http://controller:5000
@@ -498,14 +502,14 @@ wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
 ```
 Nạp file image này vào hệ thống bằng glance
 ```sh
-$ openstack image create "cirros" \
+openstack image create "cirros" \
   --file cirros-0.3.4-x86_64-disk.img \
   --disk-format qcow2 --container-format bare \
   --public
 ```
 Kiểm tra xem glance đã nạp thành công image vào máy chưa
 ```sh
-$ openstack image list
+openstack image list
 +--------------------------------------+--------+--------+
 | ID                                   | Name   | Status |
 +--------------------------------------+--------+--------+
@@ -517,11 +521,16 @@ $ openstack image list
 ###4.1.1 Chuẩn bị cơ sở dữ liệu, endpoint, user và service
 Thiết lập database cho glance và gán các role lên database
 ```sh
-$ mysql -u root -p
+mysql -u root -p
 CREATE DATABASE nova;
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
   IDENTIFIED BY '1111';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
+  IDENTIFIED BY '1111';
+CREATE DATABASE nova_api;
+GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' \
+  IDENTIFIED BY '1111';
+GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' \
   IDENTIFIED BY '1111';
 ```
 Tạo glance service, user cho các dịch vụ trong glance sử dụng để xác thực, tạo endpoint
@@ -543,6 +552,12 @@ Chỉnh sửa file cấu hình ```/etc/nova/nova.conf```
 [DEFAULT]
 ...
 enabled_apis = osapi_compute,metadata
+rpc_backend = rabbit
+auth_strategy = keystone
+my_ip = 10.10.10.10
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+
 [api_database]
 ...
 connection = mysql+pymysql://nova:1111@controller/nova_api
@@ -550,19 +565,12 @@ connection = mysql+pymysql://nova:1111@controller/nova_api
 [database]
 ...
 connection = mysql+pymysql://nova:1111@controller/nova
-[DEFAULT]
-...
-rpc_backend = rabbit
 
 [oslo_messaging_rabbit]
 ...
 rabbit_host = controller
 rabbit_userid = openstack
 rabbit_password = 1111
-[DEFAULT]
-...
-auth_strategy = keystone
-
 [keystone_authtoken]
 ...
 auth_uri = http://controller:5000
@@ -575,18 +583,11 @@ project_name = service
 username = nova
 password = 1111
 [DEFAULT]
-...
-my_ip = 10.10.10.10
 [DEFAULT]
-...
-use_neutron = True
-firewall_driver = nova.virt.firewall.NoopFirewallDriver
 [vnc]
-...
 vncserver_listen = $my_ip
 vncserver_proxyclient_address = $my_ip
 [glance]
-...
 api_servers = http://controller:9292
 [oslo_concurrency]
 ...
@@ -594,8 +595,8 @@ lock_path = /var/lib/nova/tmp
 ```
 Đồng bộ hóa cơ sở dữ liệu cho nova
 ```sh
-# su -s /bin/sh -c "nova-manage api_db sync" nova
-# su -s /bin/sh -c "nova-manage db sync" nova
+su -s /bin/sh -c "nova-manage api_db sync" nova
+su -s /bin/sh -c "nova-manage db sync" nova
 ```
 Khởi động lại các dịch vụ của nova
 ```sh
@@ -615,15 +616,16 @@ Cấu hình nova-compute, cấu hình file ```/etc/nova/nova.conf```
 [DEFAULT]
 ...
 rpc_backend = rabbit
-
+auth_strategy = keystone
+my_ip = 10.10.10.11
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
 [oslo_messaging_rabbit]
 ...
 rabbit_host = controller
 rabbit_userid = openstack
 rabbit_password = 1111
-[DEFAULT]
-...
-auth_strategy = keystone
+
 
 [keystone_authtoken]
 ...
@@ -636,13 +638,7 @@ user_domain_name = default
 project_name = service
 username = nova
 password = 1111
-[DEFAULT]
-...
-my_ip = 10.10.10.11
-[DEFAULT]
-...
-use_neutron = True
-firewall_driver = nova.virt.firewall.NoopFirewallDriver
+
 [vnc]
 ...
 enabled = True
@@ -724,8 +720,9 @@ Ta tiến hành tải về các dịch vụ của neutron trên controller node:
 	apt-get -y install neutron-server neutron-plugin-ml2 neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent neutron-plugin-openvswitch-agent
 ```
 
-Đầu tiên, ta cấu hình file /etc/neutron/neutron.conf:
-###5.1.3 Cấu hình để neutron sử dụng database
+
+###5.1.3 Cấu hình các dịch vụ neutron
+Đầu tiên, ta cấu hình file ```/etc/neutron/neutron.conf```
 Chỉnh sửa section [database] để neutron có thể sử dụng database neutron mà chúng ta vừa tạo ở phần trước:
 ```sh 
 	connection = mysql+pymysql://neutron:1111@controller/neutron
@@ -737,78 +734,79 @@ Lưu ý: xóa cơ sở dữ liệu mặc định của neutron, comment dòng n�
 
 Cấu hình để nova kích hoạt ml2 plugin, router services và ovelaping  ip address:
 ```sh
-	[DEFAULT]
-	...
-	verbose = True
-	core_plugin = ml2
-	service_plugins = router
-	allow_overlapping_ips = True
+[DEFAULT]
+...
+verbose = True
+core_plugin = ml2
+service_plugins = router
+allow_overlapping_ips = True
 ```
-###5.1.4 Cấu hình để neutron sử dụng messaging service
+####Cấu hình để neutron sử dụng messaging service
 Neutron liên lạc với các dịch vụ khác thông qua messaging service. Cập nhật section [DEFAULT] và section [oslo_messaging_rabbit] để cấu hình giúp neutron sử dụng messaging service:
 ```sh
-	[DEFAULT]
-	...
-	rpc_backend = rabbit
+[DEFAULT]
+...
+rpc_backend = rabbit
 ```
 Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết lập khi cài đặt messaging service ở phần trước đó:
 ```sh
-	[oslo_messaging_rabbit]
-	...
-	rabbit_host = controller
-	rabbit_userid = openstack
-	rabbit_password = 1111
+[oslo_messaging_rabbit]
+...
+rabbit_host = controller
+rabbit_userid = openstack
+rabbit_password = 1111
 ```
-###5.1.5 Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
+####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
 
 Chỉnh sửa section [DEFAULT] để thiết lập keystone là phương thức xác thực cho neutron:
 ```sh
-	[DEFAULT]
-	...
-	auth_strategy = keystone
+[DEFAULT]
+...
+auth_strategy = keystone
 ```
 
 Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới tạo ở phần trước cho neutron services, neutron service sẽ sử dụng user này khi xác thực với keystone:
 ```sh
-	[keystone_authtoken]
-	...
-	auth_uri = http://controller:5000
-	auth_url = http://controller:35357
-	auth_plugin = password
-	project_domain_id = default
-	user_domain_id = default
-	project_name = service
-	username = neutron
-	password = 1111
+[keystone_authtoken]
+...
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = 1111
 ```
 
-###5.1.6 Cấu hình neutron để thông báo các sự kiện cho nova
+####Cấu hình neutron để thông báo các sự kiện cho nova
 
 Neutron cần thông báo cho Nova khi cấu hình mạng (network topology) thay đổi. Cập nhật các section [DEFAULT] và [nova] 
 ```sh
-	[DEFAULT]
-	...
-	notify_nova_on_port_status_changes = True
-	notify_nova_on_port_data_changes = True
-	[nova]
-	...
-	auth_url = http://controller:35357
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	region_name = RegionOne
-	project_name = service
-	username = nova
-	password = 1111
+[DEFAULT]
+...
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+[nova]
+...
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = 1111
 
 ```
-###5.1.7 Cấu hình Modular Layer 2 (ML2) plug-in
-Cấu hình file ```/etc/neutron/plugins/ml2_conf.ini```
+####Cấu hình Modular Layer 2 (ML2) plug-in
+Cấu hình file ``` /etc/neutron/plugins/ml2/ml2_conf.ini ```
 ```sh
 [ml2]
 type_drivers = flat,vlan,gre,vxlan
-tenant_network_types = vlan,gre,vxlan
+tenant_network_types = vxlan
 mechanism_drivers = openvswitch,l2population
 extension_drivers = port_security
 
@@ -866,28 +864,29 @@ verbose = True
 nova_metadata_ip = controller
 metadata_proxy_shared_secret = 1111
 ```
-Tạo br-vlan và br-ex, kết nối br-vlan tới eth2 và br-ex tới eth1
+Tạo  br-ex, kết nối br-ex tới eth1
 ```sh
+sudo /usr/share/openvswitch/scripts/ovs-ctl start
 ovs-vsctl add-br br-ex
 ovs-vsctl add-port br-ex eth1
 ```
-###5.1.8 Cấu hình nova để sử dụng neutron và metadata agent.
+#### Cấu hình nova để sử dụng neutron và metadata agent.
 Để nova sử dụng neutron services để quản lý mạng cho các máy ảo, cần cấu hình lại dịch vụ nova.Chỉnh sửa file ```	/etc/nova/nova.conf```, cập nhật các section sau để cung cấp cho nova endpoint, thông tin xác thực của neutron services và thông tin về metadata service:
 ```sh
-	[neutron]
-	...
-	url = http://controller:9696
-	auth_url = http://controller:35357
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	region_name = RegionOne
-	project_name = service
-	username = neutron
-	password = NEUTRON_PASS
+[neutron]
+...
+url = http://controller:9696
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = NEUTRON_PASS
 	
-	service_metadata_proxy = True
-	metadata_proxy_shared_secret = 1111	
+service_metadata_proxy = True
+metadata_proxy_shared_secret = 1111	
 ```
 Đồng bộ hóa cơ sở dữ liệu:
 ```sh
@@ -896,17 +895,17 @@ su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
 ```
 Khởi động lại các service:
 ```sh
-	sudo service nova-api restart
-	sudo service neutron-server restart
-	sudo service neutron-openvswitch-agent restart
-	sudo service neutron-dhcp-agent restart
-	sudo service neutron-metadata-agent restart
-	sudo service neutron-l3-agent restart
+sudo service nova-api restart
+sudo service neutron-server restart
+sudo service neutron-openvswitch-agent restart
+sudo service neutron-dhcp-agent restart
+sudo service neutron-metadata-agent restart
+sudo service neutron-l3-agent restart
 ```
 ##5.2 Cấu hình trên compute node
 ###5.2.1 Chuẩn bị gói cài đặt trên compute node
 ```sh
-sudo apt-get neutron-plugin-openvswitch-agent
+sudo apt-get install neutron-plugin-openvswitch-agent
 ```
 ###5.2.2 Cấu hình cài đặt neutron trên compute node
 Cấu hình file ```/etc/neutron/neutron.conf```
@@ -928,42 +927,26 @@ rabbit_password = 1111
 
 Chỉnh sửa section [DEFAULT] để thiết lập keystone là phương thức xác thực cho neutron:
 ```sh
-	[DEFAULT]
-	...
-	auth_strategy = keystone
+[DEFAULT]
+...
+auth_strategy = keystone
 ```
 
 Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới tạo ở phần trước cho neutron services, neutron service sẽ sử dụng user này khi xác thực với keystone:
 ```sh
-	[keystone_authtoken]
-	...
-	auth_uri = http://controller:5000
-	auth_url = http://controller:35357
-	memcached_servers = controller:11211
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	project_name = service
-	username = neutron
-	password = 1111
+[keystone_authtoken]
+...
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = 1111
 ```
-
-####Cấu hình nova-compute trên computenode để nova-compute sử dụng neutron.
-Chỉnh sửa file cấu hình ```/etc/nova/nova.conf``` để nova-compute có thể sử dụng neutron, thêm thông tin xác thực của neutron vào file cấu hình của nova-compute.
-```sh
-	[neutron]
-	...
-	url = http://controller:9696
-	auth_url = http://controller:35357
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	region_name = RegionOne
-	project_name = service
-	username = neutron
-	password = 1111
-```
-
+####Cấu hình ovs-agent
 Cấu hình file ``` /etc/neutron/plugins/ml2/openvswitch_agent.ini```
 ```sh
 [ovs]
@@ -982,17 +965,35 @@ enable_security_group = True
 ```
 Tạo br-vlan và br-ex, kết nối br-vlan tới eth2 và br-ex tới eth1
 ```sh
+sudo /usr/share/openvswitch/scripts/ovs-ctl start
 ovs-vsctl add-br br-ex
 ovs-vsctl add-port br-ex eth1
 ```
+####Cấu hình nova-compute trên computenode để nova-compute sử dụng neutron.
+Chỉnh sửa file cấu hình ```/etc/nova/nova.conf``` để nova-compute có thể sử dụng neutron, thêm thông tin xác thực của neutron vào file cấu hình của nova-compute.
+```sh
+[neutron]
+...
+url = http://controller:9696
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = 1111
+```
+
+
 ###5.2.3 Kết thúc cài đặt trên compute node
 - Khởi động lại dịch vụ nova-compute
 ```sh
-	service nova-compute restart
+sudo service nova-compute restart
 ```
 - Khởi động lại linux-bridge agent
 ```sh
-	service neutron-openvswitch-agent restart
+sudo service neutron-openvswitch-agent restart
 ```
 ##5.3 Kiểm tra hoạt động của dịch vụ neutron
 Trên controller node, nhập file xác thực admin.sh
