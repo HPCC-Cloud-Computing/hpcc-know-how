@@ -70,11 +70,11 @@ Khởi động lại máy, sau đó thiết lập địa chỉ IP tĩnh cho eth0
 	
 	# NIC EXTERNAL
 	auto eth1
-	iface eth1 inet dhcp
-	#address 192.168.2.10
-	#netmask 255.255.255.0
-	#gateway 192.168.2.1
-	#dns-nameservers 8.8.8.8
+	iface eth1 inet static
+	address 192.168.2.10
+	netmask 255.255.255.0
+	gateway 192.168.2.1
+	dns-nameservers 8.8.8.8
 ```
 
 
@@ -230,11 +230,11 @@ Thiết lập địa chỉ IP, chỉnh sửa ```sh file /etc/network/interfaces 
 	
 	# NIC EXTERNAL
 	auto eth1
-	iface eth1 inet dhcp
-	#address 192.168.2.11
-	#netmask 255.255.255.0
-	#gateway 192.168.2.1
-	#dns-nameservers 8.8.8.8
+	iface eth1 inet static
+	address 192.168.2.11
+	netmask 255.255.255.0
+	gateway 192.168.2.1
+	dns-nameservers 8.8.8.8
 ```
  
 Chỉnh sửa file  /etc/hosts để phân giải IP cho các node:
