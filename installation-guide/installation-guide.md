@@ -416,7 +416,7 @@ openstack service create \
  - Admin API endpoint:
  ```sh
  openstack endpoint create --region RegionOne \
-  identity public http://controller:5000/v3
+  identity admin http://controller:35357/v3
  ```
 <h3>Tạo domain, user, project và role</h3>
 - Tạo domain
