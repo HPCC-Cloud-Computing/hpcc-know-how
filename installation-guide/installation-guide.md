@@ -868,33 +868,49 @@ $ openstack endpoint create --region RegionOne \
   Chỉnh sửa file /etc/nova/nova.conf như dưới: </br>
 <b>Lưu ý:</b> Trong trường hợp nếu có dòng khai bao trước đó thì tìm và thay thế, chưa có thì khai báo mới hoàn toàn.
 - Khai báo trong section [api_database] dòng dưới, do section [api_database] chưa có nên ta khai báo thêm
- ```sh
+```sh
 [api_database]
 connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
-  ```
+```
 - Khai báo trong section [database] dòng dưới. Do section [database] chưa có nên ta khai báo thêm.
-   ```sh
-[database]
-connection = mysql+pymysql://nova:bkcloud16@controller/nova
-  ``` 
+```sh
+	[database]
+	connection = mysql+pymysql://nova:bkcloud16@controller/nova
+```
 - Trong section [DEFAULT] :
 
-	* Thay dòng:</br> logdir=/var/log/nova
-	</br>Bằng dòng:</br> log-dir=/var/log/nova>
-	* Thay dòng:</br> enabled_apis=ec2,osapi_compute,metadata
-	Bằng dòng:</br> enabled_apis=osapi_compute,metadata
-	* Bỏ dòng:</br> verbose = True
-	* Khai báo thêm các dòng sau:</br>
-	   ```sh
-	rpc_backend = rabbit
-	auth__strategy = keystone
-	rootwrap_config = /etc/nova/rootwrap.conf
-	#IP MGNT cua node Controller
-	my_ip = 10.10.10.10
-	</br>
-	use_neutron = True
-	firewall_driver = nova.virt.firewall.NoopFirewallDriver
-	  ```
+	* Thay dòng: 
+	```sh
+		logdir=/var/log/nova
+	```
+	Bằng dòng: 
+	```sh
+		log-dir=/var/log/nova>
+	```
+	* Thay dòng:
+	```sh
+		enabled_apis=ec2,osapi_compute,metadata
+	```
+	Bằng dòng:
+	```sh
+		enabled_apis=osapi_compute,metadata
+	```
+	* Bỏ dòng:
+	```sh
+		verbose = True
+	```
+	* Khai báo thêm các dòng sau:
+	```sh
+		rpc_backend = rabbit
+		auth__strategy = keystone
+		rootwrap_config = /etc/nova/rootwrap.conf
+		#IP MGNT cua node Controller
+		my_ip = 10.10.10.10
+		
+		use_neutron = True
+		firewall_driver = nova.virt.firewall.NoopFirewallDriver
+	```
+	
 - Khai báo trong section [oslo_messaging_rabbit] các dòng dưới. Do section[oslo_messaging_rabbit] chưa có nên ta khai báo thêm.
 
 ```sh
@@ -926,22 +942,21 @@ vncserver_proxyclient_address = $my_ip
   ``` 
   
 - Trong section [glance] khai báo dòng để nova kết nối tới API của glance. Do section [glance] chưa có nên ta khai báo thêm.
-
- ```sh
+```sh
 [glance]
 api_servers = http://controller:9292
-  ```
+```
   
 - Trong section [oslo_concurrency] khai báo dòng dưới. Do section [oslo_concurrency]chưa có nên ta khai báo thêm.
   
-   ```sh
+```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
-  ```
+```
   
 - Khai báo thêm section mới [neutron] để nova làm việc với neutron
   
-   ```sh
+```sh
 [neutron]
 url = http://controller:9696
 auth_url = http://controller:35357
@@ -955,30 +970,30 @@ password = bkcloud16
 </br>
 service_metadata_proxy = True
 metadata_proxy_shred_secret = bkcloud16
-  ```
+```
   
   Tạo database cho nova:
   
-   ```sh
+```sh
 # su -s /bin/sh -c "nova-manage api_db sync" nova
 # su -s /bin/sh -c "nova-manage db sync" nova
-  ```
+```
   
 <a name="end"></a>
 ###5.2.2. Kết thúc bước cài đặt và cấu hình nova
 
   Khởi động lại các dịch vụ của nova sau khi cài đặt & cấu hình nova
-   ```sh
+```sh
 # service nova-api restart
 # service nova-consoleauth restart
 # service nova-scheduler restart
 # service nova-conductor restart
 # service nova-novncproxy restart
-  ```
+```
 Xóa database mặc định của nova
-   ```sh
+```sh
 # rm –f /var/lib/nova/nova.sqlite
-  ```
+```
   Kiểm tra các service của nova hoạt động hay chưa bằng lệnh dưới
 ```sh
 # openstack compute service list
@@ -992,38 +1007,38 @@ Xóa database mặc định của nova
 |  6 | nova-osapi_compute | 0.0.0.0    | internal | enabled | down  | None                       |
 |  7 | nova-metadata      | 0.0.0.0    | internal | enabled | down  | None                       |
 +----+--------------------+------------+----------+---------+-------+----------------------------+
-  ```
+```
 <a name="install_nova_compute"></a>
 ##5.3. Cài đặt và cấu hình nova trên node Compute
 
 Cài đặt gói nova-compute </br>
 ```sh
 apt-get -y install nova-compute
- ```
+```
 <b>Cấu hình nova-comupte</b> </br>
-- Sao lưu file /etc/nova/nova.conf </br>
-	```sh
+- Sao lưu file /etc/nova/nova.conf 
+```sh
 	cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
-	 ```
-- Trong section [DEFAULT] khai báo các dòng sau: </br>
-  ```sh
+```
+- Trong section [DEFAULT] khai báo các dòng sau: 
+```sh
 pc_backend = rabbit
 auth_strategy = keystone
 my_ip = 10.10.10.11
 	
 use_neutron = True
 firewall_driver = nova.virt.firewall.NoopFirewallDriver
- ```
-- Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới: </br>
-  ```sh
+```
+- Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới:
+```sh
 [oslo_messaging_rabbit]
 rabbit_host = controller
 rabbit_userid = openstack
 rabbit_password = bkcloud16
- ```
+```
 
-- Khai báo thêm section [keystone_authtoken] và các dòng dưới: </br>
- ```sh
+- Khai báo thêm section [keystone_authtoken] và các dòng dưới:
+```sh
 [keystone_authtoken]
 auth_uri = http://controller:5000
 auth_url = http://controller:35357
@@ -1034,27 +1049,27 @@ user_domain_name = default
 project_name = service
 username = nova
 password = bkcloud16
- ```
-- Khai báo thêm section [vnc] và các dòng dưới: </br>
- ```sh
-[vnc]
-enabled = True
-vncserver_listen = 0.0.0.0
-vncserver_proxyclient_address = $my_ip
-novncproxy_base_url = http://172.16.69.40:6080/vnc_auto.html
- ```
-- Khai báo thêm section [glance] và các dòng dưới: </br>
- ```sh
+```
+- Khai báo thêm section [vnc] và các dòng dưới:
+```sh
+	[vnc]
+	enabled = True
+	vncserver_listen = 0.0.0.0
+	vncserver_proxyclient_address = $my_ip
+	novncproxy_base_url = http://192.168.2.10:6080/vnc_auto.html
+```
+- Khai báo thêm section [glance] và các dòng dưới: 
+```sh
 [glance]
 api_servers = http://controller:9292
- ```
-- Khai báo thêm section [oslo_concurrency] và các dòng dưới: </br>
- ```sh
+```
+- Khai báo thêm section [oslo_concurrency] và các dòng dưới: 
+```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
- ```
-- Khai báo thêm section [neutron] và các dòng dưới: </br>
- ```sh
+```
+- Khai báo thêm section [neutron] và các dòng dưới:
+```sh
 [neutron]
 url = http://controller:9696
 auth_url = http://controller:35357
@@ -1065,7 +1080,7 @@ region_name = RegionOne
 project_name = service
 username = neutron
 password = bkcloud16
- ```
+```
 
 Khởi động lại dịch vụ nova-compute
 ```sh
@@ -1493,3 +1508,74 @@ Kết quả nếu như hệ thống hoạt động bình thường
 	| f49a4b81-afd6-4b3d-b923-66c8f0517099 | Metadata agent     | controller | :-)   | True           | neutron-metadata-agent    |
 	+--------------------------------------+--------------------+------------+-------+----------------+---------------------------+
 ```
+
+##7. Cài đặt HORIZON (dashboad)
+HORIZON hay còn gọi là dashboad dùng để cung cấp giao diện trên web để người dùng có thể sử dụng OpenStack 1 cách dễ dàng hơn.
+
+###7.1. Cài đặt và cấu hình Horizon 
+
+Cài đặt các thành phần cho dashboad:
+
+```sh
+	apt-get -y install openstack-dashboard
+```
+
+Sao lưu lại file cấu hình cho dashboad
+
+```sh
+	cp /etc/openstack-dashboard/local_settings.py /etc/openstack-dashboard/local_settings.py.orig
+```
+
+Tìm các dòng sau trong file /etc/openstack-dashboard/local_settings.py và chỉnh sửa như bên dưới
+
+```sh
+	OPENSTACK_HOST = "controller"
+```
+
+```sh
+	CACHES = {
+    		'default': {
+         		'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+         		'LOCATION': 'controller:11211',
+    		}
+	}
+```
+
+```sh
+	OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
+```
+
+```sh
+	OPENSTACK_API_VERSIONS = {
+    		"identity": 3,
+    		"image": 2,
+    		"volume": 2,
+	}
+```
+
+```sh
+	OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
+```
+
+```sh
+	OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+```
+
+```sh
+	TIME_ZONE = "Asia/Ho_Chi_Minh"
+```
+
+Xóa theme mặc định của ubuntu
+
+```sh
+	apt-get -y remove --auto-remove openstack-dashboard-ubuntu-theme
+```
+
+Khởi động lại apache
+
+```sh
+	service apache2 restart
+```
+
+Mở web với địa chỉ http://192.168.2.10/horizon để vào dashboad
+
