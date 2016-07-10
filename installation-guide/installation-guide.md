@@ -122,7 +122,7 @@ apt-get install mariadb-server python-pymysql
 
 Thiết lập mật khẩu: bkcloud16
 
-Tạo file /etc/mysql/conf.d/mysqld_openstack.cnf với nội dung sau:
+Tạo file ``` /etc/mysql/conf.d/mysqld_openstack.cnf ```với nội dung sau:
 ```sh
 [mysqld]
 bind-address = 10.10.10.10
@@ -147,7 +147,7 @@ Network Time Protocol là dịch vụ cho phép đồng bộ hóa giữa các m�
 ```sh
 apt-get install chrony
 ```
-Tiến hành chỉnh sửa file cấu hình ```sh/etc/chrony/chrony.conf```:
+Tiến hành chỉnh sửa file cấu hình ```/etc/chrony/chrony.conf```:
 Thay các dòng dưới
 ```sh
 server 0.debian.pool.ntp.org offline minpoll 8
@@ -190,7 +190,7 @@ Ta cài đặt các gói cần thiết cho memcached
 ```sh
 apt-get -y install memcached python-memcache
 ```
-Dùng nano  sửa ```sh file /etc/memcached.conf ```, thay dòng 
+Dùng nano  sửa ``` file /etc/memcached.conf ```, thay dòng 
 ```sh -l 127.0.0.1 ``` 
 bằng dòng dưới: 
 ```sh -l 10.10.10.10 ```
@@ -216,7 +216,7 @@ hostname -F /etc/hostname
 Khởi động lại máy.
 
 Sau đó thiết lập địa chỉ IP cho eth0 và eth1:
-Thiết lập địa chỉ IP, chỉnh sửa ```sh file /etc/network/interfaces ``` với nội dung sau:
+Thiết lập địa chỉ IP, chỉnh sửa  file ``` /etc/network/interfaces ``` với nội dung sau:
 ```sh 
 	# NIC loopback
 	auto lo
@@ -266,7 +266,7 @@ Ta cài đặt NTP Client
 ```sh
 apt-get -y install chrony
 ```
-Chỉnh sửa file /etc/chrony/chrony.conf.Thay các dòng dưới
+Chỉnh sửa file ```/etc/chrony/chrony.conf```.Thay các dòng dưới
 ```sh
 server 0.debian.pool.ntp.org offline minpoll 8
 server 1.debian.pool.ntp.org offline minpoll 8
