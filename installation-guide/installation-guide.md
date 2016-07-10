@@ -1361,7 +1361,7 @@ Metadata agent có chức năng cung cấp các dữ liệu cho máy ảo khi m�
 [DEFAULT]
 ...
 nova_metadata_ip = controller
-metadata_proxy_shared_secret = 1111
+metadata_proxy_shared_secret = bkcloud16
 ```
 
 ####Cấu hình nova để sử dụng neutron và metadata agent.
@@ -1455,7 +1455,7 @@ physical_interface_mappings = provider:eth1
 ```sh
 [vxlan]
 enable_vxlan = True
-local_ip = 10.10.10.10
+local_ip = 10.10.10.11
 l2_population = True
 ```
 ở đây local_ip là 10.10.10.11 là địa chỉ của card mạng vật lý kết nối tới mạng management network, mà chúng ta sẽ triển khai mạng vxlan trên mạng vât lý này.
