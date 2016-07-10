@@ -1180,8 +1180,10 @@ source admin.sh
 ####Tải về các dịch vụ của neutron
 Ta tiến hành tải về các dịch vụ của neutron trên controller node:
 ```sh
+	apt-get update
 	apt-get -y install neutron-server neutron-plugin-ml2 \
-	neutron-linuxbridge-agent neutron-l3-agent neutron-dhcp-agent \ neutron-metadata-agent
+	neutron-linuxbridge-agent neutron-l3-agent neutron-dhcp-agent \
+	neutron-metadata-agent
 ```
 Tiếp theo, ta cấu hình các dịch vụ của neutron
 ###6.2.2 Cấu hình cài đặt neutron trên controller node
@@ -1189,148 +1191,149 @@ Tiếp theo, ta cấu hình các dịch vụ của neutron
 ####Cấu hình để neutron sử dụng database
 Chỉnh sửa section [database] để neutron có thể sử dụng database neutron mà chúng ta vừa tạo ở phần trước:
 ```sh 
-	connection = mysql+pymysql://neutron:bkcloud16@controller/neutron
+connection = mysql+pymysql://neutron:bkcloud16@controller/neutron
 ```
 Lưu ý: xóa cơ sở dữ liệu mặc định của neutron, comment dòng này ở section [database]
 ```sh
-	#connection = sqlite:////var/lib/neutron/neutron.sqlite
+#connection = sqlite:////var/lib/neutron/neutron.sqlite
 ```
 Cấu hình để nova kích hoạt ml2 plugin, router services và ovelaping  ip address:
 ```sh
-	[DEFAULT]
-	...
-	core_plugin = ml2
-	service_plugins = router
-	allow_overlapping_ips = True
+[DEFAULT]
+...
+core_plugin = ml2
+service_plugins = router
+allow_overlapping_ips = True
 ```
 ####Cấu hình để neutron sử dụng messaging service
 Neutron liên lạc với các dịch vụ khác thông qua messaging service. Cập nhật section [DEFAULT] và section [oslo_messaging_rabbit] để cấu hình giúp neutron sử dụng messaging service:
 ```sh
-	[DEFAULT]
-	...
-	rpc_backend = rabbit
+[DEFAULT]
+...
+rpc_backend = rabbit
 ```
 Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết lập khi cài đặt messaging service ở phần trước đó:
 ```sh
-	[oslo_messaging_rabbit]
-	...
-	rabbit_host = controller
-	rabbit_userid = openstack
-	rabbit_password = bkcloud16
+[oslo_messaging_rabbit]
+...
+rabbit_host = controller
+rabbit_userid = openstack
+rabbit_password = bkcloud16
 ```
 ####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
 
 Chỉnh sửa section [DEFAULT] để thiết lập keystone là phương thức xác thực cho neutron:
 ```sh
-	[DEFAULT]
-	...
-	auth_strategy = keystone
+[DEFAULT]
+...
+auth_strategy = keystone
 ```
 
 Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới tạo ở phần trước cho neutron services, neutron service sẽ sử dụng user này khi xác thực với keystone:
 ```sh
-	[keystone_authtoken]
-	...
-	auth_uri = http://controller:5000
-	auth_url = http://controller:35357
-	auth_plugin = password
-	project_domain_id = default
-	user_domain_id = default
-	project_name = service
-	username = neutron
-	password = bkcloud16
+[keystone_authtoken]
+...
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = bkcloud16
 ```
 
 ####Cấu hình neutron để thông báo các sự kiện cho nova
 
 Neutron cần thông báo cho Nova khi cấu hình mạng (network topology) thay đổi. Cập nhật các section [DEFAULT] và [nova] 
 ```sh
-	[DEFAULT]
-	...
-	notify_nova_on_port_status_changes = True
-	notify_nova_on_port_data_changes = True
-	[nova]
-	...
-	auth_url = http://controller:35357
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	region_name = RegionOne
-	project_name = service
-	username = nova
-	password = bkcloud16
+[DEFAULT]
+...
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+[nova]
+...
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = bkcloud16
 
 ```
 ####Cấu hình Modular Layer 2 (ML2) plug-in
 Trong bài hướng dẫn này, chúng ta sử dụng ML2 plugin kết hợp với Linux-bridge-agent để xây dựng nên Layer2 cho mạng ảo. Để cấu hình ML2 plug-in, tiến hành cập nhật file ```/etc/neutron/plugins/ml2/ml2_conf.ini```
-- Cập nhật section [ml2], option ``` type_driver``` cho phép chọn các loại mạng có thể được tạo ra và hoạt động bởi mechanism driver. Vì chúng ta sử dụng linux-bridge, chúng ta chọn các mạng flat, lan, vxlan
+- Cập nhật section [ml2], option ``` type_driver``` cho phép chọn các loại mạng có thể được tạo ra và hoạt động bởi mechanism driver. Vì chúng ta sử dụng linux-bridge, chúng ta chọn các mạng flat, vxlan
 ```sh
 [ml2]
-	...
-	type_drivers = flat,vlan,vxlan
+...
+type_drivers = flat,vxlan
 ```
 
 option ```mechanism_drivers``` cho phép thiết lập các plugin kết hợp với ml2 plugin. Ở đây ta thiết lập giá trị cho option này là linuxbridge và l2population
 ```sh
-	[ml2]
-	...
-	mechanism_drivers = linuxbridge,l2population
+[ml2]
+...
+mechanism_drivers = linuxbridge,l2population
 ```
 
 option ```tenant_network_types``` cho phép thiết lập các loại mạng mà các user có thể tạo trong các project. Ở đây ta thiết lập loại mạng mà các user có thể tạo là ```vxlan```
 ```sh
-	[ml2]
-	...
-	tenant_network_types = vxlan
+[ml2]
+...
+tenant_network_types = vxlan
 ```
 kích hoạt port_security:
 ```sh
-	[ml2]
-	...
-	extension_drivers = port_security
+[ml2]
+...
+extension_drivers = port_security
 ```
 - Cập nhật section [ml2_type_flat], xác định interfaces vật lý hỗ trợ thiết lập mạng ảo flat. Ở đây chúng ta thiết lập giá chị cho option ```flat_networks``` là một ```provider label```. ```provider label``` là một nhãn logic được gán vào 1 interface vật lý. nhãn logic này sẽ được xác định sẽ gán vào interface vật lý nào khi chúng ta cấu hình linux-bridge. Ở đây chúng ta sử dụng tên nhãn logic là ```provider```. 
 ```sh
-	[ml2_type_flat]
-	...
-	flat_networks = provider
+[ml2_type_flat]
+...
+flat_networks = provider
 ```
 - Cập nhật section [ml2_type_vxlan], xác định khoảng giá trị có thể dùng để gán ID cho các VXLAN. Như đã cấu hình ở option ```tenant_network_type```, các private network do user tạo ra sẽ có kiểu là vxlan. Để phân biệt được các máy thuộc các mạng ảo( tức các VXLAN ) khác nhau, thì mỗi VXLAN sẽ có 1 id riêng. Ở đây ta thiết lập giá trị cho option ```vni_ranges``` là ```1:1000```, tức là các VXLAN được tạo ra trong hệ thống mạng ảo sẽ nhận ID có giá trị từ 1 tới 1000.
 ```sh
-	[ml2_type_vxlan]
-	...
-	vni_ranges = 1:1000
+[ml2_type_vxlan]
+...
+vni_ranges = 1:1000
 ```
 - Cập nhật section [securitygroup], cải thiện hiệu quả hoạt động của tường lủa bằng cách enable option ```enable_ipset```
 ```sh
-	[securitygroup]
-	...
-	enable_ipset = True
+[securitygroup]
+...
+enable_ipset = True
 ```
 ####Cấu hình Linux bridge agent
 Để cấu hình Linux bridge agent, chúng ta chỉnh sửa file ```/etc/neutron/plugins/ml2/linuxbridge_agent.ini```
 - Cập nhật section [linux_bridge], xác định ánh xạ giữa interface vật lý với tên nhãn logic:
 ```sh
-	[linux_bridge]
-	physical_interface_mappings = provider:eth1
+[linux_bridge]
+physical_interface_mappings = provider:eth1
 ```
 - Ở đây, chúng ta ánh xạ nhãn logic ```provider``` với card vật lý eth1. Cấu hình này có liên quan tới việc chúng ta thiết lập mạng flat ở phần cấu hình trước trên ml2 plugin. Khi chúng ta thiết lập cấu hình này, thông qua nhãn logic provider, chúng ta có thể triển khai một mạng flat network ảo trên các card mạng vật lý eth1. Ở các phần sau, mạng flat network này sẽ là provider external network, cung cấp kết nối internet cho các private network thông qua các router. Chúng ta triển khai mạng flat network này trên các card mạng eth1, vì các card eth1 này kết nối tới mạng internet bên ngoài.
 - Cập nhật section [vxlan], kích hoạt option enable_vxlan để linux_bridge hỗ trợ VXLAN, kích hoạt l2_population option và ánh xạ ```local_ip``` sang địa chỉ ip của card mạng sẽ triển khai vxlan network. Ở cấu hình đang cài đặt, chúng ta sẽ triển khai các VXLAN (các private network của các user) thông qua mạng vật lý management network. Do vậy, ở từng node chúng ta sẽ cấu hình giá trị của option này tương ứng với các ip của mạng này trên các node. Ở trên controller node, management network có 1 ip 10.10.10.10 trên card eth0. Do đó chúng ta sẽ sử dụng giá trị này gán cho option ```local_ip```
 ```sh
-	[vxlan]
-	enable_vxlan = True
-	local_ip = 10.10.10.10
-	l2_population = True
+[vxlan]
+enable_vxlan = True
+local_ip = 10.10.10.10
+l2_population = True
 ```
 
 - Cập nhật section [securitygroup], để kích hoạt firewall trên linux_bridge
 ####firewall này triển khai trên bridge nào ?
 ```sh
-	[securitygroup]
-	...
-	enable_security_group = True
-	firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+[securitygroup]
+...
+enable_security_group = True
+firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
 ```
 
 ####Cấu hình Neutron DHCP agent
@@ -1338,19 +1341,19 @@ Dịch vụ ```neutron-dhcp-agent``` có chức năng tạo ra, quản lý, cấ
 
 Để cấu hình dịch vụ ```neutron-dhcp-agent```, chỉnh sửa file ```/etc/neutron/dhcp_agent.ini```, section [DEFAULT], chỉnh sửa option interface-driver sử dụng Linux-bridge, dhcp_drive sử dụng dnsmasq, và kích hoạt option enable_isolated_metadata để dhcp có thể đóng vai trò cung cấp metadata cho instance:
 ```sh
-	[DEFAULT]
-	...
-	interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver
-	dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
-	enable_isolated_metadata = True
+[DEFAULT]
+...
+interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver
+dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+enable_isolated_metadata = True
 ```
 ####Cấu hình L3 agent
 Dịch vụ ```neutron-l3-agent``` có chức năng tạo ra và quản lý các router ảo trên hệ thống mạng ảo. Cấu hình file ```/etc/neutron/l3_agent.ini```, thiết lập interface_driver của các router sử dụng Linux-bridge và để trống giá trị external_network_bridge.
 ```sh
-	[DEFAULT]
-	...
-	interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver
-	external_network_bridge =
+[DEFAULT]
+...
+interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver
+external_network_bridge =
 ```
 ####Cấu hình neutron metadata agent
 Metadata agent có chức năng cung cấp các dữ liệu cho máy ảo khi máy ảo cần. Cấu hình metadata agent bằng cách chỉnh sửa file: ``` /etc/neutron/metadata_agent.ini ``` , thiết lập địa chỉ của metadata server là controller và mật khẩu để truy cập vào metadata server là 1111 trong section [DEFAULT]
@@ -1364,41 +1367,41 @@ metadata_proxy_shared_secret = 1111
 ####Cấu hình nova để sử dụng neutron và metadata agent.
 Để nova sử dụng neutron services để quản lý mạng cho các máy ảo, cần cấu hình lại dịch vụ nova.Chỉnh sửa file ```	/etc/nova/nova.conf```, cập nhật các section sau để cung cấp cho nova endpoint, thông tin xác thực của neutron services và thông tin về metadata service:
 ```sh
-	[neutron]
-	...
-	url = http://controller:9696
-	auth_url = http://controller:35357
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	region_name = RegionOne
-	project_name = service
-	username = neutron
-	password = bkcloud16
+[neutron]
+...
+url = http://controller:9696
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = bkcloud16
 	
-	service_metadata_proxy = True
-	metadata_proxy_shared_secret = bkcloud16	
+service_metadata_proxy = True
+metadata_proxy_shared_secret = bkcloud16	
 ```
 ###6.2.3 Kết thúc cài đặt trên controller node
 - Đồng bộ hóa cơ sở dữ liệu cho neutron
 ```sh
-	su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
-	--config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron 
+su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
+--config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron 
 ```
 - Khởi động lại dịch vụ nova-api và các dịch vụ trong neutron
 ```sh
-	service nova-api restart
-	service neutron-server restart
-	service neutron-linuxbridge-agent restart
-	service neutron-dhcp-agent restart
-	service neutron-metadata-agent restart
-	service neutron-l3-agent restart
+service nova-api restart
+service neutron-server restart
+service neutron-linuxbridge-agent restart
+service neutron-dhcp-agent restart
+service neutron-metadata-agent restart
+service neutron-l3-agent restart
 ```
 ##6.3 Cài đặt neutron lên compute node
 ###6.3.1 Chuẩn bị các thành phần của neutron trên compute node
 Trên compute node, ta sẽ triển khai thành phần neutron-linuxbridge-agent. Tải về neutron-linuxbridge-agent:
 ```sh
-	apt-get install neutron-linuxbridge-agent
+apt-get install neutron-linuxbridge-agent
 ```
 
 ###6.3.2 Cấu hình neutron trên compute node
@@ -1406,95 +1409,95 @@ Ta cấu hình file /etc/neutron/neutron.conf:
 ####Cấu hình để neutron sử dụng messaging service
 Neutron liên lạc với các dịch vụ khác thông qua messaging service. Cập nhật section [DEFAULT] và section [oslo_messaging_rabbit] để cấu hình giúp neutron sử dụng messaging service:
 ```sh
-	[DEFAULT]
-	...
-	rpc_backend = rabbit
+[DEFAULT]
+...
+rpc_backend = rabbit
 ```
 Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết lập khi cài đặt messaging service ở phần trước đó:
 ```sh
-	[oslo_messaging_rabbit]
-	...
-	rabbit_host = controller
-	rabbit_userid = openstack
-	rabbit_password = bkcloud16
+[oslo_messaging_rabbit]
+...
+rabbit_host = controller
+rabbit_userid = openstack
+rabbit_password = bkcloud16
 ```
 ####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
 
 Chỉnh sửa section [DEFAULT] để thiết lập keystone là phương thức xác thực cho neutron:
 ```sh
-	[DEFAULT]
-	...
-	auth_strategy = keystone
+[DEFAULT]
+...
+auth_strategy = keystone
 ```
 
 Cập nhật section [keystone_authtoken] để gán user neutron mà ta mới tạo ở phần trước cho neutron services, neutron service sẽ sử dụng user này khi xác thực với keystone:
 ```sh
-	[keystone_authtoken]
-	...
-	auth_uri = http://controller:5000
-	auth_url = http://controller:35357
-	memcached_servers = controller:11211
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	project_name = service
-	username = neutron
-	password = bkcloud16
+[keystone_authtoken]
+...
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = bkcloud16
 ```
 ####Cấu hình linux-bridge agent
 - Cấu hình linux-bridge agent trên compute node để chuẩn bị hạ tầng mạng ảo trên compute node. Chỉnh sửa file ```/etc/neutron/plugins/ml2/linuxbridge_agent.ini ```, cấu hình để mapping - ánh xạ nhãn ```provider``` vào card vật lý eth1. Khi chúng ta muốn các máy ảo trên compute node có khả năng kết nối trực tiếp vào mạng external network, khi đó các máy ảo này sẽ kết nối vào mạng ảo flat này thông qua 1 bridge kết nối tới eth1.
 ```sh
-	[linux_bridge]
-	physical_interface_mappings = provider:eth1
+[linux_bridge]
+physical_interface_mappings = provider:eth1
 ```
 - Cấu hình cho vxlan tương tự như controller node
 ```sh
-	[vxlan]
-	enable_vxlan = True
-	local_ip = 10.10.10.10
-	l2_population = True
+[vxlan]
+enable_vxlan = True
+local_ip = 10.10.10.10
+l2_population = True
 ```
 ở đây local_ip là 10.10.10.11 là địa chỉ của card mạng vật lý kết nối tới mạng management network, mà chúng ta sẽ triển khai mạng vxlan trên mạng vât lý này.
 - Kích hoạt security group trên compute node
 ```sh
-	[securitygroup]
-	...
-	enable_security_group = True
-	firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+[securitygroup]
+...
+enable_security_group = True
+firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
 ```
 ####Cấu hình nova-compute trên computenode để nova-compute sử dụng neutron.
 Chỉnh sửa file cấu hình ```/etc/nova/nova.conf``` để nova-compute có thể sử dụng neutron, thêm thông tin xác thực của neutron vào file cấu hình của nova-compute.
 ```sh
-	[neutron]
-	...
-	url = http://controller:9696
-	auth_url = http://controller:35357
-	auth_type = password
-	project_domain_name = default
-	user_domain_name = default
-	region_name = RegionOne
-	project_name = service
-	username = neutron
-	password = bkcloud16
+[neutron]
+...
+url = http://controller:9696
+auth_url = http://controller:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = bkcloud16
 ```
 ###6.3.3 Kết thúc cài đặt trên compute node
 - Khởi động lại dịch vụ nova-compute
 ```sh
-	service nova-compute restart
+service nova-compute restart
 ```
 - Khởi động lại linux-bridge agent
 ```sh
-	service neutron-linuxbridge-agent restart
+service neutron-linuxbridge-agent restart
 ```
 ##6.4 Kiểm tra hoạt động của dịch vụ neutron
 Trên controller node, nhập file xác thực admin.sh
 ```sh
-	source admin.sh
+source admin.sh
 ```
 Kiểm tra xem các agent đã được bật đầy đủ hay chưa 
 ```sh
-	neutron agent-list
+neutron agent-list
 ```
 Kết quả nếu như hệ thống hoạt động bình thường
 ```sh
