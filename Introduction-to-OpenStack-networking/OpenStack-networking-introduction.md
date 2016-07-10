@@ -30,7 +30,9 @@ Sau khi đã xác định được các thiết bị đã có trong mạng ảo,
 
 Sau khi triển khai xong hạ tầng mạng ảo, các user có thể sử dụng các dịch vụ mà neutron cung cấp để xây dựng nên các mạng ảo cho project của user đó và cung cấp kết nối mạng cho các máy ảo trong project. 
 ###2.2 Ví dụ về một hệ thống mạng trong OpenStack cloud
-Để hiểu rõ hơn về cách triển khai một hệ thống mạng trên OpenStack cloud, chúng ta cùng xem xét 1 ví dụ. Dưới đây là một hệ thống mạng self-service  được triển khai trên cấu hình vật lý gồm 1 node controller và một node compute.Ở đây chúng ta sẽ triển khai một hệ thống mạng self service sử dụng linux-bridge làm L2 plugin, hệ thống này cho phép người dùng có thể tạo ra các mạng ảo riêng cho các project (private self-service network). Sơ đồ triển khai hệ thống mạng như sau:
+Để hiểu rõ hơn về cách triển khai một hệ thống mạng trên OpenStack cloud, chúng ta cùng xem xét 1 ví dụ. Dưới đây là một hệ thống mạng self-service  được triển khai trên cấu hình vật lý gồm 1 node controller và một node compute.
+
+Ở đây chúng ta sẽ triển khai một hệ thống mạng self service sử dụng linux-bridge làm L2 plugin, hệ thống này cho phép người dùng có thể tạo ra các mạng ảo riêng cho các project (private self-service network). Sơ đồ triển khai hệ thống mạng như sau:
 
 ![self-service-architect1.png](./img/self-service-architect1.png)
 
