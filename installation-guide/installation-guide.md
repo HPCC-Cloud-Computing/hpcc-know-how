@@ -967,7 +967,8 @@ region_name = RegionOne
 project_name = service
 username = neutron
 password = bkcloud16
-</br>
+
+
 service_metadata_proxy = True
 metadata_proxy_shred_secret = bkcloud16
 ```
