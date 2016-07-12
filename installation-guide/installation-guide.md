@@ -1101,15 +1101,13 @@ Cuối cùng, xác định xem node compute của bạn hỗ trợ cách thức 
 ```sh
 $ egrep -c '(vmx|svm)' /proc/cpuinfo
 ```
-Nếu kết quả trả về là 1 hay lớn hơn, thì node compute của bạn đã hỗ trợ tăng tốc phần cứng mà không cần các cấu hình bổ sung. Nhưng nếu kế quả trả về là 0, nghĩa là node compute của bạn không hỗ trợ tăng tốc phần cứng, bạn phải cấu hình libvirt sử dụng QEMU thay vì KVM.
-
-	* Sửa trong section `[libvirt]` ở file `/etc/nova/nova-compute.conf` như sau:
+Nếu kết quả trả về là 1 hay lớn hơn, thì node compute của bạn đã hỗ trợ tăng tốc phần cứng mà không cần các cấu hình bổ sung. Nhưng nếu kế quả trả về là 0, nghĩa là node compute của bạn không hỗ trợ tăng tốc phần cứng, bạn phải cấu hình libvirt sử dụng QEMU thay vì KVM. Khi đó, phải sửa trong section `[libvirt]` ở file `/etc/nova/nova-compute.conf` như sau:
 	
-	```sh
+```sh
 	[libvirt]
 	...
 	virt_type = qemu
-	```
+```
 
 Khởi động lại dịch vụ `nova-compute`
 ```sh
