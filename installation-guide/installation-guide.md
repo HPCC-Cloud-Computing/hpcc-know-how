@@ -731,25 +731,30 @@ openstack token issue
 Nova có các thành phần như sau: 
 
 - API:
-    * nova-api
-    * nova-api-metadata
+    * nova-api: chấp nhận và phản hồi với người dùng cuối yêu cầu API Compute. Nó hỗ trợ các dịch vụ OpenStack Compute API, Amazon EC2 API, và Admin API đặc biệt để cho người dùng có đặc quyền thực hiện các hành vi chính. Nó thực thi một số chính sách và khởi tạo các hoạt động cùng nhau, ví dụ như chạy 1 instance.
+    Theo mặc định, nova-api lắng nghe trên cổng 8773 đối với EC2 API và trên cồng 8774 đối với OpenStack API
+    * nova-api-metadata: chấp nhận các yêu cầu metadata từ các instance. Nova-api-metadata service thường được sử dụng khi bạn chạy ở chế độ đa máy chủ (multi-host) với cài đăt nova-network
 - Compute Core:
-    * nova-compute
-    * nova-schedule
-    * nova-conductor
-    * nova-cert
+    * nova-compute: là 1 daemon tạo ra và chấm dứt các thể hiện của máy ảo thông qua các API của công nghệ tạo máy ảo đó. Ví dụ
+	XenAPI cho XenServer/XCP
+	Libvirt cho KVM hay QEMU
+	VMwareAPI cho VMware
+Tiến trình này khá phức tạp, về cơ bản, các daemon chấp nhận các hoạt động từ hàng đợi và thực hiện một loạt các lệnh hệ thống như chạy 1 máy ảo KVM và cập nhật trạng thái của nó trong database. 
+    * nova-schedule: lấy một yêu cầu tạo máy ảo từ hàng đợi và tính toán chọn ra host phù hợp nhất để tạp máy ảo.
+    * nova-conductor: trung gian tương tác giữa nova-compute service và database. Nó giúp loại bỏ các truy cập trực tiếp từ các nova-compute service đến database.
+    * nova-cert: Một máy chủ daemon phục vụ dịch vụ Nova Cert cho chuẩn X509. Được sử dụng để tạo ra các giấy chứng nhận cho euca-bundle-image. Nó chỉ cần thiết cho EC2 API.(Nhưng hiện nay nova không còn hỗ trợ ec2 api).
 - Networking for VMs:
-    * nova-network
+    * nova-network: Một máy chủ daemon phục vụ dịch vụ Nova Cert cho chuẩn X509. Được sử dụng để tạo ra các giấy chứng nhận cho euca-bundle-image. Nó chỉ cần thiết cho EC2 API.
 - Console interfaces:
-    * nova-novncproxy
-    * nova-spicehtml5proxy
-    * nova-xvpvncproxy
-    * nova-cert
-    * euca2ools
+    * nova-consoleauth daemon:: dịch vụ này phải chạy trong giao diện proxy để hoạt động. Bạn có thể chạy các proxy của 1 trong 2 loại đối với 1 dịch vụ nova-consoleauth trong 1 cấu hình cluster duy nhất.
+    * nova-spicehtml5proxy: cung cấp 1 proxy để truy cập chạy các instance thông qua kết nối SPICE. Hỗ trợ các client trên nền web với HTML5
+    * nova-xvpvncproxy: cung cấp 1 proxy để truy cập chạy các instance thông qua kết nối VNC. Hỗ trợ client Java OpenStack cụ thể
+    * nova-cert: chứng nhận X509 (trong nova-cert module)
+    * nova-novncproxy daemon: cung cấp 1 proxy để truy cập chạy các instance thông qua 1 kết nối VNC. Hỗ trợ các client trên nền web với novnc.
 - Command line:
-    * nova client
+    * nova client: cho phép người dùng thực thi các lệnh như 1 quản trị viên được ủy quyền hay người dùng cuối.
 - Other component:
-    * The queue
+    * The queue: một trung tâm để truyền các tin nhắn giữa các daemon.
     * SQL database
 
 
@@ -764,7 +769,7 @@ Nova có các thành phần như sau:
 ```sh
 $ mysql -uroot -pbkcloud16
 ```
-Tạo database
+Tạo database: service nova cần tạo ra 2 database là nova và nova_api
 </br>
 ```sh
 CREATE DATABASE nova_api;
@@ -777,6 +782,7 @@ GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
   IDENTIFIED BY 'bkcloud16';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
   IDENTIFIED BY 'bkcloud16';
+  exit;
 ```
 Khai báo biến môi trường
  ```sh
@@ -788,7 +794,7 @@ Tạo user có tên là nova
  ```sh
 openstack user create nova --domain default  --password bkcloud16
   ```
-Phân quyền cho tài khoản nova
+Phân quyền admin cho user nova
  ```sh
 $ openstack role add --project service --user nova admin
   ```
@@ -806,7 +812,7 @@ $ openstack service create --name nova \
 | type        | compute                          |
 +-------------+----------------------------------+
   ```
-Tạo endpoint
+Tạo các endpoint cho nova:
  ```sh
 $ openstack endpoint create --region RegionOne \
   compute public http://controller:8774/v2.1/%\(tenant_id\)s
@@ -858,26 +864,26 @@ $ openstack endpoint create --region RegionOne \
   ```
   Cài đặt các gói và cấu hình:
 ```sh
-# apt-get install nova-api nova-conductor nova-consoleauth \
+apt-get install nova-api nova-conductor nova-consoleauth \
   nova-novncproxy nova-scheduler
   ```  
-  Sao lưu file /etc/nova/nova.conf trước khi cấu hình
+  Sao lưu file `/etc/nova/nova.conf` trước khi cấu hình
   ```sh
-# cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
+cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
   ```
-  Chỉnh sửa file /etc/nova/nova.conf như dưới: </br>
+  Chỉnh sửa file `/etc/nova/nova.conf` như dưới: </br>
 <b>Lưu ý:</b> Trong trường hợp nếu có dòng khai bao trước đó thì tìm và thay thế, chưa có thì khai báo mới hoàn toàn.
-- Khai báo trong section [api_database] dòng dưới, do section [api_database] chưa có nên ta khai báo thêm
+- Khai báo trong section `[api_database]` dòng dưới, do section `[api_database]` chưa có nên ta khai báo thêm
 ```sh
 [api_database]
 connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
 ```
-- Khai báo trong section [database] dòng dưới. Do section [database] chưa có nên ta khai báo thêm.
+- Khai báo trong section `[database]` dòng dưới. Do section `[database]` chưa có nên ta khai báo thêm.
 ```sh
 	[database]
 	connection = mysql+pymysql://nova:bkcloud16@controller/nova
 ```
-- Trong section [DEFAULT] :
+- Trong section `[DEFAULT]`:
 
 	* Thay dòng: 
 	```sh
@@ -885,7 +891,7 @@ connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
 	```
 	Bằng dòng: 
 	```sh
-		log-dir=/var/log/nova>
+		log-dir=/var/log/nova
 	```
 	* Thay dòng:
 	```sh
@@ -895,6 +901,8 @@ connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
 	```sh
 		enabled_apis=osapi_compute,metadata
 	```
+	(Do trong bản Mitaka, nova không còn hỗ trợ EC2 API)
+	
 	* Bỏ dòng:
 	```sh
 		verbose = True
@@ -910,8 +918,9 @@ connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
 		use_neutron = True
 		firewall_driver = nova.virt.firewall.NoopFirewallDriver
 	```
+	( Theo mặc định, Compute sử dụng 1 driver tường lửa nội bộ (internal firewall driver). Nhưng từ khi dịch vụ Networking chứa 1 firewall drive thì bạn phải vô hiệu hóa driver firewall của Compute bằng cách thêm dòng nova.virt.firewall.NoopFirewallDriver firewall driver)
 	
-- Khai báo trong section [oslo_messaging_rabbit] các dòng dưới. Do section[oslo_messaging_rabbit] chưa có nên ta khai báo thêm.
+- Khai báo trong section `[oslo_messaging_rabbit]`các dòng dưới. Do section `[oslo_messaging_rabbit]` chưa có nên ta khai báo thêm.
 
 ```sh
 [oslo_messaging_rabbit]
@@ -919,7 +928,7 @@ rabbit_host = controller
 rabbit_userid = openstack
 rabbit_password = bkcloud16
   ```
-- Trong section [keystone_authtoken] khai báo các dòng dưới. Do section[keystone_authtoken] chưa có nên ta khai báo thêm.
+- Trong section `[keystone_authtoken]` khai báo các dòng dưới. Do section `[keystone_authtoken]` chưa có nên ta khai báo thêm.
  
  ```sh
 [keystone_authtoken]
@@ -933,7 +942,7 @@ project_name = service
 username = nova
 password = bkcloud16
   ```
-- Trong section [vnc] khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section [vnc] chưa có nên ta khai báo thêm.
+- Trong section `[vnc]` khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section `[vnc]` chưa có nên ta khai báo thêm.
 
   ```sh
 [vnc]
@@ -941,20 +950,20 @@ vncserver_listen = $my_ip
 vncserver_proxyclient_address = $my_ip
   ``` 
   
-- Trong section [glance] khai báo dòng để nova kết nối tới API của glance. Do section [glance] chưa có nên ta khai báo thêm.
+- Trong section `[glance]` khai báo dòng để nova kết nối tới API của glance. Do section `[glance]` chưa có nên ta khai báo thêm.
 ```sh
 [glance]
 api_servers = http://controller:9292
 ```
   
-- Trong section [oslo_concurrency] khai báo dòng dưới. Do section [oslo_concurrency]chưa có nên ta khai báo thêm.
+- Trong section `[oslo_concurrency]` khai báo dòng dưới. Do section `[oslo_concurrency]` chưa có nên ta khai báo thêm.
   
 ```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
 ```
   
-- Khai báo thêm section mới [neutron] để nova làm việc với neutron
+- Khai báo thêm section mới `[neutron]` để nova làm việc với neutron
   
 ```sh
 [neutron]
@@ -968,16 +977,15 @@ project_name = service
 username = neutron
 password = bkcloud16
 
-
 service_metadata_proxy = True
 metadata_proxy_shred_secret = bkcloud16
 ```
   
-  Tạo database cho nova:
+  Đồng bộ database cho nova:
   
 ```sh
-# su -s /bin/sh -c "nova-manage api_db sync" nova
-# su -s /bin/sh -c "nova-manage db sync" nova
+su -s /bin/sh -c "nova-manage api_db sync" nova
+su -s /bin/sh -c "nova-manage db sync" nova
 ```
   
 <a name="end"></a>
@@ -1012,16 +1020,20 @@ Xóa database mặc định của nova
 <a name="install_nova_compute"></a>
 ##5.3. Cài đặt và cấu hình nova trên node Compute
 
+Phần này sẽ nói về cách cài đặt và cấu hình dịch vụ compute trên node Compute. Dịch vụ compute có hỗ trợ 1 số 
+hypervisor để tạo máy ảo. Nhưng để đơn giản trong phần này sẽ sử dụng QEMU hypervisor và KVM trên node compute để hỗ trợ 
+tăng tốc phần cứng cho máy ảo. 
+
 Cài đặt gói nova-compute </br>
 ```sh
 apt-get -y install nova-compute
 ```
 <b>Cấu hình nova-comupte</b> </br>
-- Sao lưu file /etc/nova/nova.conf 
+- Sao lưu file `/etc/nova/nova.conf` 
 ```sh
 	cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
 ```
-- Trong section [DEFAULT] khai báo các dòng sau: 
+- Trong section `[DEFAULT]` khai báo các dòng sau: 
 ```sh
 pc_backend = rabbit
 auth_strategy = keystone
@@ -1030,7 +1042,7 @@ my_ip = 10.10.10.11
 use_neutron = True
 firewall_driver = nova.virt.firewall.NoopFirewallDriver
 ```
-- Khai báo thêm section [oslo_messaging_rabbit] và các dòng dưới:
+- Khai báo thêm section `[oslo_messaging_rabbit]` và các dòng dưới:
 ```sh
 [oslo_messaging_rabbit]
 rabbit_host = controller
@@ -1038,7 +1050,7 @@ rabbit_userid = openstack
 rabbit_password = bkcloud16
 ```
 
-- Khai báo thêm section [keystone_authtoken] và các dòng dưới:
+- Khai báo thêm section `[keystone_authtoken]` và các dòng dưới:
 ```sh
 [keystone_authtoken]
 auth_uri = http://controller:5000
@@ -1051,7 +1063,7 @@ project_name = service
 username = nova
 password = bkcloud16
 ```
-- Khai báo thêm section [vnc] và các dòng dưới:
+- Khai báo thêm section `[vnc]` và các dòng dưới:
 ```sh
 	[vnc]
 	enabled = True
@@ -1059,17 +1071,19 @@ password = bkcloud16
 	vncserver_proxyclient_address = $my_ip
 	novncproxy_base_url = http://192.168.2.10:6080/vnc_auto.html
 ```
-- Khai báo thêm section [glance] và các dòng dưới: 
+Các thành phần máy chủ lắng nghe tất cả các địa chỉ IP còn các thành phần proxy chỉ lắng nghe trên địa chỉ IP giao diện quản lý của các node compute. Base URL cho biết nơi mà bạn có thể sử dụng một trình duyệt web để truy cập console từ xa của tinstance trên node compute này.
+**chú ý*: Nếu trình duyệt web để truy cập console từ xa nằm trên một máy chủ mà không thể phân giải tên máy chủ controller, bạn phải thay thế controller với các địa chỉ IP giao diện quản lý của các node compute.
+- Khai báo thêm section `[glance]` và các dòng dưới: 
 ```sh
 [glance]
 api_servers = http://controller:9292
 ```
-- Khai báo thêm section [oslo_concurrency] và các dòng dưới: 
+- Khai báo thêm section `[oslo_concurrency]` và các dòng dưới: 
 ```sh
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
 ```
-- Khai báo thêm section [neutron] và các dòng dưới:
+- Khai báo thêm section `[neutron]` và các dòng dưới:
 ```sh
 [neutron]
 url = http://controller:9696
@@ -1083,7 +1097,21 @@ username = neutron
 password = bkcloud16
 ```
 
-Khởi động lại dịch vụ nova-compute
+Cuối cùng, xác định xem node compute của bạn hỗ trợ cách thức ảo hóa nào, chạy lênh:
+```sh
+$ egrep -c '(vmx|svm)' /proc/cpuinfo
+```
+Nếu kết quả trả về là 1 hay lớn hơn, thì node compute của bạn đã hỗ trợ tăng tốc phần cứng mà không cần các cấu hình bổ sung. Nhưng nếu kế quả trả về là 0, nghĩa là node compute của bạn không hỗ trợ tăng tốc phần cứng, bạn phải cấu hình libvirt sử dụng QEMU thay vì KVM.
+
+	* Sửa trong section `[libvirt]` ở file `/etc/nova/nova-compute.conf` như sau:
+	
+	```sh
+	[libvirt]
+	...
+	virt_type = qemu
+	```
+
+Khởi động lại dịch vụ `nova-compute`
 ```sh
 service nova-compute restart
  ```
@@ -1091,7 +1119,7 @@ Xóa database mặc định của hệ thống tạo ra
 ```sh
 rm -f /var/lib/nova/nova.sqlite
  ```
-Dùng lệnh nano để thêm file admin-openrc chứa nội dung dưới:
+Dùng lệnh nano để thêm file `admin-openrc` chứa nội dung dưới:
 ```sh
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
