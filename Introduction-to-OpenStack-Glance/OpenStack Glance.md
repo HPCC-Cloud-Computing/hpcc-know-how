@@ -44,6 +44,8 @@ Trong OpenStack, Nova cung cấp các tính năng để tạo ra image từ các
 <li>Trong Glance, các images được sử dụng để vận hành máy ảo mới. Nó cũng có thể lấy bản snapshots từ các máy ảo đang chạy để thực hiện dự phòng cho các VM và trạng thái các máy ảo đó.
 </li>
 </ul>
+<img src="./img/overview-glance.jpg"/>
+
 <h3><a name="component">1.3 Các thành phần của Glance</a></h3>
 
 Glance bao gồm các thành phần sau:
@@ -66,8 +68,12 @@ Glance tiếp nhận các API request yêu cầu images từ người dùng đ�
 <div>là hệ thống lưu trữ do OpenStack Swift cung cấp - dịch vụ lưu trữ có tính sẵn sàng cao , lưu trữ các image dưới dạng các object.</div>
 </li>
 <li><b>BlockStorage: </b>hệ thống lưu trữ có tính sẵn sàng cao do OpenStack Cinder cung cấp, lưu trữ các image dưới dạng khối</li>
-<li><b>VMWare</b></li>
-<li><b>Amazon S3</b></li>
+<li><b>VMWare: </b>
+<div>ESX/ESXi hoặc vCenter Server.</div>
+</li>
+<li><b>Amazon S3</b>
+<div>Dịch vụ của Amazon</div>
+</li>
 <li><b>RADOS Block Device(RBD): </b>
 <div>lưu trữ các images trong cụm lưu trữ Ceph sử dụng giao diện RBD của Ceph</div>
 </li>
