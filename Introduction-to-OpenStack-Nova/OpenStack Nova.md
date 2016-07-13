@@ -17,13 +17,16 @@
     * [5.2 Đối với các user của project](#user_project)
 
 
+(Tài liệu này tìm hiểu theo kiến trúc và chức năng của các thành phần Nova trong bản OpenStack Mitaka)
+
+
 <a name="overview"></a>
 ##1 Tóm tắt về dịch vụ OpenStack Compute
 Sử dụng OpenStack Compute để lưu trữ và quản lý hệ thống điện toán đám mây. OpenStack compute là 1 phần quan trọng của hệ thống cung cấp dịch vụ hạ tầng điện toán đám mây IaaS (Infrestructure-as-a-Service). Các module chính được viết bằng Python.
 
 ![](./img/os .png)
 
-OS Compute tương tác với OS Identity (Keystone) để xác thực người dùng, tương tác với dịch vụ OS Image (Glance & Cinder) để lấy đĩa cài hệ điều hành, và OS Dashboard  để cung cấp dịch vụ tương tác cho người sử dụng và giao diện quản trị. Truy cập vào Image bị giới hạn bởi các project và các người dùng, và qouta cung cấp bị giới hạn cho project. OpenStack Compute có thể scale lên phần cứng chuẩn (mở rộng phần cứng vật lý), và tải xuống image để chạy thực thể.
+OpenStack Compute tương tác với OpenStack Identity (Keystone) để xác thực người dùng, tương tác với dịch vụ OpenStack Image (Glance & Cinder) để lấy đĩa cài hệ điều hành, và OpenStack Dashboard  để cung cấp dịch vụ tương tác cho người sử dụng và giao diện quản trị. Truy cập vào Image bị giới hạn bởi các project và các người dùng, và quotas  giới hạn cho các project. OpenStack Compute có thể scale lên phần cứng chuẩn (mở rộng phần cứng vật lý), và tải xuống image để chạy thực thể.
 
 ![](./img/nova architecture 2.png)
 
@@ -57,8 +60,12 @@ Các project bao gồm một VLAN riêng, và các volume, instance, images, key
 
 - Số lượng volume có thể được triển khai 
 - Số nhân xử lý và dung lượng Ram có thể được phân bổ
-- Glián địa chỉ IP cho bất kỳ instance nào khi nó được chạy. Điều này cho phép các instance có thể có cùng 1 địa chỉ IP được public
-- Cố định các địa chỉ IP được giao cho các instance giống nhau khi nó chạy. Điều này cho phép các instance có thể có địa chỉ IP public hay private giống nhau.
+- Floating IP cho bất kỳ instance nào khi nó được chạy. Điều này cho phép các instance có địa chỉ IP được public để truy cập.
+- Fixed IP đến cùng 1 instance so với private Ip của instance đó. Điều này cho phép các instance có địa chỉ IP để truy cập public và private.
+
+(Mỗi instance đều có 1 địa chỉ IP private và fixed, và có thể có 1 địa chỉ IP public hoặc floating. Private IP được dùng để giao tiếp giữa các instances, public Ip dùng để nối ra mạng ngoài của cloud, bao gồm cả kết nối tới internet.
+Khi bạn chạy 1 instance thì instance đó sẽ được gán 1 private Ip và Ip này sẽ giữ nguyên kể cả khi bạn khởi động lại hệ thống, nó chỉ mất khi bạn xóa instance đó.)
+
 
 Các role kiểm soát các hành động của 1 user được phép thực hiện. Theo mặc định, hầu hết các hành động không yêu cầu 1 role đặc biệt, nhưng bạn có thể cấu hình chúng bằng cách sửa file policy.json để thêm role cho user. Ví dụ, 1 luật có thể được định nghĩa để 1 user phải có quyền admin để có thể phân bổ 1 địa chỉ IP public.
 </br> 
@@ -116,8 +123,8 @@ root@controller:/home/hamanhdong# nova flavor-list
 ##2. Các service của OpenStack Compute
 <a name="api"></a>
 ###2.1.  API
-<b>Nova-api service:</b> chấp nhận và phản hồi với người dùng cuối yêu cầu API Compute. Nó hỗ trợ các dịch vụ OpenStack Compute API, Amazon EC2 API, và Admin API đặc biệt để cho người dùng có đặc quyền thực hiện các hành vi chính. Nó thực thi một số chính sách và khởi tạo các hoạt động cùng nhau, ví dụ như chạy 1 instance.
-Theo mặc định, nova-api lắng nghe trên cổng 8773 đối với EC2 API và trên cồng 8774 đối với OpenStack API.
+<b>Nova-api service:</b> chấp nhận và phản hồi với người dùng cuối yêu cầu API Compute. Nó hỗ trợ các dịch vụ OpenStack Compute API, và Admin API đặc biệt để cho người dùng có đặc quyền thực hiện các hành vi chính. Nó thực thi một số chính sách và khởi tạo các hoạt động cùng nhau, ví dụ như chạy 1 instance.
+Theo mặc định, nova-api lắng nghe trên cồng 8774 đối với OpenStack API.
 
 <b>Nova-api-metadata service:</b> chấp nhận các yêu cầu metadata từ các instance. Nova-api-metadata service thường được sử dụng khi bạn chạy ở chế độ đa máy chủ (multi-host) với cài đăth nova-network
 
@@ -133,12 +140,13 @@ Theo mặc định, nova-api lắng nghe trên cổng 8773 đối với EC2 API 
 - VMwareAPI cho VMware
 
 Tiến trình này khá phức tạp, về cơ bản, các daemon chấp nhận các hoạt động từ hàng đợi và thực hiện một loạt các lệnh hệ thống như chạy 1 máy ảo KVM và cập nhật trạng thái của nó trong database.
-</br>
+
+
 <b>Nova-scheduler service:</b> lấy một yêu cầu tạo máy ảo từ hàng đợi và xác định máy chủ compute mà nó chạy.
-</br>
+
+
 <b>Nova-conductor module:</b> trung gian tương tác giữa nova-compute service và database. Nó giúp loại bỏ các truy cập trực tiếp từ các nova-compute service đến database. Nova-conductor module chia theo chiều ngang, nghĩa là bạn có thể chạy nhiều instance của nova-conductor trên các máy khác nhau khi cần thiết để mở rộng thêm mục đích sử dụng. Tuy nhiên, không triển khai module này trên các nút có dịch vụ nova-compute chạy để thuận tiện cho việc di chuyển hay mở rộng sau này.</br>
 Hiện nay, OpenStack đang cố đẩy thêm các thành phần liên quan trên nova-compute sang nova-conductor để thuận tiên hơn cho sự di chuyển (migrations) hay mở rộng kích thước. Và để cho nova-conductor sẽ thực hiện các hoạt phức tạp, để đảm bảo sự phát triển và xử lý lỗi tốt hơn.
-
 </br>
 <b>Nova-cert module:</b> Một máy chủ daemon phục vụ dịch vụ Nova Cert cho chuẩn X509. Được sử dụng để tạo ra các giấy chứng nhận cho euca-bundle-image. Nó chỉ cần thiết cho EC2 API.
 
@@ -234,6 +242,7 @@ Một số chi tiết trong ví dụ trên có thể khác trong môi trường 
 </br>
 ![](https://ilearnstack.files.wordpress.com/2013/04/request-flow1.png)
 
+(Hình trên là của phiên bản cũ, trong bản Mitaka, dịch vụ Quantum đã đổi sang tên mới là Neutron)
 </br>
 link: https://ilearnstack.com/2013/04/26/request-flow-for-provisioning-instance-in-openstack/</br>
 1. Từ Dashboard hoặc CLI, user nhập các thông tin chứng thực (ví dụ như user name và password) và thực hiện lời gọi REST tới Keystone để xác thực.</br>
