@@ -398,7 +398,7 @@ Disk identifier: 0x00000000
 Ổ cứng `/dev/sdb` trên kia chính là ổ cứng mà chúng ta đã tạo từ bước trước, chưa chứa gì (`/dev/sda` đã chứa hệ điều hành). Nếu chưa có bạn nên xem lại bước tạo ổ cứng bên trên.
 
 - Tạo volume vật lý LVM /dev/sdb
-``sh
+```sh
 # pvcreate /dev/sdb
 Physical volume "/dev/sdb" successfully created
 ```
@@ -414,14 +414,14 @@ Chỉ có các instance mới có thể truy cập vào các volume của BlockS
 - Chỉnh sửa file `/etc/lvm/lvm.conf` theo các bước dưới đây:
 
   * Trong phần devices, thêm 1 bộ lọc để chỉ chấp nhận thiết bị `/dev/sdb` và từ chối tất cả các thiết bị khác.
-  ``sh
+  ```sh
   devices {
   ...
   filter = [ "a/sdb/", "r/.*/"]
   ```
   Mỗi item trong mảng lọc bắt đầu bằng ký tự `'a'` để chấp nhận (accept), bắt đầu bằng ký tự `'r'` là để từ chối (reject). Mảng phải kết thúc với ký hiệu `“r./*/”` để từ chối tất cả các thiết bị còn lại. Bạn có thể sử dụng lênh `vgs -vvvv`  để kiểm tra bộ lọc.
 
-  **Chú ý: **
+  **Chú ý:**
 	* Nếu node storage của bạn sử dụng LVM trên ổ đĩa chứa hệ điều hành, bạn phải thêm 	thiết bị liên quan vào bộ lọc. Ví dụ: nếu `/dev/sda` chứa hệ điều hành thì bạn phải thêm 	vào như sau:
   ```sh
 	filter = [ "a/sda/", "a/sdb/", "r/.*/"]
@@ -429,7 +429,7 @@ Chỉ có các instance mới có thể truy cập vào các volume của BlockS
 	* Nếu node compute của bạn sử dụng LVM trên ổ đĩa chứa hệ điều hành, bạn cũng phải 	sửa lại bộ lọc trong file `/etc/lvm/lvm.conf` trên các node đó để thêm vào như trên. Ví dụ 	nếu hệ điều hành ở /dev/sda thì bạn phải thêm:
 	```sh
 	filter = [ "a/sda/", "r/.*/"]
-  ```
+	 ```
   
 - Cài đặt package:
 ```sh
