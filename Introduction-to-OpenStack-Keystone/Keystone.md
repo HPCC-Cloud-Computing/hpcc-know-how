@@ -29,7 +29,7 @@
   <li><a href="#authen_token">1.3.2.	Token</a></li>
 </ul>
 
-<a href="#tq_author">1.4.	Access Management và Authorization</a>
+<a href="#tq_author">1.4.	Access Management và Authorization</a></br>
 <a href="#tq_format">1.5.	Các định dạng Token</a>
 <ul>
   <li><a href="#format_uuid">1.5.1.	UUID	</a></li>
@@ -210,137 +210,16 @@
 &emsp;KeyStone tạo ra một chính sách Role-Based Access Control (RBAC), thực thi tại mỗi public API endpoint. Các chính sách được lưu trong file policy.json, nó bao gồm mục tiêu và quy tắc. Mỗi luật bắt đầu với " identity:" </br>
 <img src="img/password_diagram.png"/><br><br>
 <h3><a name="tq_format">1.5.	Các định dạng Token </a></h3></br>
-<h3><a name="format_uuid">1.5.1.	UUID </a></h3></br>
-&emsp;Trong những ngày đầu tiên, định dạng token của Keystone là UUID format. UUID format đơn giản chỉ lại một chuỗi 32 ký tự được sinh ngẫu nhiên. Token này được cung cấp và được xác thực bởi dịch vụ identity. </br>
-&emsp;Lợi ích của Token format này là token nhỏ (ngắn) và dễ sử dụng, đủ đơn giản để có thể thêm vào trong các lệnh cURL. </br>
-&emsp;Tuy nhiên nhược điểm của nó là không mang đủ những thông tin để có thể xác thực một cách trực tiếp các dữ liệu và request. Các dịch vụ của openstack cứ liên tục phải gửi lại token về phía keystone server để xác thực các request đến các service đó. Dẫn đến bất kì hành động nào trong Openstack đều phải thông qua keystone server.</br>
-<b>UUID Token Generation Workflow</b></br>
-<img src="img/uuid-token_generation.png"/><br><br>
-&emsp;Khi user gửi yều cầu tạo token đến Keystone với các thông tin Username, password và Project Name, Keystone sẽ thực hiện các bước sau để tạo ra UUID Token</br>
-<ol>
-    <li>Xác nhận user và lấy user ID</li>
-    <li>Xác nhận project và lấy project ID và domain ID</li>
-    <li>Lấy các Role của user trên project hoặc domain. Trả về failure, nếu user không có quyền nào.</li>
-    <li>Lấy các service và endpoint của tất các các service trong OpenStack</li>
-    <li>Đóng gói các thông tin Identity, Resource, Assignment và Catalog vào payload token và tạo Token ID</li>
-&emsp;Lưu giữ các thông tin Token ID, Expiration, Valid, User ID, Extra vào backend.</br>
-</ol>
-<b>UUID Token Validation Workflow</b></br>
-<img src="img/uuid-token_validation.png"/><br><br>
-&emsp;Quá trình xác minh UUID Token như sau:</br>
-<ol>
-    <li>Sử dụng câu lệnh “GET v3/auth/tokens” để gửi token đến Keystone </li>
-    <li>Lấy payload Token từ backend và kiểm tra các giá trị có đúng hay không? Nếu sai “Token Not Found”, Nếu đúng thực hiện bước tiếp theo.</li>
-    <li>Phân tích token và lấy metadata của token đó (bao gồm User ID, Project ID, Audit  ID, và Token Expiry).</li>
-    <li>Kiểm tra xem token đã hết hạn hay chưa (sử dung thời gian hiện tại được tính toàn trong UTC)? Nếu đã quá hạn (thời gian hiện tại lớn hơn thời gian hết hạn) thì báo “Token Not Found”, nếu đúng thực hiện bước tiếp theo.</li>
-    <li>Kiểm tra xem Token đã bị thu hồi hay chưa? Nếu đã bị thu hồi, thì trả về “Token Not Found”. Nếu đúng, trả về “HTTP/1.1 200 OK” (có nghĩa là token sử dụng được)</li>
-</ol>
-<b>UUID Token Revocation Workflow</b></br> 
-<img src="img/uuid-token_revocation.jpg"/><br><br>
-&emsp;Quá trình thu hồi một token thực hiện như sau:</br>
-<ol>
-    <li>Gửi request “DELETE v3/auth/tokens” đến Keystone để yêu cầu thu hồi token. Trước khi thu hồi token, thì phải thực hiện xác minh token (thực hiện các bước như trên)</li>
-    <li>Kiểm tra xem có Audit ID không? Nếu không chuyển sang bước 3. Nếu có thì chuyển sang bước 6</li>
-    <li>Token được thu hồi khi hết hạn.</li>
-    <li>Tạo event thu hồi với các thông tin sau: User ID, Project ID, Revoke At, Issued Before và Token Expiry</li>
-    <li>Chuyển đến bước 8.</li>
-    <li>Thu hồi bởi Audit ID.</li>
-    <li>Tạo event thu hồi với các thông tin: Audit ID, Revoke At, Issued Before</li>
-    <li>Lọc các event revoke đang tồn tại dựa trên revoke at</li>
-    <li>Cài đặt giá trị false cho token kvs</li>
-</ol>
-<h3><a name="format_pki">1.5.2.	PKI – PKIZ</a></h3></br>
-&emsp;Fomat token thứ 2 mà Keystone hỗ trợ là PKI format. Trong format này, token sẽ chứa toàn bộ thông tin xác minh chẳng hạn như: Khi nào token được cung cấp, khi nào token hết hạn, định danh người dùng, project, domain, role và service catalog. Tất cả những thông tin này được đóng gói trong một payload.</br>
-&emsp;Muốn gửi token qua HTTP, JSON token payload phải được mã hóa base64 với 1 số chỉnh sửa nhỏ. Cụ thể, Format=CMS+[zlib] + base64. Ban đầu JSON payload phải được ký sử dụng một khóa bất đối xứng(private key), sau đó được đóng gói trong CMS (cryptographic message syntax - cú pháp thông điệp mật mã). Với PKIz format, sau khi đóng dấu, payload được nén lại sử dụng trình nén zlib. Tiếp đó PKI token được mã hóa base64 và tạo ra một URL an toàn để gửi token đi.</br>
-&emsp;Các OpenStack services cache lại token này để đưa ra quyết định ủy quyền mà không phải liên hệ lại keystone mỗi lần có yêu cầu ủy quyền dịch vụ cho user.</br>
-&emsp;Kích thước của 1 token cơ bản với single endpoint trong catalog lên tới 1700 bytes. Với các hệ thống triển khai lớn nhiều endpoint và dịch vụ, kích thước của PKI token có thể vượt quá kích thước giới hạn cho phép của HTTP header trên hầu hết các webserver(8KB). Thực tế khi sử dụng chuẩn token PKIz đã nén lại nhưng kích thước giảm không đáng kể (khoảng 10%).</br>
-&emsp;PKI và PKIz tokens tuy rằng có thể cached nhưng chúng có nhiều hạn chế</br>
-<ul>
-    <li>Khó cấu hình để sử dụng</li>
-    <li>Kích thước quá lớn làm giảm hiệu suất web</li>
-    <li>Khó khăn khi sử dụng trong cURL command.</li>
-    <li>Keystone phải lưu các token với rất nhiều thông tin trong backend database với nhiều mục đích, chẳng hạn như tạo danh sách các token đã bị thu hồi. Hệ quả là người dùng phải lo về việc phải flush Keystone token database định kì tránh ảnh hưởng hiệu suất.</li>
-</ul>
-<b>Token PKI/PKIZ Generation Workflow</b></br>
-<img src="img/pki-token_generation.png"/><br><br>
-<ol>
-    <li>User gửi request đến Keystone.</li>
-    <li>Xác minh identity, resource (project và domain), assignment</li>
-    <li>Tạo JSON Token Payload</li>
-    <li>“Ký" lên JSON payload với Signing Key và Signing Certificate , sau đó được đóng gói lại dưới định dang CMS (cryptographic message syntax - cú pháp thông điệp mật mã)</li>
-    <li>Bước tiếp theo, nếu muốn đóng gói token định dạng PKI thì convert payload sang UTF-8, convert token sang một URL định dạng an toàn. Nếu muốn token đóng gói dưới định dang PKIz, thì phải nén token sử dụng zlib, tiến hành mã hóa base64 token tạo ra URL an toàn, convert sang UTF-8 và chèn thêm tiếp đầu ngữ "PKIZ"</li>
-    <li>Lưu vào Backend</li>
-</ol>
-<b>Token PKI/PKIZ Validation Workflow</b></br>
-&emsp;Tương tự như UUID, chỉ khác ở bước gửi yêu cầu, Keystone sẽ băm lại PKI Token với thuật toán băm đã cấu hình trước. Các bước tiếp theo tương tự UUID Token</br>
-<b>Token PKI/PKIZ Revocation Workflow</b></br>
-&emsp;Tương tự như UUID.</br>
-<h3><a name="format_fernet">1.5.3.	Fernet</a></h3></br>
-&emsp;Format mới nhất mà Keystone hỗ trợ là Fernet format. Fernet token chứa tối đa 255 ký tự, lớn hơn UUID và bé hơn rất nhiều so với PKI. Token này chỉ chứa đầy đủ thông tin của một token để không cần phải lưu trong database.</br>
-&emsp;Fernet token cũng được “Ký” sử dụng khóa đối xứng để ngăn chặn giả mạo. Và các khóa này cần phải được phân bổ đến các OpenStack region khác nhau.</br>
-<b>Fernet key</b></br>
-&emsp;Một key reponsitory được yêu cầu bởi Keystone để lưu trữ các Key dùng để mã hóa và giải mã các thông tin của token. Mỗi Key trong reponsitory có 3 trạng thái:</br>
-<ul>
-    <li>Primary key:  Một key reponsitory chỉ có duy nhất một primary key. Sử dụng để mã hóa và giải mã token. Key này luôn đặt tên là index cao nhất trong key reponsitory</li>
-    <li>Secondary key: là một thời điểm của primary key, nhưng nó đã bị giảm vị trí của một primary key khác. Key này chỉ được dùng để giải mã token. Keystone sữ dụng để giải mã các token được mã hóa bởi các primary key cũ.</li>
-    <li>Staged key: Là một Key đặc biệt, có một số điểm tương đồng với Secondary key. Một key reponsitory chỉ có duy nhất một primary key. Nó giống với Secondary key là chỉ có khả năng giải mã token. Staged key sẽ là primary key trong lên chuyển khóa tiếp theo. Nó được đặt tên là index 0 trong key reponsitory.</li>
-</ul>
-&emsp;Fernet key có một chu kỳ, được bắt đầu từ Staged key, sau đó được nâng lên Primary key và cuối cùng giảm xuống Secondary key. Fernet key được lưu trữ trong file “/etc/keystone/fernet-keys”</br>
-<b>Fernet key rotation</b></br>
-<img src="img/fernet_key_rotation.png"/><br><br>
-&emsp;Quá trình rotate key cụ thể như sau:</br>
-<ul>
-    <li>Ban đầu: Key reponsitory sẽ có Staged key và primary key. Không có secondary key.</li>
-    <li>Rotate lần đầu tiên: Staged key sẽ trở thành primary key. Primary key chuyển thành secondary key. Một Staged key mới được tạo ra</li>
-    <li>Rotate lầu thứ 2: Staged key Staged key sẽ trở thành primary key. Primary key chuyển thành secondary key thứ 2 trong key reponsitory. Một Staged key mới được tạo ra.</li>
-    <li>Tương tự như vậy cho các lần tiếp theo.</li>
-</ul>
-&emsp;Vậy thì key reponsitory sẽ bị quá tải khi số lượng secondary key tăng lên? Không, key reponsitory sẽ có số lượng key cố định, khi vượt mức thì nó sẽ xóa secondary key xuất hiện sớm nhất.</br>
-<b>Token Generation Workflow</b></br>
-<img src="img/fernet-token_generation.png"/><br><br>
-&emsp;Sau khi nhận được yêu cầu tạo token từ user Keystone sẽ thực hiện quá trình tạo token:</br>
-&emsp;Như hình trên, token bao gồm các trường sau:</br>
-<ol>
-    <li>Fernet token version: cho biết phiên bản của định dạng token </li>
-    <li>Current Timestamp : nhãn thời gian hiện tại, chỉ ra thời điểm token được tạo ra</li>
-    <li>IV – Initialation : sử dụng để mã hóa và giãi mã </li>
-    <li>Cipher text: là sự kết hợp của token payload (với các thông tin như version, user ID, Methods, Project ID,…) và Padding message. Sau đó, encrypt sử dụng encryption key được cung cấp</li>
-    <li>HMAC: là tổng hợp tất cả các trường trên và “ký” sử dụng signing key mà user cung cấp </li>
-</ol>
-<b>Token Validation Workflow</b></br>
-<img src="img/fernet-token_validation.png"/><br><br>
-&emsp;Quá trình validation token cụ thể như sau:</br>
-<ol>
-    <li>User gửi yêu cầu validation đến keystone với phương thức: GET v3/auth/tokens</li>
-    <li>Khôi phục lại Padding, trả về token với padding chính xác</li>
-    <li>Giải mã token sử dụng fernet key để lấy token payload</li>
-    <li>Xác định version từ token payload. Version cố định bởi keystone (unscope payload: 0; domain scope payload: 1; project scope payload: 2).</li>
-    <li>Phân tích payload để xác minh các trường. ví dụ, trong phạm vi một project có các trường: user ID, project ID, Methods, Audit ID, expiry</li>
-    <li>Kiểm tra xem token đã hết hạn chưa? Nếu đã hết hạn (thời gian hiện tại lớn hơn thời gian hết hạn), thì trả về “Token Not Found”. Nếu chưa hết hạn, tiếp tục bước sau.</li>
-    <li>Kiểm tra token đã bị thu hồi hay chưa? Nếu đã bị thu hồi, trả về “Token not found”. Nếu đúng, trả về “HTTP/1.1 200 OK” token đã được validation</li>
-</ol>
-<b>Token Validation Workflow</b></br>
-&emsp;Tương tự UUID và PKI/ PKIZ </br>
-<b>Multiple Data Center</b></br>
-<img src="img/fernet-multiple_data_center.jpg"/><br><br>
-&emsp;Giả sử triển khai hệ thống cloud với keystone ở cả hai bên US-WEST và US-EAST. Cả hai bên này đều có LDAP và Database luôn luôn được đồng bộ. Hoạt động của keystone khi user muốn thực hiện tạo một máy ảo VM như sau:</br>
-<ul>
-    <li>User sử dụng Nova ở US-WEST:
-        <ul>
-            <li>Đầu tiên, user sẽ yêu cầu token đến keystone. Keystone sẽ tạo ra một fernet token cho user (mô tả trong Token Generation Workflow). Trả lại user fernet token</li>
-            <li>User gửi yều cầu tạo máy ảo đến Nova và fernet token của mình. </li>
-            <li>Nova thực hiện validation token bằng cách gửi yêu cầu validation token đến cho Keystone. Keystone thực hiện validation token (các bước cụ thể mô tả ở trên). Keystone gửi kết quả lại cho Nova </li>
-            <li>Nếu xác minh đúng, Nova thực hiện yêu cầu tạo máy ảo và gửi phản hồi cho user</li>
-        </ul>
-    </li>
-    <li>
-        <ul>
-            <li>User gửi yều cầu tạo máy ảo đến Nova và fernet token của mình (đã được cấp bởi keystone bên US-WEST). </li>
-            <li>Nova thực hiện validation token bằng cách gửi yêu cầu validation token đến cho Keystone. Keystone thực hiện validation token (các bước cụ thể mô tả ở trên). Keystone gửi kết quả lại cho Nova </li>
-            <li>Nếu xác minh đúng, Nova thực hiện yêu cầu tạo máy ảo và gửi phản hồi cho user</li>
-        </ul>
-    </li>
-</ul>
+&emsp;Keystone cung cấp một số loại format keystone, và các người dùng có thể băn khoăn vì sao lại có nhiều loại như vậy. Để hiểu được tạo sao lại có nhiều format token, sau đây sẽ trình bày ngắn gọn các format token theo thứ tự xuất hiện</br>
+<h4><a name="format_uuid">1.5.1. UUID</a></h4></br>
+&emsp;Đầu tiên, Keystone hỗ trợ UUID token. UUID token là một chuỗi 32 ký tự sinh ngẫu nhiên được sử dụng cho việc xác thực và ủy quyền. Ưu điểm của UUID token là kích thước nhỏ, dễ sử dụng và nó đơn giản để thêm vào trong cURL command. Nhưng nhược điểm của UUID token là nó không mang đầy đủ thông tin của người dùng cho việc xác thực cục bộ tại các OpenStack service. Token phải được lưu trong database của Keystone. Điều này dẫn đến bùng nổ database nếu số lượng user tăng lên. Bên cạnh đó, khi người dùng request kèm token UUID đến các OpenStack service thì các OpenStack service luôn phải gửi token lại cho server Keystone để xác thực nếu một hoạt động muốn xác thực. Điều này dẫn đến Keystone luôn phải làm việc trong mọi hoạt động OpenStack, và trở thành nút thắt cổ chai trong hệ thống OpenStack.</br>
+<h4><a name="format_pki">1.5.2. PKI-PKIZ</a></h4></br>
+&emsp;Để giải quyết các vấn đề còn tồn tại của UUID token, Keystone đã tạo ra loại format token mới là PKI token. PKI token chứa đầy đủ thông tin có hoạt động xác thực cục bộ (có nghĩa là các OpenStack service không cần phải gửi token lại cho Keystone để thực hiện xác thực khi một hoạt động cần được xác thực) và danh mục các dịch vụ. Ngoài ra, token cần này còn được đăng ký và các service có thể cache lại token này và sử dụng nó cho đến khi hết hạn hoặc là bị hủy. Do chứa đầy đủ thông tin xác thực nên không cần database để lưu trữ token, nhưng việc này cũng tạo ra nhược điểm của PKI token là kích thước quá lớn. Kích thước của PKI token có thể lên tới 8K, điều này dẫn đến khó khăn trong việc tích hợp vào HTTP header (một số webserver không xử lý được HTTP header 8K). Ngoài ra, cũng vì kích thước mà các token này rất khó để sử dụng trong các câu lệnh cURL.</br>
+<img src="img/pki.png"/><br><br>
+&emsp;Để giảm bớt kích thước của PKI token, Keystone đã nén token này lại. Loại token được nén lại này là PKIz token. Nhưng dù có nén thì loại token này cũng có kích thước quá lớn (việc nén chỉ giảm được khoảng 10%)</br>
+<img src="img/pkiz.png"/><br><br>
+<h4><a name="format_fernet">1.5.3. Fernet</a></h4></br>
+&emsp;Loại token cải tiến hơn được tạo ra là Fernet token. Loại token này có kích thước nhỏ (tối đa 255 ký tự - lớn hơn kích thước của UUID và bé hơn rất nhiều so với PKI token) nhưng lại mang đầy đủ thông tin cho việc xác thực cục bộ và Keystone không cần phải lưu trữ token trong database – Việc này sẽ làm tăng hiệu năng của Keystone một cách đáng kể. Fernet token chứa một số thông tin như: Định danh người dùng, project, hạn sử dụng token,…</br>
 <h3><a name="tq_activity">1.6.	Hoạt động của Keystone</a></h3></br>
 &emsp;Biểu đồ tuẩn tự dưới đây sẽ mô tả quá trình hoạt động của Keystone trong ví dụ cụ thể là tạo một máy ảo VM.</br>
 <img src="img/keystone_process_flow.png"/><br><br>
