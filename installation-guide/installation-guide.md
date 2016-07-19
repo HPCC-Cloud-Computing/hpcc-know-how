@@ -1601,6 +1601,11 @@ Xóa theme mặc định của ubuntu
 	apt-get -y remove --auto-remove openstack-dashboard-ubuntu-theme
 ```
 
+Chỉnh sửa trong file `/etc/apache2/conf-available/openstack-dashboard.conf` bằng cách thêm vào dòng:
+```sh
+WSGIApplicationGroup %{GLOBAL}
+```
+
 Khởi động lại apache
 
 ```sh
