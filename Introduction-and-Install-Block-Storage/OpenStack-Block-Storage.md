@@ -13,6 +13,10 @@
 - [4. Cài đặt và cấu hình trên node storage  ](#install_storage)
   * [4.1 Tạo ổ cứng mới cho node storage](#create_hardware)
   * [4.2 Cài đặt và cấu hình](#configure_storage)
+- [5. Tạo volume](#create_volume)
+- [6. Mount volume vào máy ảo, tạo data và detach để kiểm tra](#mount_and_check)
+  * [6.1 Mount volume vào máy ảo và tạo data](#mount)
+  * [6.2 Detach volume và gán vào 1 instance khác để kiểm tra](#detach)
 
 
 <a name="over_view_cinder"></a>
@@ -525,4 +529,142 @@ root@compute1:/home/compute# cinder service-list
 +------------------+------------+------+---------+-------+----------------------------+-----------------+
 ```
 
-  
+<a name="create_volume"></a>
+##5. Tạo volume
+
+1 volume là 1 khối thiết bị để lưu trữ, giống như USB. Bạn có thể gán chúng cho 1 instance bất kỳ. 
+
+Để tạo 1 volume, source file demo.sh để tạo trên project demo
+```sh
+$ . demo.sh
+```
+Tạo 1 volume mới với tên là `volumev0`, kích thước `2Gb`
+```sh
+$ openstack volume create --size 2 volume0
++---------------------+--------------------------------------+
+| Field               | Value                                |
++---------------------+--------------------------------------+
+| attachments         | []                                   |
+| availability_zone   | nova                                 |
+| bootable            | false                                |
+| consistencygroup_id | None                                 |
+| created_at          | 2016-07-22T14:30:48.391027           |
+| description         | None                                 |
+| encrypted           | False                                |
+| id                  | 603a747d-7b29-44ff-90cd-ce097246ef1b |
+| multiattach         | False                                |
+| name                | volume0                              |
+| properties          |                                      |
+| replication_status  | disabled                             |
+| size                | 2                                    |
+| snapshot_id         | None                                 |
+| source_volid        | None                                 |
+| status              | creating                             |
+| type                | None                                 |
+| updated_at          | None                                 |
+| user_id             | 684286a9079845359882afc3aa5011fb     |
++---------------------+--------------------------------------+
+```
+Kiểm tra lại trạng thái của volume mới tạo (lưu ý phải ở trạng thái `available`)
+```sh
+$ openstack volume list
++--------------------------------------+--------------+-----------+------+-------------+
+| ID                                   | Display Name | Status    | Size | Attached to |
++--------------------------------------+--------------+-----------+------+-------------+
+| 603a747d-7b29-44ff-90cd-ce097246ef1b | volume0      | available |    2 |             |
++--------------------------------------+--------------+-----------+------+-------------+
+```
+Tạo 2 máy ảo là `test_cinder1` và `test_cinder2` và kiểm tra `id` của mỗi máy bằng lệnh:
+```sh
+root@controller:/home/ha# nova list
++--------------------------------------+--------------+---------+------------+-------------+-------------------------------------------+
+| ID                                   | Name         | Status  | Task State | Power State | Networks                                  |
++--------------------------------------+--------------+---------+------------+-------------+-------------------------------------------+
+| 72a4860e-33d9-402a-9e4e-710683bad297 | test_cinder1 | SHUTOFF | -          | Shutdown    | selfservice=192.168.20.101, 192.168.1.105 |
+| 28a63719-9900-45e2-8266-ddab9593f2c7 | test_cinder2 | ACTIVE  | -          | Running     | selfservice=192.168.20.102, 192.168.1.106 |
++--------------------------------------+--------------+---------+------------+-------------+-------------------------------------------+
+```
+Lấy `id` của máy ảo thứ nhất (tên là `test_cinder1`) để `attach volumev0` vào:
+
+(Ta có thể `attach volume` cho máy ảo ngay cả khi nó `đang chạy`)
+```dh
+$ openstack server add volume 72a4860e-33d9-402a-9e4e-710683bad297 volumev0
+```
+Kiểm tra lại trạng thái của volumev0 sau khi đã attach vào máy ảo `test_cinder1`:
+```sh
+root@controller:/home/ha# openstack volume list
++--------------------------------------+--------------+--------+------+---------------------------------------+
+| ID                                   | Display Name | Status | Size | Attached to                           |
++--------------------------------------+--------------+--------+------+---------------------------------------+
+| 603a747d-7b29-44ff-90cd-ce097246ef1b | volume0      | in-use |    2 | Attached to test_cinder1 on /dev/vdb  |
++--------------------------------------+--------------+--------+------+---------------------------------------+
+```
+Tiến hành bật máy ảo `test_cinder1` lên và login vào, kiểm tra trạng thái của volume vừa gán cho máy ảo `test_cinder1` để biết nó được gán vào ổ đĩa nào bằng lệnh:
+```sh
+$ sudo fdisk -l
+```
+Kết quả:
+
+![](./img/test1_login.png)
+
+Dựa vào kết quả trên, ta thấy volume đã được gán vào ổ đĩa /dev/vdb trên máy ảo.
+
+<a name="mount_and_check"></a>
+##6. Mount volume vào máy ảo, tạo data và detach để kiểm tra
+
+<a name="mount"></a>
+###6.1 Mount volume vào máy ảo và tạo data
+
+Tạo file system với định dạng ext4 cho ổ đĩa /dev/vdb (ổ đĩa mà volume0 đã được gán vào)
+
+![](./img/mkfs.png)
+
+Sau đó kiểm tra lại kết quả:
+
+![](./img/blkid.png)
+
+Tiến hành mount volume cho máy ảo:
+
+Đầu tiên, ta tạo 1 thư mục mới để chứa volume sẽ được mount vào.
+Ví dụ, tạo 1 thư mục `test` trong `/mnt`, sau đó mount `volume0` được gán trên ổ đĩa `/dev/vdb` vào thư mục test mới tạo:
+```sh
+$ sudo mount -t ext4 /dev/vdb /mnt/test
+```
+Kiểm tra lại kết quả bằng lệnh:
+
+![](./img/df -h instance1.png)
+
+Nếu kết quả như hình trên chứng tỏ đã mount thành công, bây giờ ta có thể sử dụng thư mục này để lưu trữ như 1 thư mục bình thường trên máy. Ta tạo thử 1 file `abc.txt` trong thư mục `/mnt/test` với nội dung bất kỳ, ví dụ: 
+
+![](./img/abc.png)
+
+<a name="detach"></a>
+###6.2 Detach volume và gán vào 1 instance khác để kiểm tra
+
+Sử dụng giao diện bằng cách đăng nhập vào horizon
+
+Vào Project  -> Volumes -> Manage Attachments 
+
+![](./img/manager attach.png)
+
+Sau đó chọn `Detach Volume` để detach `volume0` ra khỏi máy ảo `test_cinder1`
+
+![](./img/detack volume.png)
+
+Chọn lại vào `Manage Attachments` của `volumev0`, và tiến hành attach volumev0 này vào máy ảo `test_cinder2`
+
+Login vào máy ảo `test_cinder2` và kiểm tra lại xem `volume0` đã được attach vào ổ đĩa nào:
+
+![](./img/instance2.png)
+
+Như kết quả trong hình trên, `volumev0` đã được attach vào ổ đĩa `/dev/vdb` trong máy ảo `test_cinder2`.
+
+Sau đó, tạo 1 thư mục mới `test2` trong thư muc `/mnt` để mount volumev0 vào và xem kết quả:
+
+![](./img/mount to test2.png)
+
+Sau khi mount thành công volumev0 vào thư mục `/mnt/test2`, tiên hành kiểm tra lại data trong volume0:
+
+![](./img/ok instance 2.png)
+
+Kết quả là data trong volumev0 đã được tạo trên instance 1 vẫn được giữ nguyên sau khi detach khỏi instance 1 và attach vào instance mới.
