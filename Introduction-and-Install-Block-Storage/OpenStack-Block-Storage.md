@@ -6,7 +6,9 @@
 ## Mục Lục
 
 - [1. Về Block Storage](#over_view_cinder)
-- [2. Cinder component](#cinder-component)
+- [2. Cinder](#cinder)
+  * [2.1 Cinder component](#cinder_component)
+  * [2.2 Cinder workflow](#cinder_workflow)
 - [3. Cài đặt và cấu hình trên node controller](#install_controller)
   * [3.1 Tạo database, user, service và API endpoint](#database)
   * [3.2 Cài đặt và cấu hình các component](#install_configure)
@@ -44,14 +46,18 @@ Hầu hết các block storage driver cho phép instance truy cập trực tiế
 
 (Link tìm hiểu thêm: http://docs.openstack.org/ops-guide/arch_storage.html)
 
-<a name="cinder-component"></a>
+<a name="cinder"></a>
 ##2. Cinder component
+
+<a name="cinder_component"></a>
+###2.1 Cinder component
 
 OpenStack Block Storege service (cinder) dùng để thêm các persistent storage đến 1 máy ảo. Block Storage cung cấp 1 cơ  sơ hạ tầng để quản lý các volume và tương tác với OpenStack Compute để cung cấp volume cho các instance. Dịch vụ này cũng cho phép quản lý volume snapshots và volume types.
 
 
 Các thành phần của cinder:
 
+![](./img/cinder_component.png)
 
 **cinder-api:** chấp nhận các API request và chuyển chúng đến cho cinder-volume để họat động
 
@@ -62,6 +68,15 @@ Các thành phần của cinder:
 **cinder-backup daemon:** cung cấp dịch vụ backing up volume. Cũng giống như cinder-volume, cinder-backup cũng có thể tương tác với nhiều nhà cung cấp storage thông qua 1 driver architecture.
 
 **messaging queue:** định hướng cho các tin nhắn giữa các tiến trình của Block Storage.
+
+<a name="cinder_workflow"></a>
+###2.2 Cinder workflow
+
+![](./img/cinder_and_nova.png)
+
+1 volume sẽ được tạo thông qua `cinder create command`. Dòng lệnh này sẽ tạo ra 1 `logical volume` (lv) vào trong `volume group` (VG) với tên gọi “`cinder-volumes`”. Để attach volume mới được tạo này vào 1 instance, ta sử dụng `nova volume-attach command`. Lệnh này sẽ tạo ra 1 `iSCSI` duy nhất để truyền data giữa node compute và node storage. 
+
+Sau khi attach volume thì node compute chứa instance được attach có thể active iCSI để truyền data đến node storage. Như trong hình trên thì volume được gán vào instance đã được mount vào ổ đĩa `/dev/vda` trên instance.
 
 <a name="install_controller"></a>
 ##3. Cài đặt và cấu hình trên node controller
