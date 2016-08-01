@@ -883,7 +883,7 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = NEUTRON_PASS
+password = 1111
 	
 service_metadata_proxy = True
 metadata_proxy_shared_secret = 1111	
