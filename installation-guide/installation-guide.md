@@ -1,7 +1,8 @@
 #Giới thiệu về OpenStack
 OpenStack là một hệ thống cung cấp khả năng triển khai đám mây trên một nền tảng hệ thống máy chủ vật lý. Sử dụng OpenStack, người dùng có thể tạo ra, sử dụng và quản lý  một đám mây với các tài nguyên điện toán, lưu trữ và mạng thông qua  nhiều phương tiện khác nhau như giao diện dòng lệnh (CLI) hoặc thông qua giao diện web.
+Để cung cấp khả năng triển khai đám mây, OpenStack cung cấp một tập hợp các chương trình SOA - Service Oriented Architecture. Người quản trị hệ thống sử dụng OpenStack thiết lập một đám mây bằng cách cài đặt các thành phần của OpenStack lên các thành phần vật lý của hệ thống. 
 
-Nói một cách dễ hiểu, OpenStack là một gói các dịch vụ cho phép thiết lập một đám mây trên 1 nền tảng vật lý. Điều kiện cần để triển khai OpenStack là chúng ta có một hệ thống máy chủ vật lý được kết nối với nhau. Sau đó trên từng đơn vị máy thành viên trong hệ thống sẽ được triển khai các dịch vụ của đám mây như: Xác thực(identity) , điện toán (compute), mạng(network), lưu trữ (storage), giao diện web… để tạo thành một đám mây hoàn chỉnh. Tùy thuộc vào dịch vụ được triển khai trên các máy vật lý, các tài nguyên vật lý sẽ được ánh xạ lên đám mây tạo ra các tài nguyên trên đám mây như các máy ảo, hệ thống lưu trữ và mạng.
+Điều kiện cần để triển khai OpenStack là chúng ta có một hệ thống các máy chủ vật lý được kết nối với nhau. Sau đó trên từng đơn vị máy thành viên trong hệ thống sẽ được triển khai các dịch vụ của đám mây như: Xác thực(identity) , điện toán (compute), mạng(network), lưu trữ (storage), giao diện web… để tạo thành một đám mây hoàn chỉnh. Tùy thuộc vào dịch vụ được triển khai trên các máy vật lý, các tài nguyên vật lý sẽ được ánh xạ lên đám mây tạo ra các tài nguyên trên đám mây như các máy ảo, hệ thống lưu trữ và mạng.
 
 Các dịch vụ chính trong OpenStack :
 
@@ -51,30 +52,30 @@ Sau đó ta thiết lập hostname và địa chỉ tĩnh cho các card mạng:
 Thiết lập hostname với tên là controller
 
 ```sh
-	echo "controller" > /etc/hostname
-	hostname -F /etc/hostname
+echo "controller" > /etc/hostname
+hostname -F /etc/hostname
 ```
 
 Khởi động lại máy, sau đó thiết lập địa chỉ IP tĩnh cho eth0 và eth1. Chỉnh sửa file /etc/network/interfaces với nội dung sau:
 
-```sh
-	# NIC loopback
-	auto lo
-	iface lo inet loopback
+```bash
+# NIC loopback
+auto lo
+iface lo inet loopback
 	
-	# NIC MGNG
-	auto eth0
-	iface eth0 inet static
-	address 10.10.10.10
-	netmask 255.255.255.0
+# NIC MGNG
+auto eth0
+iface eth0 inet static
+address 10.10.10.10
+netmask 255.255.255.0
 	
-	# NIC EXTERNAL
-	auto eth1
-	iface eth1 inet static
-	address 192.168.2.10
-	netmask 255.255.255.0
-	gateway 192.168.2.1
-	dns-nameservers 8.8.8.8
+# NIC EXTERNAL
+auto eth1
+iface eth1 inet static
+address 192.168.2.10
+netmask 255.255.255.0
+gateway 192.168.2.1
+dns-nameservers 8.8.8.8
 ```
 
 
@@ -84,9 +85,9 @@ Khởi động lại máy, sau đó thiết lập địa chỉ IP tĩnh cho eth0
  
 Chỉnh sửa file  /etc/hosts để phân giải IP cho các node:
 ```sh
-	127.0.0.1   controller localhost
-	10.10.10.10    controller
-	10.10.10.11    compute
+127.0.0.1   controller localhost
+10.10.10.10    controller
+10.10.10.11    compute
 ```
 	
 Khởi động lại máy tính.
@@ -120,7 +121,7 @@ Ta cài đặt gói mariaDb:
 apt-get install mariadb-server python-pymysql
 ```
 
-Thiết lập mật khẩu: bkcloud16
+Thiết lập mật khẩu: bkcloud
 
 Tạo file ``` /etc/mysql/conf.d/mysqld_openstack.cnf ```với nội dung sau:
 ```sh
@@ -173,9 +174,9 @@ Ta cài đặt gói rabbitmq-server lên controller node:
 apt-get -y install rabbitmq-server
 ```
 
-Cấu hình RabbitMQ, tạo user openstack với mật khẩu là ```bkcloud16```:
+Cấu hình RabbitMQ, tạo user openstack với mật khẩu là ```bkcloud```:
 ```sh
-rabbitmqctl add_user openstack bkcloud16
+rabbitmqctl add_user openstack bkcloud
 ```
 
 Gán quyền read, write cho tài khoản openstack trong RabbitMQ
@@ -191,9 +192,9 @@ Ta cài đặt các gói cần thiết cho memcached
 apt-get -y install memcached python-memcache
 ```
 Dùng nano  sửa ``` file /etc/memcached.conf ```, thay dòng 
-```sh -l 127.0.0.1 ``` 
+```-l 127.0.0.1 ``` 
 bằng dòng dưới: 
-```sh -l 10.10.10.10 ```
+```-l 10.10.10.10 ```
 Trong đó 10.10.10.10 là địa chỉ nic management của controller node
 
 Khởi động lại memcache
@@ -208,7 +209,7 @@ Ta kiểm tra và chỉnh sửa sao cho eth0 nằm ở mạng Vmnet2(internal) v
 Sau đó ta thiết lập hostname và địa chỉ tĩnh cho các card mạng:
 
 Thiết lập hostname với tên là compute
-```sh
+```bash
 echo "compute" > /etc/hostname
 hostname -F /etc/hostname
 ```
@@ -217,31 +218,31 @@ Khởi động lại máy.
 
 Sau đó thiết lập địa chỉ IP cho eth0 và eth1:
 Thiết lập địa chỉ IP, chỉnh sửa  file ``` /etc/network/interfaces ``` với nội dung sau:
-```sh 
-	# NIC loopback
-	auto lo
-	iface lo inet loopback
+```bash 
+# NIC loopback
+auto lo
+iface lo inet loopback
 	
-	# NIC MGNG
-	auto eth0
-	iface eth0 inet static
-	address 10.10.10.11
-	netmask 255.255.255.0
+# NIC MGNG
+auto eth0
+iface eth0 inet static
+address 10.10.10.11
+netmask 255.255.255.0
 	
-	# NIC EXTERNAL
-	auto eth1
-	iface eth1 inet static
-	address 192.168.2.11
-	netmask 255.255.255.0
-	gateway 192.168.2.1
-	dns-nameservers 8.8.8.8
+# NIC EXTERNAL
+auto eth1
+iface eth1 inet static
+address 192.168.2.11
+netmask 255.255.255.0
+gateway 192.168.2.1
+dns-nameservers 8.8.8.8
 ```
  
 Chỉnh sửa file  /etc/hosts để phân giải IP cho các node:
-```sh 
-	127.0.0.1   compute localhost
-	10.10.10.10    controller
-	10.10.10.11    compute
+```bash 
+127.0.0.1   compute localhost
+10.10.10.10    controller
+10.10.10.11    compute
 ```
 	
 Khởi động lại máy tính.
@@ -249,89 +250,95 @@ Khởi động lại máy tính.
 ###2.2.2 Cài đặt dịch vụ Network Time Protocol và OpenStack Client
 ####Cài đặt OpenStack Client
 Sau khi khởi động lại, ta kích hoạt repository Openstack:
-```sh
+```bash
 apt-get install software-properties-common
 add-apt-repository cloud-archive:mitaka
 ```
 Sau đó cập nhật lại:
-```sh
+```bash
 apt-get update && apt-get dist-upgrade
 ```
 Sau đó ta cài đặt OpenStack client:
-```sh
+```bash
 apt-get install python-openstackclient
 ```
 ###Cài đặt và cấu hình NTP trên Compute node
 Ta cài đặt NTP Client
-```sh
+```bash
 apt-get -y install chrony
 ```
 Chỉnh sửa file ```/etc/chrony/chrony.conf```.Thay các dòng dưới
-```sh
+```bash
 server 0.debian.pool.ntp.org offline minpoll 8
 server 1.debian.pool.ntp.org offline minpoll 8
 server 2.debian.pool.ntp.org offline minpoll 8
 server 3.debian.pool.ntp.org offline minpoll 8
 ```
 bằng dòng
-```sh
+```bash
 server controller iburst
 ```
 Khởi động lại dịch vụ NTP
-```sh
+```bash
 service chrony restart
 ```
 
-<h3><a name="install_config">3. Cấu hình và cài đặt Keystone</a></h3>
+#Cấu hình và cài đặt Keystone
 - Trước tiên, cần phải tạo ra một database cho dịch vụ keystone bằng các câu lệnh sau:
-```sh
-mysql -u root –pbkcloud16
+```bash
+mysql -uroot -pbkcloud
 CREATE DATABASE keystone;
 
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
-IDENTIFIED BY 'bkcloud16';
+IDENTIFIED BY 'bkcloud';
 
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
-IDENTIFIED BY 'bkcloud16';
+IDENTIFIED BY 'bkcloud';
 flush privileges;
 exit;
 ```
 - Cấu hình không cho dịch vụ keystone tự động khởi động:
-```sh
+```bash
 echo "manual" > /etc/init/keystone.override
 ```
 - Chạy lệnh sau để cài đặt các gói của keystone:
-```sh
+```bash
 apt-get install keystone apache2 libapache2-mod-wsgi
 ```
 - Cấu hinh file `/etc/keystone/keystone.conf` với các yêu cầu sau:
  - Trong phần `[default]`, định nghĩa giá trị của thẻ quản trị ban đầu:
-  ```sh
+  
+  ```bash
   [DEFAULT]
   ...
-  admin_token = bkcloud16
+  admin_token = bkcloud
   ```
+  
  - Trong phần database, cấu hình truy cập đến database:
+
   ```sh
   [database]
   ...
-  connection = mysql+pymysql://keystone:bkcloud16@controller/keystone
+  connection = mysql+pymysql://keystone:bkcloud@controller/keystone
   ```
   - Trong phần [token], cấu hình nhà cung cấp thẻ Fernet:
+
   ```sh  
   [token]
   ...
   provider = fernet
   ```
 - Đồng bộ database dịch vụ xác thực:
-  ```sh
-  su -s /bin/sh -c "keystone-manage db_sync" keystone
+  
   ```
+  su -s /bin/sh -c "keystone-manage db_sync" keystone
+ ```
 - Thiết lập Fernet key:
-  ```sh
+  
+  ```
   keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
   ```
-<h3>cấu hình máy chủ Apache</h3>
+Cấu hình máy chủ Apache
 - Chỉnh sửa file `/etc/apache2/apache2.conf` và cấu hình tùy chọn Servername để ánh xạ đến node controller:
 ```sh
 ServerName controller
@@ -383,11 +390,11 @@ service apache2 restart
 ```sh
 rm -f /var/lib/keystone/keystone.db
 ```
-<h3>Tạo endpoint và các service cho keystone</h3>
+###Tạo endpoint và các service cho keystone
 - Vì ban đầu, database của Keystone không chứa thông tin xác thực và catalog sevices nên để tạo được các endpoint và các service thì phải có một token để cho phép thực hiện bước này. 
 - Truyền vào các biến môi trường để khởi tạo service và các endpoint indentity:
 ```sh
-export OS_TOKEN=bkcloud16
+export OS_TOKEN=bkcloud
 ```
 ADMIN_TOKEN ở đây là giá trị đã được khai báo trong file cấu hình ở bước trước.
 - Khai báo URL endpoint và version API identity:
@@ -397,28 +404,31 @@ export OS_IDENTITY_API_VERSION=3
 ```
 - Keystone quản lý một catalog các dịch vụ trong môi trường OpenStack. Các dịch vụ sử dụng catalog này để xác định các dịch vụ khác đang có trong môi trường.
 - Tạo service cho dịch vụ identity:
-```sh
+```
 openstack service create \
   --name keystone --description "OpenStack Identity" identity
 ```
 - Keystone cũng quản lý một danh mục các endpoint API được kết nối với các dịch vụ trong môi trường OpenStack . Các dịch vụ sử dụng catalog này để xác định các giao tiếp với các dịch vụ khác trong môi trường OpenStack.
 - Tạo các endpoints API: 
  - Public API endpoint:
- ```sh
+ 
+ ```
  openstack endpoint create --region RegionOne \
  identity public http://controller:5000/v3
  ```
  - Internal API endpoint:
- ```sh
+ 
+ ```
  openstack endpoint create --region RegionOne \
  identity internal http://controller:5000/v3
  ```
  - Admin API endpoint:
- ```sh
+ 
+ ```
  openstack endpoint create --region RegionOne \
   identity admin http://controller:35357/v3
  ```
-<h3>Tạo domain, user, project và role</h3>
+###Tạo domain, user, project và role
 - Tạo domain
 
 	```sh
@@ -433,7 +443,7 @@ openstack service create \
 
 - Tạo user `admin`
 	```sh
-	openstack user create admin --domain default --password bkcloud16
+	openstack user create admin --domain default --password bkcloud
 	```
 
 - Tạo role `admin`
@@ -458,7 +468,7 @@ openstack service create \
 
 - Tạo user tên là `demo`
 	```sh
-	openstack user create demo --domain default --password bkcloud16
+	openstack user create demo --domain default --password bkcloud
 	```
 
 - Tạo role tên là `user`
@@ -471,21 +481,20 @@ openstack service create \
 	openstack role add --project demo --user demo user
 	```
 
-<h3>Kiểm tra hoạt động</h3>
+###Kiểm tra hoạt động
 - Vì lý do bảo mật, vô hiệu hóa cơ chế thẻ token tạm thời bằng cách chỉnh sửa trong file `/etc/keystone/keystone-paste.ini`, xóa các dòng `admin_token_auth` từ các phần `[pipeline:public_api]`,`[pipeline:admin_api]` và `[pipeline:api_v3]`
 - Gỡ bỏ các biến môi trường đã thiết lập trong quá trình tạo service và endpoint cho dịch vụ Identity:
-```sh
+```bash
 unset OS_TOKEN OS_URL
 ```
 - Kiểm tra hoạt động bằng cách yêu cầu token cho user “admin” đã tạo ở trên:
-```sh
+```bash
   openstack --os-auth-url http://controller:35357/v3 \
    --os-project-domain-name default --os-user-domain-name default \
    --os-project-name admin --os-username admin token issue
-  Password:
 ```
   Nhập password vào và hiển thị kết quả như sau:
-```sh
+```bash
 +------------+-----------------------------------------------------------------+
 | Field      | Value                                                           |
 +------------+-----------------------------------------------------------------+
@@ -504,7 +513,7 @@ export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
-export OS_PASSWORD=bkcloud16
+export OS_PASSWORD=bkcloud
 export OS_AUTH_URL=http://controller:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
@@ -531,202 +540,214 @@ openstack token issue
 
 #Cài đặt Glance
 
-<h3><a name="prerequisites">4.1 Tạo database, dịch vụ xác thực và API endpoints cho Glance</a></h3>
-<a name="4.1.1."> </a> 
-#### 4.1.1 Tạo database cho `glance`
+##Tạo database, dịch vụ xác thực và API endpoints cho Glance
+####Tạo database cho `glance`
 - Đăng nhập vào mysql
-  ```sh
-  mysql -uroot -pbkcloud16
-  ```
 
-- Tạo database và gán các quyền cho user trong database `glance`
-	```sh
-	CREATE DATABASE glance;
-	GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'bkcloud16';
-	GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'bkcloud16';
-	FLUSH PRIVILEGES;
-		
-	exit;
-	```
+```bash
+mysql -uroot -pbkcloud
+```
+- Tạo database và gán các quyền cho user trong database `glance`	
 
-<a name="4.1.2."> </a> 
-#### 4.1.2. Cấu hình xác thực cho dịch vụ `glance`
+```bash
+CREATE DATABASE glance;
+GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'bkcloud';
+GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'bkcloud';
+FLUSH PRIVILEGES;
+exit;
+```
+
+#### Cấu hình xác thực cho dịch vụ `glance`
 - Lấy thông tin xác thực bằng cách sử dụng file `admin-openrc`
-  ```sh
-  source admin-openrc
-  ```
+
+```sh
+source admin-openrc 
+```
   
 - Tạo user `glance`
-	```sh
-	openstack user create glance --domain default --password bkcloud16
-	```
+	
+```sh
+openstack user create glance --domain default --password bkcloud	
+```
 
 - Gán quyền `admin` cho user `glance` và project `service` 
-	```sh
-	openstack role add --project service --user glance admin
-	```
+	
+```sh
+openstack role add --project service --user glance admin	
+```
   Các bước phía trên giúp tạo một user tên là glance được cấp quyền admin trong project service, từ đó dịch vụ glance có thể sử dụng user này để thực hiện các request tới các dịch vụ khác khi cần thiết.
   
 - Kiểm tra lại xem user `glance` có role là gì
 
-  ```sh
-  openstack role list --user glance --project service
-  ```
+```sh
+openstack role list --user glance --project service
+```
 	
 - Tạo dịch vụ có tên là `glance`
-	```sh
-	openstack service create --name glance --description "OpenStack Image service" image
-	```
+```sh
+openstack service create --name glance --description "OpenStack Image service" image
+```
 
-<a name="4.1.3."> </a> 
-#### 4.1.3. Tạo các endpoints
+####Tạo các endpoints
 - Tạo các endpoint cho dịch vụ `glance`
-	```sh
-	openstack endpoint create --region RegionOne image public http://controller:9292
-
-	openstack endpoint create --region RegionOne image internal http://controller:9292
-
-	openstack endpoint create --region RegionOne image admin http://controller:9292
-	```
 	
-<h3><a name="ins_conf">4.2 Cài đặt và cấu hình các thành phần của Glance</a></h3>
+```bash
+openstack endpoint create --region RegionOne image public http://controller:9292
+openstack endpoint create --region RegionOne image internal http://controller:9292
+openstack endpoint create --region RegionOne image admin http://controller:9292
+```
+	
+##Cài đặt và cấu hình các thành phần của Glance
 - Cài đặt gói `glance`
-	```sh
-	apt-get -y install glance
-	```
+```bash
+apt-get -y install glance
+```
 
 - Sao lưu các file `/etc/glance/glance-api.conf` và `/etc/glance/glance-registry.conf` trước khi cấu hình
-	```sh
-	cp /etc/glance/glance-api.conf /etc/glance/glance-api.conf.orig
-	cp /etc/glance/glance-registry.conf /etc/glance/glance-registry.conf.orig
-	```
+```bash
+cp /etc/glance/glance-api.conf /etc/glance/glance-api.conf.orig
+cp /etc/glance/glance-registry.conf /etc/glance/glance-registry.conf.orig	
+```
 
 - Sửa các mục dưới đây trong hai file `/etc/glance/glance-api.conf`
  
  - Trong section `[database]` :
  
  - Comment dòng 
-	 ```sh
-	 #sqlite_db = /var/lib/glance/glance.sqlite
-	 ```
+	 
+```bash
+#sqlite_db = /var/lib/glance/glance.sqlite	
+```
  - Thêm dòng dưới 
-	 ```sh
-	 connection = mysql+pymysql://glance:bkcloud16@controller/glance
-	 ```
+	 
+```bash
+connection = mysql+pymysql://glance:bkcloud@controller/glance	 
+```
  
  - Trong section `[keystone_authtoken]` sửa các dòng cũ thành dòng dưới để cấu hình dịch vụ xác thực với Keystone khi có yêu cầu từ user hoặc nova component
-		```sh
-		auth_uri = http://controller:5000
-		auth_url = http://controller:35357
-		memcached_servers = controller:11211
-		auth_type = password
-		project_domain_name = default
-		user_domain_name = default
-		project_name = service
-		username = glance
-		password = bkcloud16
-		```
-    <b>auth_uri:</b> chỉ đến dịch vụ Keystone. Thông tin này được sử dụng bởi các middleware để truy vấn Keystone về tính hợp lệ của thẻ xác thực.
+		
+```bash
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = glance
+password = bkcloud		
+```
+auth_uri: chỉ đến dịch vụ Keystone. Thông tin này được sử dụng bởi các middleware để truy vấn Keystone về tính hợp lệ của thẻ xác thực.
     
  - Trong section ` [paste_deploy]` khai báo dòng dưới
-		```sh
-		flavor = keystone
-		```
- - Khai báo trong section `[glance_store]` nơi lưu trữ file image
- 
-     ```sh
-     stores = file,http
-     default_store = file
-     filesystem_store_datadir = /var/lib/glance/images/
-     ```
+		
+```bash
+flavor = keystone		
+```
+ - Khai báo trong section `[glance_store]` nơi lưu trữ file image 
+
+```bash
+stores = file,http
+default_store = file
+filesystem_store_datadir = /var/lib/glance/images/     
+```
     Trong cấu hình trên, ta cho phép hai hệ thống backend lưu trữ image là `file` và `http`, trong đó sử dụng hệ thống backend lưu trữ mặc định là `file`. Cấu hình thư mục lưu trữ các file images khi tải lên glance nằm trong thư mục `/var/lib/glance/images/`
     
 - Sửa các mục dưới đây trong hai file `/etc/glance/glance-registry.conf`
  - Trong section `[database]` :
  
  - Comment dòng 
-	 ```sh
-	 #sqlite_db = /var/lib/glance/glance.sqlite
-	 ```
+	 
+```bash
+#sqlite_db = /var/lib/glance/glance.sqlite	 
+```
  - Thêm dòng dưới 
-	 ```sh
-	 connection = mysql+pymysql://glance:bkcloud16@controller/glance
-	 ```
+	 
+```bash
+connection = mysql+pymysql://glance:bkcloud@controller/glance	 
+```
 
  - Trong section `[keystone_authtoken]` sửa các dòng cũ thành dòng dưới
-	 ```sh
-	 auth_uri = http://controller:5000
-	 auth_url = http://controller:35357
-	 memcached_servers = controller:11211
-	 auth_type = password
-	 project_domain_name = default
-	 user_domain_name = default
-	 project_name = service
-	 username = glance
-	 password = bkcloud16
-	 ```
+	 
+```bash
+auth_uri = http://controller:5000
+auth_url = http://controller:35357
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = glance
+password = bkcloud
+```
 
- - Trong section ` [paste_deploy]` khai báo dòng dưới
-	 ```sh
-	 flavor = keystone
-	 ```
+ - Trong section ` [paste_deploy]` khai báo dòng dưới	 
+
+```bash	 
+flavor = keystone	 
+```
 	
 - Đồng bộ database cho glance
-	```sh
-	su -s /bin/sh -c "glance-manage db_sync" glance
-	```
+```sh
+su -s /bin/sh -c "glance-manage db_sync" glance	
+```
 
 - Khởi động lại dịch vụ `Glance`
-	```sh
-	service glance-registry restart
-	service glance-api restart
-	```
+	
+```sh
+service glance-registry restart
+service glance-api restart	
+```
 
 - Xóa file database mặc định trong `glance`
-	```sh
-	rm -f /var/lib/glance/glance.sqlite
-	```
-<h3><a name="verify">4.3 Kiểm chứng lại việc cài đặt Glance</a></h3>
+	
+```sh
+rm -f /var/lib/glance/glance.sqlite	
+```
+##Kiểm chứng lại việc cài đặt Glance
 - Khai báo biến môi trường cho dịch vụ `glance`
-	```sh
-	echo "export OS_IMAGE_API_VERSION=2" | tee -a admin-openrc demo-openrc
-
-	source admin-openrc
-	```
+	
+```bash
+echo "export OS_IMAGE_API_VERSION=2" | tee -a admin-openrc demo-openrc
+source admin-openrc	
+```
 
 - Tải file image cho `glance`. Ở đây ta tải image <b>Cirros</b>, chúng có kích thước bé được thiết kế để test trên clound cũng như trên OpenStack Compute. 
-	```sh
-	wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
-	```
+	
+```bash
+wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img	
+```
   Ngoài ra ta có thể sử dung một số image khác như CentOS, Debian, Fedora… trên trang web <a>http://docs.openstack.org/image-guide/obtain-images.html</a>
 
 - Upload file image vừa tải về
-	```sh
-	openstack image create "cirros" \
-	 --file cirros-0.3.4-x86_64-disk.img \
-	 --disk-format qcow2 --container-format bare \
-	 --public
-	```
+	
+```bash
+openstack image create "cirros" \
+--file cirros-0.3.4-x86_64-disk.img \
+--disk-format qcow2 --container-format bare \
+--public	
+```
 
 - Kiểm tra lại image đã có hay chưa
-	```sh
-	openstack image list
-	```
+	
+```bash
+openstack image list	
+```
 	
 - Nếu kết quả lệnh trên hiển thị như bên dưới thì dịch vụ `glance` đã cài đặt thành công.
-	```sh
-	root@controller:~# openstack image list
-	+--------------------------------------+--------+--------+
-	| ID                                   | Name   | Status |
-	+--------------------------------------+--------+--------+
-	| 19d53e24-2985-4f75-bd63-7568a5f2f10f | cirros | active |
-	+--------------------------------------+--------+--------+
-	root@controller:~#
-
-	```
-##5. Cấu hình và cài đặt Nova
-<a name="overview"></a>
-##5.1. Các thành phần của OpenStack Nova
+	
+```sh
+root@controller:~# openstack image list
++--------------------------------------+--------+--------+
+| ID                                   | Name   | Status |
++--------------------------------------+--------+--------+
+| 19d53e24-2985-4f75-bd63-7568a5f2f10f | cirros | active |
++--------------------------------------+--------+--------+
+root@controller:~#
+	
+```
+#Cấu hình và cài đặt Nova
+##Các thành phần của OpenStack Nova
 - Nova đảm nhiệm chức năng cung cấp và quản lý tài nguyên trong OpenStack để cấp cho các VM. Trong hướng dẫn nãy sẽ sử dụng KVM làm hypervisor. Nova sẽ tác động vào KVM thông qua libvirt.
 Nova có các thành phần như sau: 
 
@@ -758,179 +779,131 @@ Tiến trình này khá phức tạp, về cơ bản, các daemon chấp nhận 
     * SQL database
 
 
-<a name="install_nova_controller"></a>
-##5.2. Cài đặt và cấu hình nova trên node Controller
-<a name="create_db_enpoint"></a>
-###5.2.1. Tạo database và endpoint cho nova
+##Cài đặt và cấu hình nova trên node Controller
+###Tạo database và endpoint cho nova
 
-Đăng nhập vào database với quyền root
-</br>
-
-```sh
-$ mysql -uroot -pbkcloud16
+Đăng nhập vào database với quyền root
+```bash
+mysql -uroot -pbkcloud
 ```
 Tạo database: service nova cần tạo ra 2 database là nova và nova_api
-</br>
-```sh
+```bash
 CREATE DATABASE nova_api;
 CREATE DATABASE nova;
 GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' \
-  IDENTIFIED BY 'bkcloud16';
+  IDENTIFIED BY 'bkcloud';
 GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' \
-  IDENTIFIED BY 'bkcloud16';
+  IDENTIFIED BY 'bkcloud';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
-  IDENTIFIED BY 'bkcloud16';
+  IDENTIFIED BY 'bkcloud';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
-  IDENTIFIED BY 'bkcloud16';
+  IDENTIFIED BY 'bkcloud';
   exit;
 ```
 Khai báo biến môi trường
- ```sh
-$ . admin.openrc
-  ```
+
+```bash
+.admin.openrc
+```
 + Tạo user, phân quyền và tạo endpoint cho dịch vụ nova
-</br>
 Tạo user có tên là nova
- ```sh
-openstack user create nova --domain default  --password bkcloud16
-  ```
+```bash
+openstack user create nova --domain default  --password bkcloud
+```
 Phân quyền admin cho user nova
- ```sh
-$ openstack role add --project service --user nova admin
-  ```
-  Tạo service có tên là nova
-  ```sh
-$ openstack service create --name nova \
-  --description "OpenStack Compute" compute
-+-------------+----------------------------------+
-| Field       | Value                            |
-+-------------+----------------------------------+
-| description | OpenStack Compute                |
-| enabled     | True                             |
-| id          | 060d59eac51b4594815603d75a00aba2 |
-| name        | nova                             |
-| type        | compute                          |
-+-------------+----------------------------------+
-  ```
+```bash
+openstack role add --project service --user nova admin
+```
+  Tạo service có tên là nova  
+```bash
+openstack service create --name nova \
+--description "OpenStack Compute" compute
+```
 Tạo các endpoint cho nova:
- ```sh
-$ openstack endpoint create --region RegionOne \
-  compute public http://controller:8774/v2.1/%\(tenant_id\)s
-+--------------+-------------------------------------------+
-| Field        | Value                                     |
-+--------------+-------------------------------------------+
-| enabled      | True                                      |
-| id           | 3c1caa473bfe4390a11e7177894bcc7b          |
-| interface    | public                                    |
-| region       | RegionOne                                 |
-| region_id    | RegionOne                                 |
-| service_id   | e702f6f497ed42e6a8ae3ba2e5871c78          |
-| service_name | nova                                      |
-| service_type | compute                                   |
-| url          | http://controller:8774/v2.1/%(tenant_id)s |
-+--------------+-------------------------------------------+
-
-$ openstack endpoint create --region RegionOne \
-  compute internal http://controller:8774/v2.1/%\(tenant_id\)s
-+--------------+-------------------------------------------+
-| Field        | Value                                     |
-+--------------+-------------------------------------------+
-| enabled      | True                                      |
-| id           | e3c918de680746a586eac1f2d9bc10ab          |
-| interface    | internal                                  |
-| region       | RegionOne                                 |
-| region_id    | RegionOne                                 |
-| service_id   | e702f6f497ed42e6a8ae3ba2e5871c78          |
-| service_name | nova                                      |
-| service_type | compute                                   |
-| url          | http://controller:8774/v2.1/%(tenant_id)s |
-+--------------+-------------------------------------------+
-
-$ openstack endpoint create --region RegionOne \
-  compute admin http://controller:8774/v2.1/%\(tenant_id\)s
-+--------------+-------------------------------------------+
-| Field        | Value                                     |
-+--------------+-------------------------------------------+
-| enabled      | True                                      |
-| id           | 38f7af91666a47cfb97b4dc790b94424          |
-| interface    | admin                                     |
-| region       | RegionOne                                 |
-| region_id    | RegionOne                                 |
-| service_id   | e702f6f497ed42e6a8ae3ba2e5871c78          |
-| service_name | nova                                      |
-| service_type | compute                                   |
-| url          | http://controller:8774/v2.1/%(tenant_id)s |
-+--------------+-------------------------------------------+
-  ```
-  Cài đặt các gói và cấu hình:
+ 
 ```sh
+openstack endpoint create --region RegionOne \
+compute public http://controller:8774/v2.1/%\(tenant_id\)s
+
+openstack endpoint create --region RegionOne \
+compute internal http://controller:8774/v2.1/%\(tenant_id\)s
+
+openstack endpoint create --region RegionOne \
+compute admin http://controller:8774/v2.1/%\(tenant_id\)s
+```
+  Cài đặt các gói và cấu hình:
+```bash
 apt-get install nova-api nova-conductor nova-consoleauth \
-  nova-novncproxy nova-scheduler
-  ```  
-  Sao lưu file `/etc/nova/nova.conf` trước khi cấu hình
-  ```sh
-cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
-  ```
+nova-novncproxy nova-scheduler
+```  
+  Sao lưu file `/etc/nova/nova.conf` trước khi cấu hình
+  
+```bash
+cp /etc/nova/nova.conf /etc/nova/nova.conf.orig  
+```
   Chỉnh sửa file `/etc/nova/nova.conf` như dưới: </br>
 <b>Lưu ý:</b> Trong trường hợp nếu có dòng khai bao trước đó thì tìm và thay thế, chưa có thì khai báo mới hoàn toàn.
 - Khai báo trong section `[api_database]` dòng dưới, do section `[api_database]` chưa có nên ta khai báo thêm
-```sh
+```bash
 [api_database]
-connection = mysql+pymysql://nova:bkcloud16@controller/nova_api
+connection = mysql+pymysql://nova:bkcloud@controller/nova_api
 ```
 - Khai báo trong section `[database]` dòng dưới. Do section `[database]` chưa có nên ta khai báo thêm.
-```sh
-	[database]
-	connection = mysql+pymysql://nova:bkcloud16@controller/nova
+```bash
+[database]
+connection = mysql+pymysql://nova:bkcloud@controller/nova
 ```
 - Trong section `[DEFAULT]`:
 
-	* Thay dòng: 
-	```sh
-		logdir=/var/log/nova
-	```
-	Bằng dòng: 
-	```sh
-		log-dir=/var/log/nova
-	```
-	* Thay dòng:
-	```sh
-		enabled_apis=ec2,osapi_compute,metadata
-	```
-	Bằng dòng:
-	```sh
-		enabled_apis=osapi_compute,metadata
-	```
-	(Do trong bản Mitaka, nova không còn hỗ trợ EC2 API)
+Thay dòng: 
+```bash
+logdir=/var/log/nova	
+```
+Bằng dòng: 
+```bash
+log-dir=/var/log/nova
+```
+ Thay dòng:
+```bash
+enabled_apis=ec2,osapi_compute,metadata
+```
 	
-	* Bỏ dòng:
-	```sh
-		verbose = True
-	```
-	* Khai báo thêm các dòng sau:
-	```sh
-		rpc_backend = rabbit
-		auth__strategy = keystone
-		rootwrap_config = /etc/nova/rootwrap.conf
-		#IP MGNT cua node Controller
-		my_ip = 10.10.10.10
+Bằng dòng:
+```bash
+enabled_apis=osapi_compute,metadata
+```
+(Do trong bản Mitaka, nova không còn hỗ trợ EC2 API)
+	
+Bỏ dòng:
+```bash
+verbose = True
+```
+	* Khai báo thêm các dòng sau trong section [DEFAULT] :
+	
+```bash
+rpc_backend = rabbit
+auth__strategy = keystone
+rootwrap_config = /etc/nova/rootwrap.conf
+#IP MGNT cua node Controller
+my_ip = 10.10.10.10
 		
-		use_neutron = True
-		firewall_driver = nova.virt.firewall.NoopFirewallDriver
-	```
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver	
+```
 	( Theo mặc định, Compute sử dụng 1 driver tường lửa nội bộ (internal firewall driver). Nhưng từ khi dịch vụ Networking chứa 1 firewall drive thì bạn phải vô hiệu hóa driver firewall của Compute bằng cách thêm dòng nova.virt.firewall.NoopFirewallDriver firewall driver)
 	
 - Khai báo trong section `[oslo_messaging_rabbit]`các dòng dưới. Do section `[oslo_messaging_rabbit]` chưa có nên ta khai báo thêm.
 
-```sh
+
+```bash
 [oslo_messaging_rabbit]
 rabbit_host = controller
 rabbit_userid = openstack
-rabbit_password = bkcloud16
-  ```
+rabbit_password = bkcloud
+```
 - Trong section `[keystone_authtoken]` khai báo các dòng dưới. Do section `[keystone_authtoken]` chưa có nên ta khai báo thêm.
  
- ```sh
+```bash
 [keystone_authtoken]
 auth_uri = http://controller:5000
 auth_url = http://controller:35357
@@ -940,18 +913,18 @@ project_domain_name = default
 user_domain_name = default
 project_name = service
 username = nova
-password = bkcloud16
-  ```
+password = bkcloud
+```
 - Trong section `[vnc]` khai báo các dòng dưới để cấu hình VNC điều khiển các máy ảo trên web. Do section `[vnc]` chưa có nên ta khai báo thêm.
 
-  ```sh
+```bash
 [vnc]
 vncserver_listen = $my_ip
 vncserver_proxyclient_address = $my_ip
-  ``` 
+``` 
   
 - Trong section `[glance]` khai báo dòng để nova kết nối tới API của glance. Do section `[glance]` chưa có nên ta khai báo thêm.
-```sh
+```bash
 [glance]
 api_servers = http://controller:9292
 ```
@@ -963,9 +936,9 @@ api_servers = http://controller:9292
 lock_path = /var/lib/nova/tmp
 ```
   
-- Khai báo thêm section mới `[neutron]` để nova làm việc với neutron
+- Khai báo thêm section mới `[neutron]` để nova làm việc với neutron
   
-```sh
+```bash
 [neutron]
 url = http://controller:9696
 auth_url = http://controller:35357
@@ -975,37 +948,37 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = bkcloud16
+password = bkcloud
 
 service_metadata_proxy = True
-metadata_proxy_shred_secret = bkcloud16
+metadata_proxy_shred_secret = bkcloud
 ```
   
   Đồng bộ database cho nova:
   
-```sh
+```bash
 su -s /bin/sh -c "nova-manage api_db sync" nova
 su -s /bin/sh -c "nova-manage db sync" nova
 ```
-  
-<a name="end"></a>
-###5.2.2. Kết thúc bước cài đặt và cấu hình nova
+  ###5.2.2. Kết thúc bước cài đặt và cấu hình nova
 
-  Khởi động lại các dịch vụ của nova sau khi cài đặt & cấu hình nova
-```sh
-# service nova-api restart
-# service nova-consoleauth restart
-# service nova-scheduler restart
-# service nova-conductor restart
-# service nova-novncproxy restart
+  Khởi động lại các dịch vụ của nova sau khi cài đặt & cấu hình nova
+```bash
+service nova-api restart
+service nova-consoleauth restart
+service nova-scheduler restart
+service nova-conductor restart
+service nova-novncproxy restart
 ```
-Xóa database mặc định của nova
+Xóa database mặc định của nova
 ```sh
-# rm –f /var/lib/nova/nova.sqlite
+rm –f /var/lib/nova/nova.sqlite
 ```
   Kiểm tra các service của nova hoạt động hay chưa bằng lệnh dưới
 ```sh
-# openstack compute service list
+openstack compute service list
+
+
 +----+--------------------+------------+----------+---------+-------+----------------------------+
 | Id | Binary             | Host       | Zone     | Status  | State | Updated At                 |
 +----+--------------------+------------+----------+---------+-------+----------------------------+
@@ -1017,21 +990,20 @@ Xóa database mặc định của nova
 |  7 | nova-metadata      | 0.0.0.0    | internal | enabled | down  | None                       |
 +----+--------------------+------------+----------+---------+-------+----------------------------+
 ```
-<a name="install_nova_compute"></a>
-##5.3. Cài đặt và cấu hình nova trên node Compute
+##Cài đặt và cấu hình nova trên node Compute
 
 Phần này sẽ nói về cách cài đặt và cấu hình dịch vụ compute trên node Compute. Dịch vụ compute có hỗ trợ 1 số 
 hypervisor để tạo máy ảo. Nhưng để đơn giản trong phần này sẽ sử dụng QEMU hypervisor và KVM trên node compute để hỗ trợ 
 tăng tốc phần cứng cho máy ảo. 
 
 Cài đặt gói nova-compute </br>
-```sh
+```bash
 apt-get -y install nova-compute
 ```
 <b>Cấu hình nova-comupte</b> </br>
 - Sao lưu file `/etc/nova/nova.conf` 
-```sh
-	cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
+```bash
+cp /etc/nova/nova.conf /etc/nova/nova.conf.orig
 ```
 - Trong section `[DEFAULT]` khai báo các dòng sau: 
 ```sh
@@ -1047,7 +1019,7 @@ firewall_driver = nova.virt.firewall.NoopFirewallDriver
 [oslo_messaging_rabbit]
 rabbit_host = controller
 rabbit_userid = openstack
-rabbit_password = bkcloud16
+rabbit_password = bkcloud
 ```
 
 - Khai báo thêm section `[keystone_authtoken]` và các dòng dưới:
@@ -1061,15 +1033,15 @@ project_domain_name = default
 user_domain_name = default
 project_name = service
 username = nova
-password = bkcloud16
+password = bkcloud
 ```
 - Khai báo thêm section `[vnc]` và các dòng dưới:
 ```sh
-	[vnc]
-	enabled = True
-	vncserver_listen = 0.0.0.0
-	vncserver_proxyclient_address = $my_ip
-	novncproxy_base_url = http://192.168.2.10:6080/vnc_auto.html
+[vnc]
+enabled = True
+vncserver_listen = 0.0.0.0
+vncserver_proxyclient_address = $my_ip
+novncproxy_base_url = http://192.168.2.10:6080/vnc_auto.html
 ```
 Các thành phần máy chủ lắng nghe tất cả các địa chỉ IP còn các thành phần proxy chỉ lắng nghe trên địa chỉ IP giao diện quản lý của các node compute. Base URL cho biết nơi mà bạn có thể sử dụng một trình duyệt web để truy cập console từ xa của tinstance trên node compute này.
 **chú ý*: Nếu trình duyệt web để truy cập console từ xa nằm trên một máy chủ mà không thể phân giải tên máy chủ controller, bạn phải thay thế controller với các địa chỉ IP giao diện quản lý của các node compute.
@@ -1094,47 +1066,49 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = bkcloud16
+password = bkcloud
 ```
 
 Cuối cùng, xác định xem node compute của bạn hỗ trợ cách thức ảo hóa nào, chạy lênh:
 ```sh
-$ egrep -c '(vmx|svm)' /proc/cpuinfo
+egrep -c '(vmx|svm)' /proc/cpuinfo
 ```
 Nếu kết quả trả về là 1 hay lớn hơn, thì node compute của bạn đã hỗ trợ tăng tốc phần cứng mà không cần các cấu hình bổ sung. Nhưng nếu kế quả trả về là 0, nghĩa là node compute của bạn không hỗ trợ tăng tốc phần cứng, bạn phải cấu hình libvirt sử dụng QEMU thay vì KVM. Khi đó, phải sửa trong section `[libvirt]` ở file `/etc/nova/nova-compute.conf` như sau:
 	
 ```sh
-	[libvirt]
-	...
-	virt_type = qemu
+[libvirt]
+...
+virt_type = qemu
 ```
 
 Khởi động lại dịch vụ `nova-compute`
 ```sh
 service nova-compute restart
- ```
+```
 Xóa database mặc định của hệ thống tạo ra
 ```sh
 rm -f /var/lib/nova/nova.sqlite
- ```
+```
 Dùng lệnh nano để thêm file `admin-openrc` chứa nội dung dưới:
-```sh
+```bash
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
-export OS_PASSWORD=bkcloud16
+export OS_PASSWORD=bkcloud
 export OS_AUTH_URL=http://controller:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
- ```
+```
 Thực thi file admin-openrc
-```sh
+```bash
 source admin-openrc
- ```
+```
 Kiểm tra lại các dịch vụ của nova đã được cài đặt thành công hay chưa:
-```sh
-root@compute1:~# openstack compute service list
+
+```bash
+
+openstack compute service list
 +----+------------------+------------+----------+---------+-------+----------------------------+
 | Id | Binary           | Host       | Zone     | Status  | State | Updated At                 |
 +----+------------------+------------+----------+---------+-------+----------------------------+
@@ -1144,9 +1118,10 @@ root@compute1:~# openstack compute service list
 |  6 | nova-conductor   | controller | internal | enabled | up    | 2016-04-15T15:10:32.000000 |
 |  7 | nova-compute     | compute1   | nova     | enabled | up    | 2016-04-15T15:10:25.000000 |
 +----+------------------+------------+----------+---------+-------+----------------------------+
- ```
-#6 Cài đặt dịch vụ OpenStack Networking - Neutron
-##6.1 Các thành phần của dịch vụ Neutron
+
+```
+#Cài đặt dịch vụ OpenStack Networking - Neutron
+##Các thành phần của dịch vụ Neutron
 Dịch vụ Neutron bao gồm các thành phần sau:
 
 -	neutron-server: Tiếp nhận các  API request từ user và chuyển các request tới các plugin để xử lý
@@ -1166,59 +1141,59 @@ Khi triển khai cài đặt trên các máy vật lý, các dịch vụ sẽ đ
 -	Trên node compute: neutron-linuxbridge-agent
 Ngoài các thành phần trên, Neutron còn có các thành phần khác như cơ sở dữ liệu, các endpoint và user trong Keystone Identity.
 
-##6.2 Chuẩn bị cấu hình trên controller node và tải về các thành phần của neutron trên controller node
+##Chuẩn bị cấu hình trên controller node và tải về các thành phần của neutron trên controller node
 
 Để bắt đầu cài đặt trên controller node, ta cần tạo cơ sở dữ liệu cho Neutron:
 
-###6.2.1 Tạo database, user và endpoint cho neutron.
+###Tạo database, user và endpoint cho neutron.
 
 - Đăng nhập vào MySQL
-```sh
-	mysql -uroot -pbkcloud16
+```bash
+mysql -uroot -pbkcloud
 ```
 - Tạo database và phân quyền
 ```sh
-	CREATE DATABASE neutron;
-	GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'bkcloud16';
-	GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'bkcloud16';
-		
-	FLUSH PRIVILEGES;
-	exit;
+CREATE DATABASE neutron;
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'bkcloud';
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'bkcloud';		
+FLUSH PRIVILEGES;
+exit;
 ```
 - Khai báo biến môi trường
-```sh
+```bash
 source admin.sh
 ```
-- Tạo tài khoản tên ```sh neutron```, thêm tài khoản ```sh neutron``` vào project ```sh service``` với quyền của tài khoản ```sh neutron``` đối với project ```sh service``` là ```sh admin```
-```sh
-	openstack user create neutron --domain default --password bkcloud16
-	openstack role add --project service --user neutron admin
+- Tạo tài khoản tên ```neutron```, thêm tài khoản ```neutron``` vào project ```service``` với quyền của tài khoản ```neutron``` đối với project ```service``` là ```admin```:
+
+```bash
+openstack user create neutron --domain default --password bkcloud
+openstack role add --project service --user neutron admin
 ```
 - Tạo dịch vụ tên là neutron
-```sh
-	openstack service create --name neutron --description "OpenStack Networking" network
+```bash
+openstack service create --name neutron --description "OpenStack Networking" network
 ```
 - Tạo các endpoint cho dịch vụ neutron trong keystone
-```sh	
-	openstack endpoint create --region RegionOne network public http://controller:9696
-	openstack endpoint create --region RegionOne network internal http://controller:9696	
-	openstack endpoint create --region RegionOne network admin http://controller:9696
+```bash	
+openstack endpoint create --region RegionOne network public http://controller:9696
+openstack endpoint create --region RegionOne network internal http://controller:9696	
+openstack endpoint create --region RegionOne network admin http://controller:9696
 ```
 ####Tải về các dịch vụ của neutron
 Ta tiến hành tải về các dịch vụ của neutron trên controller node:
-```sh
-	apt-get update
-	apt-get -y install neutron-server neutron-plugin-ml2 \
-	neutron-linuxbridge-agent neutron-l3-agent neutron-dhcp-agent \
-	neutron-metadata-agent
+```bash
+apt-get update
+apt-get -y install neutron-server neutron-plugin-ml2 \
+neutron-linuxbridge-agent neutron-l3-agent neutron-dhcp-agent \
+neutron-metadata-agent
 ```
 Tiếp theo, ta cấu hình các dịch vụ của neutron
-###6.2.2 Cấu hình cài đặt neutron trên controller node
+###Cấu hình cài đặt neutron trên controller node
 Đầu tiên, ta cấu hình file /etc/neutron/neutron.conf:
 ####Cấu hình để neutron sử dụng database
 Chỉnh sửa section [database] để neutron có thể sử dụng database neutron mà chúng ta vừa tạo ở phần trước:
 ```sh 
-connection = mysql+pymysql://neutron:bkcloud16@controller/neutron
+connection = mysql+pymysql://neutron:bkcloud@controller/neutron
 ```
 Lưu ý: xóa cơ sở dữ liệu mặc định của neutron, comment dòng này ở section [database]
 ```sh
@@ -1245,7 +1220,7 @@ Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết 
 ...
 rabbit_host = controller
 rabbit_userid = openstack
-rabbit_password = bkcloud16
+rabbit_password = bkcloud
 ```
 ####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
@@ -1269,7 +1244,7 @@ project_domain_name = default
 user_domain_name = default
 project_name = service
 username = neutron
-password = bkcloud16
+password = bkcloud
 ```
 
 ####Cấu hình neutron để thông báo các sự kiện cho nova
@@ -1289,7 +1264,7 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = nova
-password = bkcloud16
+password = bkcloud
 
 ```
 ####Cấu hình Modular Layer 2 (ML2) plug-in
@@ -1388,7 +1363,7 @@ Metadata agent có chức năng cung cấp các dữ liệu cho máy ảo khi m�
 [DEFAULT]
 ...
 nova_metadata_ip = controller
-metadata_proxy_shared_secret = bkcloud16
+metadata_proxy_shared_secret = bkcloud
 ```
 
 ####Cấu hình nova để sử dụng neutron và metadata agent.
@@ -1404,19 +1379,19 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = bkcloud16
+password = bkcloud
 	
 service_metadata_proxy = True
-metadata_proxy_shared_secret = bkcloud16	
+metadata_proxy_shared_secret = bkcloud	
 ```
-###6.2.3 Kết thúc cài đặt trên controller node
+###Kết thúc cài đặt trên controller node
 - Đồng bộ hóa cơ sở dữ liệu cho neutron
-```sh
+```bash
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
 --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron 
 ```
 - Khởi động lại dịch vụ nova-api và các dịch vụ trong neutron
-```sh
+```bash
 service nova-api restart
 service neutron-server restart
 service neutron-linuxbridge-agent restart
@@ -1424,29 +1399,32 @@ service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 service neutron-l3-agent restart
 ```
-##6.3 Cài đặt neutron lên compute node
-###6.3.1 Chuẩn bị các thành phần của neutron trên compute node
+##Cài đặt neutron lên compute node
+###Chuẩn bị các thành phần của neutron trên compute node
 Trên compute node, ta sẽ triển khai thành phần neutron-linuxbridge-agent. Tải về neutron-linuxbridge-agent:
-```sh
+```bash
 apt-get install neutron-linuxbridge-agent
 ```
 
-###6.3.2 Cấu hình neutron trên compute node
+###Cấu hình neutron trên compute node
 Ta cấu hình file /etc/neutron/neutron.conf:
 ####Cấu hình để neutron sử dụng messaging service
 Neutron liên lạc với các dịch vụ khác thông qua messaging service. Cập nhật section [DEFAULT] và section [oslo_messaging_rabbit] để cấu hình giúp neutron sử dụng messaging service:
+
 ```sh
 [DEFAULT]
 ...
 rpc_backend = rabbit
 ```
+
 Phần xác thực cho rabbit_mq phải khớp với các thông tin ta thiết lập khi cài đặt messaging service ở phần trước đó:
+
 ```sh
 [oslo_messaging_rabbit]
 ...
 rabbit_host = controller
 rabbit_userid = openstack
-rabbit_password = bkcloud16
+rabbit_password = bkcloud
 ```
 ####Cấu hình để neutron sử dụng dịch vụ xác thực Keystone
 Để hệ thống mạng neutron hoạt động, cần cấp quyền admin cho dịch vụ neutron để neutron có thể sử dụng được các dịch vụ khác khi hoạt động. 
@@ -1470,7 +1448,7 @@ project_domain_name = default
 user_domain_name = default
 project_name = service
 username = neutron
-password = bkcloud16
+password = bkcloud
 ```
 ####Cấu hình linux-bridge agent
 - Cấu hình linux-bridge agent trên compute node để chuẩn bị hạ tầng mạng ảo trên compute node. Chỉnh sửa file ```/etc/neutron/plugins/ml2/linuxbridge_agent.ini ```, cấu hình để mapping - ánh xạ nhãn ```provider``` vào card vật lý eth1. Khi chúng ta muốn các máy ảo trên compute node có khả năng kết nối trực tiếp vào mạng external network, khi đó các máy ảo này sẽ kết nối vào mạng ảo flat này thông qua 1 bridge kết nối tới eth1.
@@ -1506,7 +1484,7 @@ user_domain_name = default
 region_name = RegionOne
 project_name = service
 username = neutron
-password = bkcloud16
+password = bkcloud
 ```
 ###6.3.3 Kết thúc cài đặt trên compute node
 - Khởi động lại dịch vụ nova-compute
@@ -1546,24 +1524,24 @@ HORIZON hay còn gọi là dashboad dùng để cung cấp giao diện trên web
 
 Cài đặt các thành phần cho dashboad:
 
-```sh
-	apt-get -y install openstack-dashboard
+```bash
+apt-get -y install openstack-dashboard
 ```
 
 Sao lưu lại file cấu hình cho dashboad
 
-```sh
-	cp /etc/openstack-dashboard/local_settings.py /etc/openstack-dashboard/local_settings.py.orig
+```bash
+cp /etc/openstack-dashboard/local_settings.py /etc/openstack-dashboard/local_settings.py.orig
 ```
 
 Tìm các dòng sau trong file /etc/openstack-dashboard/local_settings.py và chỉnh sửa như bên dưới
 
 ```sh
-	OPENSTACK_HOST = "controller"
+OPENSTACK_HOST = "controller"
 ```
 
 ```sh
-	CACHES = {
+CACHES = {
     		'default': {
          		'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
          		'LOCATION': 'controller:11211',
@@ -1572,33 +1550,33 @@ Tìm các dòng sau trong file /etc/openstack-dashboard/local_settings.py và ch
 ```
 
 ```sh
-	OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
+OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
 ```
 
 ```sh
-	OPENSTACK_API_VERSIONS = {
+OPENSTACK_API_VERSIONS = {
     		"identity": 3,
     		"image": 2,
     		"volume": 2,
-	}
+}
 ```
 
 ```sh
-	OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
 ```
 
 ```sh
-	OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
 ```
 
 ```sh
-	TIME_ZONE = "Asia/Ho_Chi_Minh"
+TIME_ZONE = "Asia/Ho_Chi_Minh"
 ```
 
 Xóa theme mặc định của ubuntu
 
 ```sh
-	apt-get -y remove --auto-remove openstack-dashboard-ubuntu-theme
+apt-get -y remove --auto-remove openstack-dashboard-ubuntu-theme
 ```
 
 Chỉnh sửa trong file `/etc/apache2/conf-available/openstack-dashboard.conf` bằng cách thêm vào dòng:
@@ -1609,7 +1587,7 @@ WSGIApplicationGroup %{GLOBAL}
 Khởi động lại apache
 
 ```sh
-	service apache2 restart
+service apache2 restart
 ```
 
 Mở web với địa chỉ http://192.168.2.10/horizon để vào dashboad
