@@ -1,0 +1,28 @@
+Work log 7/3/2017:
+Vấn đề trọng tâm là thiết kế hệ thống sử dụng multi-ring (trình bày ở phần dưới), vì ngoài cloud-ring,
+sẽ mở rộng ra Distributed File System ring và Cached Ring.
+- Nghĩ một phương thức khác để implement Folder Data Object thay vì lưu content của folder bằng XML ( Sử dụng Object metadata)/
+Tìm hướng thiết kế multi-ring cho system
+
+Task for Công:
+    - Phân biệt các phương thức lưu trữ sau:
+        + Block storage
+        + File system
+        + Object storage
+    - Giải thích lý do window bị defragment
+
+Task for Công + Kiên:
+    - Phân tích để mở rộng hệ thống ra multi-ring:
+        - Hệ thống có 3 ring:
+            - Cloud ring (AWS-S3, Swift)
+            - Distributed File System ring (Ceph, Google File System,vv...)
+            - Cache ring ( Data Cached in SAS server...)
+    - Bắt đầu thiết kế hệ thống Storage API Server theo mô hình High - Available, yêu cầu:
+        - Cho phép lưu trữ Account Data theo 2 option ( chọn option bằng cách cấu hình file SAS.conf):
+            + Back-end: Database
+            + Back-end: Chord ring
+
+        - Sử dụng thiết kế theo Interface để implement HA bên trên.
+        - Mở rộng tính năng log-in bằng Facebook-account, Google-account...
+
+Dead-line: Tối thứ 5
