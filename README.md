@@ -1,4 +1,4 @@
-#openstack-manual
+# openstack-manual
 
 Đây là repository chứa các tài liệu tìm hiểu về OpenStack và các vấn đề liên quan của nhóm.
 - Các tìm hiểu về OpenStack nói chung và các vấn đề liên quan: đóng góp vào nhánh master
