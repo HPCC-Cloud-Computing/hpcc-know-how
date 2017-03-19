@@ -1,0 +1,3 @@
+- Viết lại thuật toán.
+- Cải tiến Ring Table.
+- Concurrency quá trình tìm kiếm.
