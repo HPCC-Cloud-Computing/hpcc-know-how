@@ -1,7 +1,6 @@
 # Swift Architect
 
-**Core source**:[https://www.swiftstack.com/docs/introduction/openstack_swift.html#swift-overviewprocesses](https://www.swiftstack.com/docs/introduction/openstack_swift.html#swift-overviewprocesses)
-
+**Core source**: [https://www.swiftstack.com/docs/introduction/openstack_swift.html](https://www.swiftstack.com/docs/introduction/openstack_swift.html)
 
 ## Swift Architecture Overview - Processes
 
@@ -14,7 +13,6 @@ Một Swift cluster là một hệ thống phân tán bao gồm một tập hợ
 Trong hệ thống Swift, các Node chạy proxy process được gọi là Proxy Node. Các Node chạy  account, container and object process đựoc gọi là Storage Node. Các Storage Node cũng chính là các Node lưu trữ các thực thể trong hệ thống (Container, Account and Data Object). Storage Node cũng chạy một loạt các Swift Services khác để duy trì tính nhất quán cho các thực thể mà  Storage Node đó lưu trữ.
 
 Bây giờ, chúng ta sẽ tìm hiểu vai trò của từng thành phần trong hệ thống Swift.
-
 
 ## Proxy Server
 
@@ -34,7 +32,7 @@ Container Server xử lý các request liên quan tới metadata của một con
 
 ## Object Layer
 
-Object Server process xử lý các các request liên quan tới các Data Object thực sự lưu trong các drive của Storage Node chạy process đó.Object được lưu trữ trong drive bằng cách sử dụng đường dẫn tạo ra bởi đường dẫn của partition chứa nó kết hợp với ID của Data Object đó và time_stamp (time\_stamp cho phép lưu trữ nhiều version cho một Data Object). Object metadata được lưu trữ trong **file’s extended attributes (xattrs)**, điều này có nghĩa là object metadata nằm trên cùng một drive với Object Content.
+Object Server process xử lý các các request liên quan tới các Data Object thực sự lưu trong các Drive (Các ổ đĩa cứng) của Storage Node chạy process đó.Object được lưu trữ trong Drive bằng cách sử dụng đường dẫn tạo ra bởi đường dẫn của partition chứa nó kết hợp với ID của Data Object đó và time_stamp (time\_stamp cho phép lưu trữ nhiều version cho một Data Object). Object metadata được lưu trữ trong **file’s extended attributes (xattrs)**, điều này có nghĩa là object metadata nằm trên cùng một Drive với Object Content.
 
 ## Swift Overview — Cluster Architecture
 
@@ -55,7 +53,7 @@ Region là một tập các Node nằm tách biệt nhau về mặt vật lý - 
 Zone là một tập hợp các Node trong một Region. Một node chỉ thuộc về một Zone và một Region có thể có một hoặc nhiều Zone.
 Trên triển khai thực tế, các Zone trên thực tế có thể là các Rack khác nhau của một DataCenter. Trong các kịch bản triển khai phổ biến nhất, Một Cluster có một Region và Region đó là tập hợp của nhiều Zone.
 
-In OpenStack Object Storage, data is placed across different tiers of failure domains. First, data is spread across regions, then zones, then servers, and finally across drives. Data is placed to get the highest failure domain isolation. If you deploy multiple regions, the Object Storage service places the data across the regions. Within a region, each replica of the data should be stored in unique zones, if possible. If there is only one zone, data should be placed on different servers. And if there is only one server, data should be placed on different drives.
+In OpenStack Object Storage, data is placed across different tiers of failure domains. First, data is spread across regions, then zones, then servers, and finally across Drives. Data is placed to get the highest failure domain isolation. If you deploy multiple regions, the Object Storage service places the data across the regions. Within a region, each replica of the data should be stored in unique zones, if possible. If there is only one zone, data should be placed on different servers. And if there is only one server, data should be placed on different Drives.
 
 ![https://www.swiftstack.com/docs/_images/cluster-zones.png](https://www.swiftstack.com/docs/_images/cluster-zones.png)
 
@@ -73,23 +71,24 @@ Chúng ta đã biết, Swift sử dụng **modified consistent hashing ring** đ
 
 Để xác định vị trí của thực thể **k**, đầu tiên chúng ta cần thực hiện quá trình Hashing. Sau khi thực hiện Hashing, chúng ta sẽ lấy một phần trong giá trị thu được để định vị. Phần giá trị đó là **x**, và **x** phải nằm trong miền giá trị của Ring. Sau đó, chúng ta sẽ xem giá trị x nằm trong partititon nào, thì partition đó chính là vị trí vật lý của thực thể **k**.
 
-Ở đây, chúng ta có thể thấy, một partition trên ring sẽ tương ứng với một vị trí vật lý xác định trên hệ thống. Sự tương ứng về vị trí ở đây được thể hiện thông qua cơ chế ánh xạ sau: Một partition thực chất là một thư mục nằm trong một Driver( một Disk).
+Ở đây, chúng ta có thể thấy, một partition trên ring sẽ tương ứng với một vị trí vật lý xác định trên hệ thống. Sự tương ứng về vị trí ở đây được thể hiện thông qua cơ chế ánh xạ sau: Một partition tham chiếu một thư mục nằm trong một Drive ( một Disk).
 
+**note**: sự tham chiếu tới 1 thư mục trong 1 Drive ở đây mang tính tương đối, vì ở phần sau, theo cơ chế sao lưu partition, chúng ta sẽ thấy một partition có nhiều bản sao, tham chiếu tới các thư mục nằm trên các Drive khác nhau.
 ![https://www.swiftstack.com/docs/_images/storage-node-partition.png](https://www.swiftstack.com/docs/_images/storage-node-partition.png)
 
 Như vậy, chúng ta có thể thấy cấu trúc lưu trữ bên trong Storage Node là: Một **Storage Node** chứa các **Drive**, và một **Drive** chứa các **Partition**.
 
-Trong khi số lượng Partition trong một Cluster không thay đổi, thì số lượng Drive có trong Cluster đó có thể thay đổi. Ví dụ ban đầu, Chúng ta có 150 partition và 2 drive, khi đó mỗi một drive sẽ có 75 partition. Sau đó, nếu chúng ta thêm một drive vao trong hệ thống, thì hệ thống của chúng ta sẽ có 3 drive, do đó mỗi một drive lúc này sẽ có 50 partition.
+Trong khi số lượng Partition trong một Cluster không thay đổi, thì số lượng Drive có trong Cluster đó có thể thay đổi. Ví dụ ban đầu, Chúng ta có 150 partition và 2 Drive, khi đó mỗi một Drive sẽ có 75 partition. Sau đó, nếu chúng ta thêm một Drive vao trong hệ thống, thì hệ thống của chúng ta sẽ có 3 Drive, do đó mỗi một Drive lúc này sẽ có 50 partition.
 
-Partition là đơn vị nhỏ nhất mà Swift làm việc. Các thực thể sẽ được lưu trữ trong các partition, process tìm kiếm các thực thể thông qua partition, và khi một drive mới được thêm vào hệ thống, một số partition sẽ được di chuyển qua drive mới đó. Khi hệ thống được thực hiện scale up, thì số lượng partition có trong hệ thống vẫn được giữ nguyên.
+Partition là đơn vị nhỏ nhất mà Swift làm việc. Các thực thể sẽ được lưu trữ trong các partition, process tìm kiếm các thực thể thông qua partition, và khi một Drive mới được thêm vào hệ thống, một số partition sẽ được di chuyển qua Drive mới đó. Khi hệ thống được thực hiện scale up, thì số lượng partition có trong hệ thống vẫn được giữ nguyên.
 
-**Note**: một drive chỉ giữ một phần nhỏ các partition trong tập các partiton có trên ring.
+**Note**: một Drive chỉ giữ một phần nhỏ các partition trong tập các partiton có trên ring.
 
 ## Durability
 
 Swift duy trì  sự ổn định thông qua cơ chế sao lưu dữ liệu, một thực thể trong hệ thống sẽ được nhân bản ra nhiều bản sao và lưu trữ tại các vị trí khác nhau trong hệ thống. Cơ chế sao lưu đảm bảo rằng, khi một phần hệ thống, ví dụ như một ổ đĩa bị gặp sự cố, thì các Data Object vẫn còn các bản sao dự phòng trên các bản sao ở các ổ đĩa khác, do đó dữ liệu được đảm bảo độ an toàn.
 
-Số lượng replica được sử dụng phổ biến là 3. Cơ chế replication của hệ thống Swift bao gồm cả các cơ chế xử lý các trường hợp các drive trong hệ thống gặp sự cố: Khi một drive trong hệ thống bị hỏng, các process chịu trách nhiệm sao lưu dữ liệu như replication/auditing processes sẽ được thông báo, sau đó các process này sẽ sao lưu những dữ liệu trên drive bị hỏng ra một vị trí khác trong hệ thống. Xác suất toàn bộ các bản sao dữ liệu của một partition trên toàn bộ hệ thống bị hỏng là nhỏ, do đó, chúng ta nói rằng Swift có tính chất ổn định.
+Số lượng replica được sử dụng phổ biến là 3. Cơ chế replication của hệ thống Swift bao gồm cả các cơ chế xử lý các trường hợp các Drive trong hệ thống gặp sự cố: Khi một Drive trong hệ thống bị hỏng, các process chịu trách nhiệm sao lưu dữ liệu như replication/auditing processes sẽ được thông báo, sau đó các process này sẽ sao lưu những dữ liệu trên Drive bị hỏng ra một vị trí khác trong hệ thống. Xác suất toàn bộ các bản sao dữ liệu của một partition trên toàn bộ hệ thống bị hỏng là nhỏ, do đó, chúng ta nói rằng Swift có tính chất ổn định.
 
 Ở phần trước chúng ta đã nói rằng, proxy server sẽ sử dụng hashing ring để xác định vị trí của các thực thể trên Cluster. Sau khi chúng ta hiểu được cơ chế sao lưu của hash, chúng ta có thể hiểu rằng, một thực thể có thể có **n** vị trí trên cluster, vì partition chứa thực thể đó có **n** vị trí (1 partition được sao lưu n lần trên n vị trí khác nhau trong một cluster).
 
@@ -101,10 +100,9 @@ Một Ring thể hiện sự mapping giữa tên của một thực thể (Data 
 
 Ring thực hiện lookup thông qua logic ring và 2 table sau: devices list and the devices lookup table.
 
-Device list là danh sách các **drive** được add vào Ring. Một row tỏng Device list chứa các thôn tin xác định vị trí - địa chỉ truy cập của một **drive** trên hệ thống: DriveID, zone, weight, IP, port và tên drive.
+Device list là danh sách các **Drive** được add vào Ring. Một row tỏng Device list chứa các thôn tin xác định vị trí - địa chỉ truy cập của một **Drive** trên hệ thống: DriveID, zone, weight, IP, port và tên Drive.
 
 ![https://www.swiftstack.com/docs/_images/partition-device-table.png](https://www.swiftstack.com/docs/_images/partition-device-table.png)
-
 
 Device lookup table là một table chứa một danh sách các partition, mỗi row trong table này chứa các thông tin về vị trí của các replica của một partition:
 
@@ -119,6 +117,29 @@ Ví dụ,  Partition 3 có 3 replica (0,1,2) nằm trên các Drive có DriveID 
 
 Quay trở lại với vấn đề lookup data trên Proxy server process. Proxy server process sẽ thực hiện việc lookup vị trí chứa data của một thực thể (Account, Container, Data Object) bằng cách Hashing tên của thực thể  cần lookup được một giá trị là Y. Sau đó thuật toán Lookup lấy ra 1 phần thông tin của Y - **Y\_HEAD\_N** ( thực tế là n bit đầu của Y) rồi xác định xem **Y\_HEAD\_N** tương ứng với PartitionID nào.  Partition có PartitionID này chính là Partition đang chứa dữ liệu của thực thể đang lookup. Sau đó hệ thống sẽ tìm xem các replica của partition này đang nằm trên các Device nào thông qua Device Lookup Table. Sau đó, hệ thống sẽ lấy ra thông tin về các Device này thông qua Device List table:  ID number, zone, weight, IP, port, và tên của Device. Dựa vào các thông tin này, Proxy Server process sẽ truy cập vào được các Device đang chứa data của thực thể đang lookup.
 
+Tiếp theo, chúng ta sẽ xem một Ring được tạo ra như thế nào, số lượng parititon trên một Ring, và làm sao để mapping một parition vào một drive trên hệ thống.
+
+## Building a Ring
+
+Khi một ring được tạo ra, số lượng partition được tạo ra trên ring đó được tính toán từ một tham số được gọi là **partition power**. Parititon power cũng như số lượng partition trên Cluster là cố định và chỉ được thiết lập một lần vào lúc bắt đầu xây dựng cluster. Trong suốt quá trình Cluster vận hành sau đó, chúng ta không thể thay đổi tham số partiton power và số lượng partiton trên cluster. Công thức tính số lượng partition trong Swift là **partition\_number = 2^ partition\_power**. Ví dụ, nếu ta chọn partition\_number = 12, thì số lượng partition trên cluster sẽ là 2^12 = 4096.
+
+Trong quá trình khởi tạo cluster, sau khi chúng ta đã xác định số lượng partition có trên Cluster, thì công việc tiếp theo của hệ thống là gán mỗi một partition trên ring với một Drive tương ứng. Khi chúng ta cần rebuilt lại Ring - còn gọi là rebanlancing, chỉ có một số các partition trên các drive phải di chuyển qua các drive khác drive trước đó bị ảnh hưởng. Rebalancing thường được thực hiện khi có một drive mới được gắn vào cluster, hoặc khi một drive bị gỡ khỏi cluster.
+
+Việc hệ thống quyết định một partition sẽ nằm trên drive nào phụ thuộc vào các tham số sau: Số lượng Partition Replica trên Cluster, cơ chế Replica Lock, và Device Weight.
+
+## Partition Replica Count
+
+Như đã trình bày, số lượng Partition trên một Cluster là cố định. Tuy nhiên một Partition trên Cluster được sao lưu thành k bản sao trên các Drive (thường thì k =3). Do đó số lượng Partition Replica trên các Drive của Cluster sẽ là **partition\_number\*k**. Ví dụ nếu chúng ta có số lượng partition trên Cluster là 4096 và k =3, thì số lượng Partition Replica trên các Drive sẽ là 4096*3 = 12288.
+
+## Weight
+
+Swift thiết lập thuộc tính Weight cho từng drive trong Cluster. Người dùng có thể tự thiết lập weight cho từng Drive, và giá trị của weight được thiết lập vào lúc Drive được thêm vào Cluster. Giá trị weight của một Drive tỉ lệ thuận với số lượng Partition cũng như số lượng Partition Replica được gán với Drive đó. Một drive có weight càng lớn thì số lượng Partition - Partition replica tham chiếu tới Drive đó càng nhiều.
+
+## Unique-as-possible Placement
+
+Thuật toán gán một Partition vào một Drive sử dụng các thông số liên quan tới vị trí vật lý của một Drive (Region,Zone, Node-Server, Drive). Mục tiêu của thuật toán này, đó là làm sao cho các Replica của một Partition được lưu trữ ở các Drive càng cách xa nhau càng tốt, để khi sự cố xảy ra, xác xuất tất cả các Replica của Parittion đó đều bị hỏng là nhỏ nhất.
+
+Sau khi chúng ta thực hiện xong công việc gán các Partition trên Ring vào Drive, thì các Ring trên hệ thống cho các thực thể được tạo ra: một Account Ring, một Container Ring, một Object Ring.
 
 ## References
 
