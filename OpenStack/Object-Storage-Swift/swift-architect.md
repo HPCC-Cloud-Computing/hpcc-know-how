@@ -100,7 +100,7 @@ Một Ring thể hiện sự mapping giữa tên của một thực thể (Data 
 
 Ring thực hiện lookup thông qua logic ring và 2 table sau: devices list and the devices lookup table.
 
-Device list là danh sách các **Drive** được add vào Ring. Một row tỏng Device list chứa các thôn tin xác định vị trí - địa chỉ truy cập của một **Drive** trên hệ thống: DriveID, zone, weight, IP, port và tên Drive.
+Device list là danh sách các **Drive** được add vào Ring. Một row trong Device list chứa các thôn tin xác định vị trí - địa chỉ truy cập của một **Drive** trên hệ thống: DriveID, zone, weight, IP, port và tên Drive.
 
 ![https://www.swiftstack.com/docs/_images/partition-device-table.png](https://www.swiftstack.com/docs/_images/partition-device-table.png)
 

@@ -1,0 +1,15 @@
+# Ring in Swift
+
+Trong hệ thống Swift, Ring là thành phần có vai trò xác định vị trí của data nằm ở đâu trong Cluster. Chúng ta có ba ring độc lập với nhau trong hệ thống: một ring cho các Account Databases, một Ring cho các Container Databases và một Ring cho Object Storage. Ba ring này hoạt động độc lập với nhau nhưng có chung phương thức hoạt động. Trong quá trình hoạt động, Swift không thay đổi Ring, Ring có thể được thay đổi từ bên ngoài hệ thống bởi người quản trị, sau đó người quản trị có thể nạp Ring mới vào hệ thống thay thế cho Ring cũ (Rebalancing  - Rebuilt). Điều này cũng có nghĩa là, khi người quản trị khi thực hiện việc thiết lập hệ thống phải khởi tạo một Ring ban đầu cho hệ thống trước khi hệ thống đi vào hoạt động.
+
+## Ring Builder
+
+Swift Ring được tạo ra và quản lý bởi người quản trị thông qua một công cụ được gọi là Ring-builder. Ring-builder sẽ làm nhiệm vụ xác định một partition trên Ring sẽ tham chiếu tới device nào trên Cluster, sau đó lưu các thông tin trong Ring vào một file được viết dưới định dạng **optimized Python structure to a gzipped**, sau đó Ring-file được chuyển tới các Node trên hệ thống. Các process trên các Node khi được khởi tạo sẽ load Dữ liệu của Ring từ Ring-file chứa trong Node đó lên vùng nhớ trên RAM của Process đó. Sau đó, các Process này sẽ được lập lịch, để sau một khoảng thời gian nhất định tiến hành kiểm tra lại Ring-file chứa trên Node đó có bị thay đổi hay không. Nêu Ring-file bị thay đổi (ví dụ như trong trường hợp người dùng gắn thêm một số device vào hệ thống, sau đó Rebuilt lại Ring rồi chuyển Ring mới tới các Node), Process đó tiến hành Reload lại Ring-file để cập nhật Ring mới lên RAM. Khi thông tin của Swift Ring bị thay đổi, một số Replica của một số Partition trên có thể bị thay đổi vị trí (xảy ra khi Partititon tham chiếu tới các Device khác). Khi đó, dữ liệu của các Partititon Replica này cần được cập nhật từ device cũ sang Device mới thông qua các Swift Service như Replicator, Auditor.
+
+Ring-builder luôn luôn giữ một Builder-file chứa thông tin về Ring hiện tại và một số thông tin khác. Các thông tin này được sử dụng khi Ring-builder tạo ra một Ring mới trong tương lai, cũng như được sử dụng để tạo lại Ring hiện tại, trong trường hợp một số node trên hệ thống gặp sự cố. Vì các vai trò trên của Builder-file, do đó chúng ta cần sao lưu dự phòng một số bản sao của Builder-file trên hệ thống để đảm bảo thông tin về Ring được giữ an toàn trong trường hợp hệ thóng xảy ra sự cố, thông thường Builder-file có thể được backup bằng cách copy file này qua các Node khác trong hệ thống đồng thời với việc người quàn trị cập nhật Ring mới lên các Node.
+
+## Ring Data Structure
+
+Thông tin chứa trong một Ring bao gồm các thành phần sau: Danh sách các Device có trên Cluster và thông tin về cổng truy cập tới các Device này, Danh sách tham chiếu các Partition tới các Device và tham số **Partition Shift Value** được tính theo công thức **Partition Shift Value = N - partition\_power** với N là độ dài của một MD5 hash key (theo bit) và partition\_power là số bit trong Hash key được sử dụng để xác định Partition nào đang chứa thực thể có Hash key này.
+
+
