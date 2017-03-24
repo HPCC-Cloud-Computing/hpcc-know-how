@@ -8,4 +8,3 @@ Tuy nhiên, để tạo ra sự đơn giản trong việc quản lý và trong c
 ![linux_file_system](./images/linux_file_system.png)
 
 Hệ thống quản lý file của Linux được thiết kế như thế nào? Bao gồm các thành phần gì ? Các cơ chế nào đã được thiết lập để xử lý các nhu cầu tương tác với hệ thống file của người dùng ? Chúng ta sẽ tìm câu trả lời cho các câu hỏi trên thông qua bài viết này.
-
