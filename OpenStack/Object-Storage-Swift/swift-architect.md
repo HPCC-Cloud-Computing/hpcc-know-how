@@ -98,7 +98,7 @@ Số lượng replica được sử dụng phổ biến là 3. Cơ chế replica
 
 Một Ring thể hiện sự mapping giữa tên của một thực thể (Data Object, Account, Container) với vị trí vật lý (nơi lưu trữ nội dung) của thực thể đó. Hệ thống Swift có các Ring riêng cho Account, Container và Data Object. Khi các thành phần khác muốn tương tác với  các loại đối tượng này, chúng sẽ sử dụng Ring tương ứng đẻ xác định đối tượng mà chúng muốn tương tác nằm ở vị trí nào trong hệ thống. Ring xác định vị trí của một Data Object trên hệ thống thông qua zone, device, partition và replica.
 
-Ring thực hiện lookup thông qua logic ring và 2 table sau: devices list and the devices lookup table.
+Ring thực hiện lookup thông qua logic ring và 2 table sau: devices list and the devices lookup table55.
 
 Device list là danh sách các **Drive** được add vào Ring. Một row trong Device list chứa các thôn tin xác định vị trí - địa chỉ truy cập của một **Drive** trên hệ thống: DriveID, zone, weight, IP, port và tên Drive.
 
