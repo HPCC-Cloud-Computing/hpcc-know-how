@@ -13,8 +13,8 @@ Bài viết hướng dẫn cài OpenStack bản Newton theo mô hình All-in-one
 	     # yum update  
 	     # yum upgrade
 
-#1. Chuẩn bị môi trường cài đặt
-##1.1 Cấu hình mạng
+# 1. Chuẩn bị môi trường cài đặt
+## 1.1 Cấu hình mạng
  Ta cần cấu hình 2 card mạng. Card mạng thứ nhất - **eth0** thuộc dải `10.10.10.0/24` (management network) và card mạng thứ hai - **eth1** thuộc dải `192.168.2.0/24` (external network)
  
 Thiết lập địa chỉ IP tĩnh cho eth0 và eth1.
@@ -107,7 +107,7 @@ Kiểm tra kết nối tới gateway và internet sau khi thiết lập xong.
     64 bytes from controller (10.10.10.50): icmp_seq=3 ttl=64 time=0.203 ms
     64 bytes from controller (10.10.10.50): icmp_seq=4 ttl=64 time=0.202 ms
 
-##1.2 Cài đặt NTP
+## 1.2 Cài đặt NTP
 Cài gói chrony:
 
     # yum install chrony
@@ -142,7 +142,7 @@ Kiểm tra lại hoạt động của NTP bằng lệnh dưới
     ^+ 123.108.200.124               3   9   377   114    -14ms[  -14ms] +/-  251ms
 
 
-##1.3 Cài đặt repos để cài OpenStack Newton
+## 1.3 Cài đặt repos để cài OpenStack Newton
 
 Cài đặt gói để cài OpenStack Newton
 
@@ -159,7 +159,7 @@ Cài đặt các gói client của OpenStack
 
 Khởi động lại máy, đăng nhập lại chuyển sang quyền root và thực hiện các bước tiếp theo.
 
-##1.4 Cài đặt SQL database
+## 1.4 Cài đặt SQL database
 
 Cài đặt gói phần mềm
 
@@ -185,7 +185,7 @@ Thiết lập password (bkcloud) và các cấu hình cơ bản cho MariaDB
 
     # mysql_secure_installation
 
-##1.5 Cài đặt RabbitMQ
+## 1.5 Cài đặt RabbitMQ
 
 Cài đặt gói phần mềm
 
@@ -199,7 +199,7 @@ Gán quyền read, write cho tài khoản openstack trong RabbitMQ
 
     # rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 
-##1.6 Cài đặt Memcached
+## 1.6 Cài đặt Memcached
 
 Cài đặt gói phần mềm
 
@@ -212,9 +212,9 @@ Khởi động lại memcache
     # systemctl enable memcached.service
     # systemctl start memcached.service
 
-#2. Cài đặt Keystone
+# 2. Cài đặt Keystone
 
-##2.1 Tạo database cài đặt các gói và cấu hình keystone
+## 2.1 Tạo database cài đặt các gói và cấu hình keystone
 
 Đăng nhập vào MariaDB
 
@@ -232,7 +232,7 @@ Tạo user, database cho keystone
     flush privileges;
     exit;
 
-##2.2 Cài đặt và cấu hình keystone
+## 2.2 Cài đặt và cấu hình keystone
 Cài đặt gói cho keystone
 
     # yum install openstack-keystone httpd mod_wsgi
@@ -291,7 +291,7 @@ Khai báo sử dụng token để xác thực.
     $ export OS_AUTH_URL=http://controller:35357/v3
     $ export OS_IDENTITY_API_VERSION=3
 
-##2.3 Tạo domain, projects, users, and roles
+## 2.3 Tạo domain, projects, users, and roles
 
 Tạo project có tên là `service` để chứa các user service của openstack
 
@@ -313,7 +313,7 @@ Gán tài khoản `demo` có role là `user` vào project `demo`
 
     openstack role add --project demo --user demo user
 
-##2.4 Kiểm chứng lại các bước cài đặt keysonte
+## 2.4 Kiểm chứng lại các bước cài đặt keysonte
 
 Vô hiệu hóa cơ chế xác thực bằng token tạm thời trong keysonte bằng cách xóa `admin_token_auth` trong các section `[pipeline:public_api]`, `[pipeline:admin_api]` và `[pipeline:api_v3]` của file `/etc/keystone/keystone-paste.ini`
 
@@ -332,7 +332,7 @@ Gõ lần lượt 2 lệnh dưới sau đó nhập mật khẩu
     openstack --os-auth-url http://controller:5000/v3 \
     --os-project-domain-name default --os-user-domain-name default \
 
-##2.5 Tạo script biến môi trường cho client
+## 2.5 Tạo script biến môi trường cho client
 
 Tạo file admin-openrc chứa nội dung sau:
 
@@ -375,8 +375,8 @@ Gõ lệnh dưới để kiểm tra biến môi trường ở trên đã chính 
     | user_id    | ac3377633149401296f6c0d92d79dc16                                |
     +------------+-----------------------------------------------------------------+
 
-#3. Cài đặt Glance
-###3.1 Tạo database cho glance
+# 3. Cài đặt Glance
+### 3.1 Tạo database cho glance
 Đăng nhập vào mysql
 
     mysql -u root -p
@@ -389,7 +389,7 @@ Tạo database và gán các quyền cho user `glance` trong database
     FLUSH PRIVILEGES;
     exit;
 
-###3.2 Cấu hình xác thực cho dịch vụ glance
+## 3.2 Cấu hình xác thực cho dịch vụ glance
 
 Lấy thông tin xác thực bằng cách sử dụng file `admin-openrc`
 
@@ -415,7 +415,7 @@ Tạo các endpoint cho dịch vụ `glance`
     
     openstack endpoint create --region RegionOne image admin http://controller:9292
 
-###3.3 Cài đặt các gói và cấu hình cho dịch vụ glance
+### 3.3 Cài đặt các gói và cấu hình cho dịch vụ glance
 
 Cài đặt gói `glance`
 
@@ -494,7 +494,7 @@ Khởi động lại dịch vụ `glance`
     # systemctl start openstack-glance-api.service \
       openstack-glance-registry.service
 
-##3.4 Kiểm chứng lại việc cài đặt glance
+## 3.4 Kiểm chứng lại việc cài đặt glance
 
 Khai báo biến môi trường cho dịch vụ `glance`
 
@@ -521,8 +521,8 @@ Kiểm tra lại image đã có hay chưa
     | 38047887-61a7-41ea-9b49-27987d5e8bb9 | cirros | active |
     +--------------------------------------+--------+--------+
 
-#4. Cài đặt Nova
-##4.1 Tạo database và endpoint cho nova
+# 4. Cài đặt Nova
+## 4.1 Tạo database và endpoint cho nova
 Đăng nhập vào database với quyền root
 
     mysql -u root -p
@@ -564,7 +564,7 @@ Tạo endpoint
     openstack endpoint create --region RegionOne compute internal http://controller:8774/v2.1/%\(tenant_id\)s
     
 
-##4.2 Cài đặt các gói và cấu hình
+## 4.2 Cài đặt các gói và cấu hình
 
 Cài đặt gói phần mềm
 
@@ -633,7 +633,7 @@ Nếu kết quả trả về là 1 hay lớn hơn, thì node compute của bạn
     ...
     virt_type = qemu
 
-##4.3 Kết thúc bước cài đặt và cấu hình nova
+## 4.3 Kết thúc bước cài đặt và cấu hình nova
 
 Khởi động lại các dịch vụ của `nova` sau khi cài đặt & cấu hình `nova`
 
@@ -661,7 +661,7 @@ Kiểm tra lại các dịch vụ của nova đã được cài đặt thành c�
     |  6 | nova-compute     | RAPID031 | nova     | enabled | up    | 2017-03-10T04:58:24.000000 |
     +----+------------------+----------+----------+---------+-------+----------------------------+
 
-#5. Cài đặt neutron
+# 5. Cài đặt neutron
 Có 2 cơ chế cung cấp network cho các máy ảo là:
 
  - Provider network (không sử dụng L3 agent trong Neutron)
@@ -670,7 +670,7 @@ Có 2 cơ chế cung cấp network cho các máy ảo là:
 Trong hướng dẫn này sẽ lựa chọn cơ chế Self-service để viết tài liệu
 
 
-##5.1 Tạo database, user và endpoint cho neutron
+## 5.1 Tạo database, user và endpoint cho neutron
 
 Đăng nhập vào MySQL
 
@@ -705,7 +705,7 @@ Tạo các endpoint cho dịch vụ neutron trong keystone
         
     # openstack endpoint create --region RegionOne network admin http://controller:9696
 
-##5.2 Cấu hình và cài đặt neutron
+## 5.2 Cấu hình và cài đặt neutron
 
 Cài đặt các gói phần mềm của `neutron`
 
@@ -861,7 +861,7 @@ Kiểm tra lại hoạt động của các dịch vụ trong `neutron`
     | a544540d-d2af-4cbe-a346-501354841c7c | Linux bridge agent | RAPID031 | None              | True  | UP    | neutron-linuxbridge-agent |
     +--------------------------------------+--------------------+----------+-------------------+-------+-------+---------------------------+
 
-#6. Cài đặt Horizon (dashboard)
+# 6. Cài đặt Horizon (dashboard)
 
 Cài đặt các thành phần cho dashboad
 
@@ -920,7 +920,7 @@ Mở web với địa chỉ http://192.168.2.50/dashboard để truy cập vào 
 
 **Lưu ý**: Nếu không truy cập vào được horizon, có thể do host đang chạy firewalld và SELinux, chúng ta cần disable chúng. Xem chi tiết tại [đây](https://www.server-world.info/en/note?os=CentOS_7&p=openstack_newton&f=10)
 
-#6. Tài liệu tham khảo
+# 7. Tài liệu tham khảo
 [1] https://docs.openstack.org/newton/install-guide-rdo/
 
 [2] https://www.server-world.info/en/note?os=CentOS_7&p=openstack_newton&f=10
