@@ -2,7 +2,8 @@ Linux Bridge
 ========
 Bài viết note lại các kiến thức tìm hiểu được về Linux-bridge
 
-#Linux Bridge – The Basics
+# Linux Bridge – The Basics
+
 Linux bridge là một phần mềm đươc tích hợp vào trong nhân Linux để giải quyết vấn đề ảo hóa phần network trong các máy vật lý. Mặc dù được gọi là bridge, nhưng thực chất linux-bridge tạo ra một switch ảo, sử dụng với ảo hóa KVM/QEMU để các VMs có thể kết nối được với nhau cũng như kết nối được ra bên ngoài.
 
 Một linux-bridge có thể được tạo, xóa và quản lí nhờ command line tool được gọi là **brctl**. Để sử dụng **brctl** trên Ubuntu hoặc Debian , chúng ta cần cài package sau: 
@@ -28,7 +29,7 @@ Chúng ta sẽ tìm hiểu một số command line cơ bản sau:
 
 	$sudo brctl delif br0 eth0
 
-#The Simple Use Case
+# The Simple Use Case
 Như chúng ta đã biết, khi tạo một máy ảo mới, có nhiều options cấu hình network cho máy ảo. Một trong hai options phổ biến được sử dụng đó là `bridge networking` và `network address translation (NAT)`. Vậy sự khác nhau của 2 options này là gì?
 
 ![](https://github.com/vanduc95/OpenStack_Network/blob/master/img/bridge_vs_NAT.png) 
@@ -41,7 +42,7 @@ Bây giờ chúng ta sẽ tìm hiểu sâu hơn một chút về linux bridge b�
 
 ![](https://github.com/vanduc95/OpenStack_Network/blob/master/img/Linux-Bridge-Simple-UseCase.png) 
 
-##Step-by-step guide
+## Step-by-step guide
 **Important note**: Wireless interface không thể được gắn vào một Linux host bridge, vì vậy nếu máy của bạn kết nối với external network thông qua wireless interface (wlan0), thì không thể tạo được linux bridge. Chúng ta cần sử card mạng vật lí (trong trường hợp này là eth0)
 
 Bước 1: Tạo một linux bridge có tên là **br0**
