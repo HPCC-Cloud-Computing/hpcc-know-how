@@ -80,7 +80,7 @@ Tiến trình công việc (workflow) cơ bản của Git:
    >git config --global user.email <Email bạn dùng để đăng ký github>
   
     Ví dụ: Tên tài khoản github của mình là Monlight, email sang11a1hbt@gmail.com thì mình gõ như sau: 
-   - git config --global user.name "xuho"
+   - git config --global user.name "Monlight"
    - git config --global user.email "sang11a1hbt@gmail.com"
 
 2. Kiểm tra lại cấu hình 
@@ -129,7 +129,7 @@ Khi bạn chỉnh sửa các tập tin, Git coi là chúng đã bị thay đổi
 
 Ban đầu khi bạn tạo bản sao (clone) 1 kho chứa về máy và đổi tên thư mục thành myGit chẳng hạn thì tất cả các tập tin trong myGit sẽ ở trạng thái "tracked" và "unmodified", điều này là tất nhiên vì bạn chưa thực hiện bất kì thay đổi nào.
 
-### Kiểm tra trangj thái của tập tin
+### Kiểm tra trạng thái của tập tin
 Bạn có thể xem trạng thái này của nó bằng lệnh
 
 - $ git status 
