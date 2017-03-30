@@ -32,7 +32,7 @@ Cụ thể chức năng của từng tầng trong mô hình OSI:
 
 | Tầng | Chức năng |
 | ----------- | ------------------------------------------- |
-| Tần vật lý | Chuyển dữ liệu **thành tín hiệu và truyền** |
+| Tầng vật lý | Chuyển dữ liệu **thành tín hiệu và truyền** |
 | Tầng liên kết dữ liệu | Truyền thông giữa **hai nút mạng kế tiếp với nhau. Sử dụng địa chỉ MAC** |
 | Tầng mạng | **Chọn đường (định tuyến) và chuyển tiếp** gói tin từ nguồn đến đích. Sử dụng đỉa chỉ IP |
 | Tầng giao vận | Xử lý việc **truyền-nhận dữ liệu cho các ứng dụng** chạy trên các thiết bị đầu cuối. |

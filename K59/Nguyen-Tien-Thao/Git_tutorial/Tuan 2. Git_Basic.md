@@ -189,9 +189,9 @@ branch.master.merge=refs/heads/master
 
 ```
 
-### 3. Tạo một kho chứ git
+### 3. Tạo một kho chứa git
 
-Có hai cách để tạo một kho chứ git
+Có hai cách để tạo một kho chứa git
 
 - Tạo kho chứa từ thư mục cũ
 - Sao chép một kho chứa đã tồn tại
@@ -311,7 +311,7 @@ $ git status
 #
 ```
 
-##### **Bỏ qua các tệp tin**.
+##### **Bỏ qua các tệp tin**
 
 Trong một số trường hợp bạn sẽ không muốn đưa một số file vào thư mục git khi đó bạn có thể liệt kê các tệp tin này trong một thư mục có tên là `.gitignore`. Đây là một ví dụ
 
