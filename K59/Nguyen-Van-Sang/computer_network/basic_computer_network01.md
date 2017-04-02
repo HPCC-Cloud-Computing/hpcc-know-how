@@ -1,8 +1,4 @@
-https://www.stdio.vn/articles/read/127/hanh-trinh-cua-mot-goi-tin
 
-https://www.stdio.vn/articles/read/122/so-luoc-ve-dia-chi-ip
-
-http://dulieu.tailieuhoctap.vn/books/cong-nghe-thong-tin/quan-tri-mang/file_goc_775681.pdf
 
 # Mạng máy tính
 <!-- TOC -->
@@ -342,7 +338,16 @@ TCP :
 + Dùng cho mạng WAN 
 + Không cho phép mất gói tin 
 + Đảm bảo việc truyền dữ liệu 
-+ Tốc độ truyền thấp hơn UDP
++ Tốc độ truyền thấp hơn UTài liệu tham khảo :
+
+Slide Mạng máy tính thầy Bùi Trọng Tùng
+Slide Mạng máy tính cô Trương diệu Linh
+Computer Network tanenabun
+https://quantrimang.com/network-address-translation-nat-hoat-dong-nhu-the-nao-phan-1-118495
+https://quantrimang.com/tim-hieu-ve-cau-hinh-nat-phan-2-118501
+https://quantrimang.com/dynamic-nat-nat-dong-va-overloading-nat-hoat-dong-nhu-the-nao-phan-3-118518
+https://quantrimang.com/tim-hieu-ve-nat-phan-cuoi-118574
+Giáo trình nhập môn mạng máy tính thầy Hồ Đắc PhươDP
 
 UDP: 
 + Dùng cho mạng LAN 
@@ -408,6 +413,19 @@ IP nguồn| IP đích| Port nguồn| Port đích| Dữ liệu
 + Bước 4: Router chuyển tiếp gói tin đến trang Facebook (thông qua cơ chế định tuyến và chuyển tiếp).
 
 
+
+Tài liệu tham khảo :
+
+Slide Mạng máy tính thầy Bùi Trọng Tùng
+Slide Mạng máy tính cô Trương diệu Linh
+Computer Network tanenabun
+https://www.stdio.vn/articles/read/127/hanh-trinh-cua-mot-goi-tin
+https://www.stdio.vn/articles/read/122/so-luoc-ve-dia-chi-ip
+http://dulieu.tailieuhoctap.vn/books/cong-nghe-thong-tin/quan-tri-mang/file_goc_775681.pdf
+https://quantrimang.com/network-address-translation-nat-hoat-dong-nhu-the-nao-phan-1-118495
+https://quantrimang.com/tim-hieu-ve-cau-hinh-nat-phan-2-118501
+https://quantrimang.com/dynamic-nat-nat-dong-va-overloading-nat-hoat-dong-nhu-the-nao-phan-3-118518
+https://quantrimang.com/tim-hieu-ve-nat-phan-cuoi-118574
 
 
 
