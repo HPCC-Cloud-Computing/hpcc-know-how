@@ -416,15 +416,22 @@ IP nguồn| IP đích| Port nguồn| Port đích| Dữ liệu
 
 Tài liệu tham khảo :
 
-Slide Mạng máy tính thầy Bùi Trọng Tùng
 Slide Mạng máy tính cô Trương diệu Linh
+
 Computer Network tanenabun
+
 https://www.stdio.vn/articles/read/127/hanh-trinh-cua-mot-goi-tin
+
 https://www.stdio.vn/articles/read/122/so-luoc-ve-dia-chi-ip
-http://dulieu.tailieuhoctap.vn/books/cong-nghe-thong-tin/quan-tri-mang/file_goc_775681.pdf
-https://quantrimang.com/network-address-translation-nat-hoat-dong-nhu-the-nao-phan-1-118495
+
+http://dulieu.tailieuhoctap.vn/books/cong-nghe-thong-tin/quan-tri-mang/file_goc_775681.
+
+https://quantrimang.com/network-address-translation-nat-hoat-dong-nhu-the-nao-phan-1-
+
 https://quantrimang.com/tim-hieu-ve-cau-hinh-nat-phan-2-118501
+
 https://quantrimang.com/dynamic-nat-nat-dong-va-overloading-nat-hoat-dong-nhu-the-nao-phan-3-118518
+
 https://quantrimang.com/tim-hieu-ve-nat-phan-cuoi-118574
 
 
