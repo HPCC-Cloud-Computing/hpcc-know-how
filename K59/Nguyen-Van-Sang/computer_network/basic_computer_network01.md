@@ -1,3 +1,9 @@
+https://www.stdio.vn/articles/read/127/hanh-trinh-cua-mot-goi-tin
+
+https://www.stdio.vn/articles/read/122/so-luoc-ve-dia-chi-ip
+
+http://dulieu.tailieuhoctap.vn/books/cong-nghe-thong-tin/quan-tri-mang/file_goc_775681.pdf
+
 # Mạng máy tính
 <!-- TOC -->
 
@@ -169,20 +175,71 @@ Có 2 chức năng cơ bản:
 Để gửi gói tin ta cần phải biết địa chỉ của máy đích, luôn phải có một loại địa chỉ để xác định vị trí, từ đó trao đổi thông ti chính xác từ máy nguồn tới máy đích. Vậy nên trong Internet địa chỉ IP là duy nhất.
 
 **Cấu trúc địa chỉ IP**
-IP là một giải nhị phân dài 32 bit, gồm Network ID dùng để xác định mạng mà thiết bị kết nối vào và phần Host ID để xác định thiết bị của mạng đó.
+
+Địa chỉ IP là một dải nhị phân dài 32 bit, gồm Network ID dùng để xác định mạng mà thiết bị kết nối vào và phần Host ID để xác định thiết bị của mạng đó.
 
 ![H3](http://i.imgur.com/aIQnEDq.png)
 
 Để cho đơn giản người ta thường viế lại địa chỉ IP dưới dạng 4 số thập phân được cách nhau bởi dấu chấm.
->Ví dụ: 11001011 10110010 10001111 01100100 sẽ có dạng thập phân là  203.178.143.10/14 (/14 là mặt nạ mạng cho biết số bit thuộc phần Network ID) 
+>Ví dụ: 11001011 10110010 10001111 01100100 sẽ có dạng thập phân là  203.178.143.10
+
+Phân lớp địa chỉ IP:
+![h3](imageNet/h3.jpg)
+
+Lớp A
+
+- Địa chỉ lớp A sử dụng 8 bit đầu làm Network ID, 24 bit còn lại làm Host ID.
+- Bit đầu của một địa chỉ lớp A luôn được giữ là 0. Do đó, các địa chỉ mạng lớp A gồm: 1.0.0.0 -> 127.0.0.0.Tuy nhiên, mạng 127.0.0.0 được sử dụng làm mạng loopback  nên địa chỉ mạng lớp A sử dụng được gồm 1.0.0.0 đến 126.0.0.0 (126 mạng).
+- Phần host có 24 bit -> mỗi mạng lớp A có (2^24 – 2) host.
+- Ví dụ: 10.0.0.1, 1.1.1.1, 2.3.4.5 là các địa chỉ lớp A.
+
+
+Lớp B
+
+- Địa chỉ lớp B sử dụng 16 bit đầu làm Network ID, 16 bit còn lại làm Host ID.
+- Hai bit đầu của một địa chỉ lớp B luôn được giữ là 1 0. Do đó các địa chỉ mạng lớp B gồm: 128.0.0.0 -> 191.255.0.0.Có tất cả 2^14 mạng.
+- Phần host: 16 bit -> một mạng lớp B có 2^16 – 2 host.
+- Ví dụ: các địa chỉ 172.16.1.1, 158.0.2.1 là các địa chỉ lớp B.
+
+Lớp C
+
+- Địa chỉ lớp C sử dụng 24 bit đầu làm Network ID, 8 bit còn lại làm Host ID.
+- Ba bit đầu của một địa chỉ lớp C luôn được giữ là 1 1 0. Do đó, các địa chỉ mạng lớp C gồm:
+ 192.0.0.0 -> 223.255.255.0 (2^21 mạng).
+- Phần host: 8 bit -> một mạng lớp C có 2^8 – 2 = 254 host.
+- Ví dụ: các địa chỉ 192.168.1.1, 203.162.4.191 là các địa chỉ lớp C. 
+
+Lớp D
+
+- Địa chỉ: 224.0.0.0 -> 239.255.255.255
+- Dùng làm địa chỉ multicast. 
+
+Lớp E
+
+- Từ 240.0.0.0 trở đi.
+- Được dùng cho mục đích nghiên cứu.
+
+
+
+
 
 Các loại địa chỉ IP:
 
-+ Địa chỉ Unicast: khi bạn muốn gửi gói tin đến một máy tính cụ thể, khi đó địa chỉ để bạn gửi tới sẽ là một địa chỉ unicast. Đây đơn giản là địa chỉ IP của một thiết bị nào đó trong cùng mạng cục bộ hoặc khác mạng cục bộ.
-+ Địa chỉ Multicast: trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, ta sẽ gửi một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị
-+ Địa chỉ Broadcast: dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
-+ Địa chỉ mạng: dùng để xác định chính xác mạng đó. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
-+ Default Gateway: trước tiên là một địa chỉ (còn được gọi là cổng mặc định).Địa chỉ này được cấu hình cho máy tính và khi một gói tin được gửi đến một địa chỉ không cùng mạng, hoặc đơn giản là không biết gửi đi đâu thì gói tin sẽ được gửi đến địa chỉ này để tiếp tục đi đến nơi khác
+> Địa chỉ Unicast: khi bạn muốn gửi gói tin đến một máy tính cụ thể, khi đó địa chỉ để bạn gửi tới sẽ là một địa chỉ unicast. Đây đơn giản là địa chỉ IP của một thiết bị nào đó trong cùng mạng cục bộ hoặc khác mạng cục bộ.
+
+> Địa chỉ Multicast: trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, ta sẽ gửi một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị
+> + Địa chỉ multicast này chính là các địa chỉ trong dải địa chỉ lớp D (224.x.x.x – 239.x.x.x)
+
+>  Địa chỉ Broadcast: dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
+> + Ví dụ: 192.168.1.255/24 là địa chỉ Broadcast của mạng 192.168.1.0/24.
+
+> Địa chỉ mạng: dùng để xác định mạng này so với mạng khác. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
+> + Ví dụ: 192.168.1.0/24 là địa chỉ mạng của mạng 192.168.1.0/24.
+
+
+> Default Gateway: trước tiên là một địa chỉ (còn được gọi là cổng mặc định).Địa chỉ này được cấu hình cho máy tính và khi một gói tin được gửi đến một địa chỉ không cùng mạng, hoặc đơn giản là không biết gửi đi đâu thì gói tin sẽ được gửi đến địa chỉ này để tiếp tục đi đến nơi khác.Default Gateway thường là địa chỉ IP có thể sử dụng đầu tiên của mạng đó.
+
+> + Ví dụ: Default gateway của mạng 192.168.1.0/24 là 192.168.1.1/24
 
 ## 3.3 Giao thức ARP
 
@@ -197,7 +254,7 @@ Các bước để A xác định MAC của B:
 + A sẽ kiểm tra cache của mình(APR table: <IP address, MAC address, TTL>),nếu tìm thấy MAC của B thì sẽ tiến hành thêm MAC đích vào gói tin rồi truyền đi
 + Nếu không tìm thấy, A sẽ gửi 1 gói tin broadcast (APR Request)đến các máy khác trong mạng( trong đó có MAC nguồn, IP nguồn của A, IP đích của B và MAC đích mặc định là: ff:ff:ff:ff:ff:ff)
 + Các máy còn lại trong mạng sẽ so sánh IP của mình với IP đích,B biết được máy A cần tìm là nó, khi đó B sẽ tạo gói tin APR Replay (chứa MAC của B) rồi gửi lại cho A, đồng thời nhập MAC, IP của A vào APR Table của mình.
-+ Khi A nhận được gói tin do B gửi tới, nó sẽ cập nhật MAC, IP của B vào ARP Table (lần dùng sau nó sẽ không phải request nữa)
++ Khi A nhận được gói tin do B gửi tới, nó sẽ cập nhật MAC, IP của B vào ARP Table (lần dùng sau nó sẽ không phải gửi gói tin request nữa)
 
 ## 3.4 Router
 
@@ -215,34 +272,54 @@ Trường hợp gói tin gửi đi mà máy nhận nằm khác mạng với máy
 + Router gỡ bỏ lớp Header của DataLink(gồm MAC nguồn, MAC cuối),sau đó đọc thông tin lớp Network(gồm IP nguồn, IP đích)
 + Router lấy IP đích, so sánh với IP trong Routing Table:
 
-     *Nếu không tìm được đường đi ứng với IP đích hoặc TTL(trong IP Header) = 0(trường hợp lặp vô tận ) ⇒ gói tin bị drop và router gửi thông báo không tìm thấy máy đích về cho máy gửi gói tin*
+     >Nếu không tìm được đường đi ứng với IP đích ⇒ gói tin bị drop và router gửi thông báo không tìm thấy máy đích về cho máy gửi gói tin
 
-     *Nếu tìm được đường đi ứng với IP đích thì router sẽ thêm lại header chứa: MAC nguồn mới - là địa chỉ MAC của router này, MAC đích mới - là địa chỉ MAC của router tiếp theo. Quá trình này lặplại cho đến khi router phát hiện ra IP đích nằm chung mạn với interface của router ⇒ Router sẽ dùng giao thức ARP để xác thực MAC của máy đích, MAC này sẽ được sử dụng làm MAC đích để máy gửi gói tin đến máy đích*
+     >Nếu tìm được đường đi ứng với IP đích thì router sẽ thêm lại header chứa: MAC nguồn mới - là địa chỉ MAC của router này, MAC đích mới - là địa chỉ MAC của router tiếp theo. Quá trình này lặp lại cho đến khi router phát hiện ra IP đích nằm chung mạng với interface của route(có cổng default gateway được thiết lập giữa router và mạng Lan có chứa IP đích) ⇒ Router sẽ gửi gói tin qua default gateway này, gói tin tiếp tục được switch quảng bá để tìm ra MAC đích, sau đó được chuyển tới náy đích.
 
 
 
-Ví dụ: Máy 1 ở mạng LAN 1 muốn chuyển một gói tin cho máy Máy 4 ở mạng LAN 2.
+Ví dụ: Host 1 ở mạng LAN 1 muốn chuyển một gói tin cho máy Host 4 ở mạng LAN 2.
 
-![H2](http://i.imgur.com/QNoTTr1.png)
 
-Quá trình 2 máy trên hình vẽ gửi gói tin cho nhau:
->Bước 1: Máy 1 tạo gói tin IP để chuẩn bị gửi cho Máy 4, IP Packet có dạng:
+![h3](imageNet/h4.png)
 
-![H2.1](http://i.imgur.com/3O8J9tK.png)
 
->Bước 2: Máy 1 kiểm tra và biết Máy 4 không cùng mạng LAN với nó, khi đó Máy 1 tiến hành đưa gói tin IP xuống tầng liên kết dữ liệu, đóng gói lại thành Frame và gửi tới cho Router, lúc này Frame có dạng:
+Quá trình 2 host trên hình vẽ gửi gói tin cho nhau:
+>Bước 1: Host 1 có IP của Host 4, nó tạo gói tin IP để chuẩn bị gửi cho Host 4, IP Packet có dạng:
 
-![H2.2](http://i.imgur.com/4CjoFm1.png)
+IP nguồn | IP đích | Dữ liệu
+---------|----------|---------
+ 137.96.7.2 | 137.96.10.4 | Data
 
->Bước 3: Router nhận được Frame, nó mở ra và bỏ Header của tầng liên kết giữ liệu(gồm MAC nguồn, MAC đích) thu được IP Packet sau:
+>Bước 2: Host 1 gửi gói tin broadcast (ARP request) đến Switch, sau đó Switch gửi gói tin broadcast này đến tất cả các máy trong mạng LAN 1 và không nhận được phản hồi từ bất kì máy nào (không có máy nào trong mạng LAN 1 có địa chỉ MAC ứng với IP đích), khi đó Router nối với LAN 1 sẽ biết là IP đích là IP khác mạng, và trả lời cho Host 1 biết MAC đích bây giờ là MAC của router này (AF-2B-D7-12-2C-01). Host 1 tiến hành đưa gói IP Packet xuống tầng liên kết dữ liệu và đóng thành Frame, Frame này có dạng:
 
-![H2.1](http://i.imgur.com/3O8J9tK.png)
 
->tiếp đó router sẽ kiểm tra địa chỉ IP đích, sau đó gắn thêm Header chứa  MAC nguồn là MAC của nó và MAC đích là MAC của Máy 4(hoặc là nút kế tiếp trong đường đi từ Máy 1 đến Máy 4). Lúc này Frame mới tới Máy 4 có dạng:
+MAC nguồn| MAC đích| IP nguồn| IP đích| Dữ liệu
+---------|----------|----------|---------|---------|
+71-65-F7-2B-08-53| AF-2B-D7-12-2C-01| 137.96.7.2 | 137.96.10.4 | Data 
 
-![H2.3](http://i.imgur.com/HJJggH3.png)
+>Sau đó gói tin được chuyển qua switch, switch lại chuyển tiếp gói tin tới router thông qua default gateway (ở đây là 137.96.7.1).
 
->Bước 4: Máy 4 nhận được Frame từ Router, nó mở ra rồi bỏ MAC Header, kiểm tra IP đích trùng với IP của nó và tiếp tục bóc bỏ IP Header để lấy dữ liệu từ máy A gửi tới 
+>Bước 3: Router nhận được Frame, nó mở ra và bỏ Header của tầng liên kết giữ liệu(gồm MAC nguồn, MAC đích) thu được IP Packet:
+
+IP nguồn | IP đích | Dữ liệu
+---------|----------|---------
+ 137.96.7.2 | 137.96.10.4 | Data
+
+>tiếp đó router sẽ tách lấy trường IP đích (137.96.10.4) và sử dụng định tuyến để biết gói tin đó cần gửi tới LAN 2, gói tin lại được đóng lại, được thêm Header chứa  MAC nguồn là MAC của router và MAC đích là mặc định (FF-FF-FF-FF-FF-FF) thu được Frame:
+
+
+MAC nguồn| MAC đích| IP nguồn| IP đích| Dữ liệu
+---------|----------|----------|---------|---------|
+ AF-2B-D7-12-2C-01 | FF-FF-FF-FF-FF-FF | 137.96.7.2 | 137.96.10.4 | Data 
+ 
+>Bước 4: Router chuyển tiếp gói tin đến switch trong mạng LAN 2 (qua default gateway 137.96.10.1), switch nhận được gói tin với MAC đích là mặc định nó tiến hành quảng bá trong mạng LAN 2 để tìm địa chỉ MAC (58-23-D7-FA-20-B0) ứng với IP đích (137.96.10.4) để chuyển gói tin tới Host 4 với định dạng:
+
+MAC nguồn| MAC đích| IP nguồn| IP đích| Dữ liệu
+---------|----------|----------|---------|---------|
+ AF-2B-D7-12-2C-01 | 58-23-D7-FA-20-B0 | 137.96.7.2 | 137.96.10.4 | Data 
+
+>Bước 5: Gói tin tới Host 4,Host 4 mở gói tin ra bỏ MAC Header, bỏ IP Header để lấy dữ liệu từ Host 1 gửi tới.
 # Chương 4: TCP,UDP
 
 ## 4.1 Phân biệt TCP và UDP
@@ -282,6 +359,11 @@ Số lượng địa chỉ IP là rất lớn, nhưng không phải là vô hạ
 IP Public là các địa chỉ độc nhất, sử dụng được trong môi trường Internet.
 
 IP Private chỉ sử dụng được trong mạng cục bộ, có thể tái sử dụng lại ở mạng cục bộ khác, nhưng trong một mạng thì vẫn phải mang giá trị duy nhất.
+Với mỗi phân lớp địa chỉ IP, thì có một dải địa chỉ dùng để làm địa chỉ private cho lớp đó:
+
++ Lớp A: Từ 10.0.0.0 đến 10.255.255.255
++ Lớp B: Từ 172.16.0.0 đến 172.31.255.255
++ Lớp C: Từ 192.168.0.0 đến 192.168.255.255
 
 Khi các thiết bị sử dụng địa chỉ IP private trong mạng cục bộ muốn truy cập được Internet – môi trường không sử dụng địa chỉ private, công nghệ NAT (Network Address Translation) được cài đặt trên các thiết bị router(đã được gán 1 địa chỉ IP Public) được sử dụng để chuyển IP private thành IP public và ngược lại, giúp cho các thiết bị trong mạng cục bộ vẫn có thể truy cập được Internet.
 
@@ -294,7 +376,7 @@ Khi các thiết bị sử dụng địa chỉ IP private trong mạng cục b�
 
 + NAT duy trì 1 bảng thông tin về gói tin được gửi qua.
 + Khi 1 máy tính kết nối đến 1 website, địa chỉ IP nguồn của máy được NAT ánh xạ sang 1 địa chỉ IP Public đã được cấu hình sẵn trên NAT Server.
-+ Sau khi có gói tin trở về, NAT dựa vào bảng record mà nó đã lưu về gói tin thay đổi địa chỉ đích thành địa chỉ của máy tính trong mạng và chuyển tiếp 
++ Khi gói tin được gửi từ website về máy, NAT dựa vào bảng NAT mà nó đã lưu ánh xạ ngược IP Public thành địa chỉ của máy tính trong mạng và chuyển tiếp 
 
 ### Các loại NAT
 
@@ -305,15 +387,25 @@ Khi các thiết bị sử dụng địa chỉ IP private trong mạng cục b�
 
 #### Bài toán chuyển gói tin sử dụng Overloading NAT
 
-Ví dụ : Máy 1 có địa chỉ IP là 137.96.7.14/24, gửi gói dữ liệu X đến Máy 4 có IP là 128.45.18.12/24. Hãy trình bày các bước để gửi gói tin X, biết port của ứng dụng gửi trên Máy 1 là 80, port của ứng dụng nhận của Máy 4 là 500.
+Ví dụ : Host 1 nằm trong Private Network có IP: 10.0.0.2, Ứng dụng của Host 1 gửi gói dữ liệu X (qua port 80) đến trang Facebook (có IP: 192.58.58.59, port 500). Dưới đây sẽ tóm tắt các bước của quá trình gói tin được truyền đi.
 
-![H5](http://i.imgur.com/j2BQejV.png)
+![Overloading NAT](imageNet/h5.jpg)
 
-+ Dữ liệu X được ứng dụng trên Máy 1 chuyển xuống tầng transport được gắn thêm header transport -> gói segment có dạng | 80 | 500 | Data |
-+ Segment chuyển xuống tầng network tiếp tục được gắn thêm IP Header -> IP Packet có dạng | 137.96.7.14/24 | 128.45.18.12/24 | 80 | 500 | Data |
-+ IP Packet sẽ chuyển xuống data link, physical và chuyển sang router
-+ Router tiến hành bỏ header của data link. Tiếp đó, NAT router dựa trên IP nguồn(137.96.7.14/24) và số hiệu cổng nguồn(80) ánh xạ tới IP Public của router(213.12.12.13/24) với port ánh xạ là 102. Khi đó gói tin gửi từ router có dạng | 213.12.12.13/24 | 128.45.18.12/24 | 102 | 500 | Data |, được router định tuyến và chuyển tiếp tới Máy 4
-+ Gói tin tới Máy 4, qua tầng network để bỏ IP header, qua transport để bỏ số hiệu cổng nguồn và đích, đồng thời dựa vào số hiệu cổng đích(port 500) để chuyển đúng X tới ứng dụng nhận của Máy 4
++ Bước 1: Dữ liệu X từ ứng dụng của Host 1 qua transport layer, qua network layer  -> IP Packet có dạng:
+
+IP nguồn| IP đích| Port nguồn| Port đích| Dữ liệu
+---------|----------|----------|---------|---------|
+ 10.0.0.2 | 192.58.58.59 | 80  | 500 | Data 
+
++ Bước 2: IP Packet sẽ chuyển xuống data link, physical và chuyển sang router
++ Bước 3: Router tiến hành bỏ header của data link. Tiếp đó, NAT router dựa trên IP nguồn(10.0.0.2) và số hiệu cổng nguồn(80) ánh xạ tới IP Public (213.12.12.13/24) với port ánh xạ là 102. Gói tin lại được đóng lại và có dạng:
+
+IP nguồn| IP đích| Port nguồn| Port đích| Dữ liệu
+---------|----------|----------|---------|---------|
+ 213.12.12.13 | 192.58.58.59 | 102  | 500 | Data 
+
+
++ Bước 4: Router chuyển tiếp gói tin đến trang Facebook (thông qua cơ chế định tuyến và chuyển tiếp).
 
 
 
