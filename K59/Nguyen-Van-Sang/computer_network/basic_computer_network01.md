@@ -1,12 +1,9 @@
-
-
-# Mạng máy tính
 <!-- TOC -->
 
 - [Mạng máy tính](#m-ng-m-y-t-nh)
 - [Chương 1: Giới thiệu cơ bản về mạng máy tính](#ch-ng-1-gi-i-thi-u-c-b-n-v-m-ng-m-y-t-nh)
     - [1.1 Các khái niệm cơ bản](#1-1-c-c-kh-i-ni-m-c-b-n)
-        - [Mạng máy tính là gì?](#m-ng-m-y-t-nh-l-g)
+        - [Mạng máy tính](#m-ng-m-y-t-nh)
         - [Topology](#topology)
         - [Protocal](#protocal)
     - [1.2 Tầng](#1-2-t-ng)
@@ -40,44 +37,51 @@
             - [Bài toán chuyển gói tin sử dụng Overloading NAT](#b-i-to-n-chuy-n-g-i-tin-s-d-ng-overloading-nat)
 
 <!-- /TOC -->
+
+# Mạng máy tính
+
 # Chương 1: Giới thiệu cơ bản về mạng máy tính
 ## 1.1 Các khái niệm cơ bản
-###  Mạng máy tính là gì?
-Tập hợp các máy tính kết nối với nhau bằng một đường truyền vật lí theo một kiến trúc nào đó để có thể trao đổi dữ liệu cho nhau.
+###  Mạng máy tính 
+Mạng máy tính là một tập hợp các máy tính kết nối với nhau bằng một đường truyền vật lí và dựa theo một kiến trúc mạng nào đó để có thể trao đổi dữ liệu cho nhau.
+
+Có các thành phần chính sau:
 + Máy tính: máy chủ (chia sẻ tài nguyên của nó cho các máy tính khác trong mạng), các máy trạm (các máy tính cá nhân kết nối với máy chủ và sử dụng tài nguyên được chia sẻ từ máy chủ),thiết bị ngoại vi(máy in, ổ đĩa cứng ...), card mạng (điều khiển việc truyền chính xác dữ liệu tới các nút mạng, và chuyển đổi dữ liệu sang dạng điện hay quang),..
-+ Kết nối bằng 1 phương tiện truyền (như cáp mạng,..) -> tạo ra đường truyền vật lí để liên kết các nút mạng, truyền dẫn các tín hiệu điện hay quang
-+ Theo 1 kiến trúc mạng (topology + protocol)
++ Kết nối các thiết bị với nhau bằng một phương tiện truyền (như cáp mạng,..) -> tạo ra đường truyền vật lí để liên kết các nút mạng, truyền dẫn các tín hiệu điện hay quang
++ Theo một kiến trúc mạng (topology + protocol)
 ###  Topology 
-Là cẩu trúc hình học không gian của mạng (thực chất là cách bố trí các phần tử của mạng cũng như cách nối giữa chúng với nhau)
+Là cẩu trúc hình học không gian của mạng (thực chất là cách bố trí các phần tử của mạng cũng như cách nối giữa chúng với nhau).
 
 Có 3 dạng topology(hình trạng) cơ bản:
-+ Mạng hình sao(star topology)
-+ Mạng dạng tuyến(bus topology)
-+ Mạng hình vòng(ring topology)
++ Mạng hình sao(star topology): các máy tính được nối vào cùng một thiết bị trung tâm (như hub, switch, ...).
++ Mạng dạng tuyến(bus topology): các máy tính được nối với nhau theo dạng đường thẳng.
++ Mạng hình vòng(ring topology): các máy tính được nối với nhau tạo thành một vòng kín.
 
-Tuy nhiên trên thực tế luôn có sự kết hợp giữa các hình trạng mạng để tạo thành mạng phức tạp hơn như StarBus, StarRing ...
+Tuy nhiên trên thực tế luôn có sự kết hợp giữa các hình topology để tạo thành mạng phức tạp hơn như StarBus, StarRing ...
+
 ### Protocal 
-Khi 2 máy khác nhau muốn giao tiếp với nhau thì chúng cần một protocol(giao thức).
+Khi 2 máy khác nhau muốn giao tiếp với nhau thì chúng cần một protocol(giao thức). Có thể hiểu đơn giản protocol là sự thống nhất về cách thức trao đổi thông tin giữa các máy.
 
-Chúng ta hiểu nôm na protocol là sự thống nhất về cách thức trao đổi thông tin giữa các máy.
-
-Để chuẩn hơn ta định nghĩa như sau:
-+ Protocol là quy tắc, quy ước truyền thông ao gồm việc gửi và nhận các thông điệp bao gồm: **Gửi** một yêu cầu hoặc thông tin và  **Nhận** một thông tin hoặc yêu cầu hành động
-+ Protocol là việc xác định khuôn dạng dữ liệu, thông điệp; thứ tự truyền nhận thông điệp giữa các thực thể trên mạng; cũng như các hành động tương ứng khi nhận được thông điệp
+Để chuẩn hơn protocol được định nghĩa như sau:
++ Protocol là quy tắc, quy ước truyền thông bao gồm việc gửi và nhận các thông điệp: đó là Gửi một yêu cầu hoặc thông tin và  Nhận một thông tin hoặc yêu cầu hành động
++ Protocol xác định khuôn dạng dữ liệu, thông điệp; thứ tự truyền nhận thông điệp giữa các thực thể trên mạng; cũng như các hành động tương ứng khi nhận được thông điệp
 + Ví dụ một vài giao thức mạng: TCP, UDP, IP, HTTP, Telnet, Ethernet, ...
 
 ## 1.2 Tầng
 **Tâng là gì?**
-Tầng(layer) là cách tổ chức chương trình thành các thành phần chức năng riêng biệt theo một cách nhất định và theo thứ bậc. Mỗi tầng thường có một giao diện duy nhất cung cấp cho tầng bên trên và sử dụng giao thức do tầng bên dưới cung cấp còn lại sẽ độc lập với các tầng khác
+Tầng(layer) là cách tổ chức chương trình thành các thành phần chức năng riêng biệt theo một cách nhất định và theo thứ bậc. Mỗi tầng thường có một giao diện duy nhất cung cấp cho tầng bên trên và sử dụng giao thức do tầng bên dưới cung cấp, và nó sẽ độc lập với các tầng khác.
 
 >Vậy tại sao cần phải phân tầng?
->+ Áp dụng nguyên lý chia để trị đối với các hệ thống phức tạp
+>+ Để chia hệ thống phức tạp thành nhiều phần đơn giản hơn
 >+ Cho phép xác định rõ nhiệm vụ của mỗi bộ phận và quan hệ giữa chúng
 >+ Cho phép dễ dàng bảo trì và nâng cấp hệ thống
+
+Phân tầng tạo ra các mô hình mạng như: OSI, TCP/IP,...
+
 ### 1.2.1  Mô hình OSI(7 tầng)
 
 **Tầng 1: Tầng vật lý (Physical Layer)**
-Điều khiển việc truyền tải thật sự các bit trên đường truyền vật lý. Nó định nghĩa các tín hiệu điện, trạng thái đường truyền, phương pháp mã hóa dữ liệu, các loại đầu nối được sử dụng ...
+Điều khiển việc truyền tải thật sự các bit trên đường truyền vật lý. Nó định nghĩa các tín hiệu điện, trạng thái đường truyền, phương pháp mã hóa dữ liệu vật lí, các loại đầu nối được sử dụng ...
 
 **Tầng 2: Tầng liên kết dữ liệu (Data-Link Layer)**
 Tầng này đảm bảo truyền tải các khung dữ liệu (Frame) giữa hai máy tính có đường truyền vật lý nối trực tiếp với nhau. Nó hỗ trợ cơ chế phát hiện và xử lý lỗi dữ liệu.
@@ -85,17 +89,17 @@ Tầng này đảm bảo truyền tải các khung dữ liệu (Frame) giữa ha
 **Tầng 3: Tầng mạng (Network Layer)**
 Tầng này đảm bảo cho việc truyền các gói tin dữ liệu (Packet) giữa 2 máy tính bất kỳ trong mạng máy tính(có thể có hoặc không có kết nối đường truyền vật lí trực tiếp). Nói cách khác, tầng mạng nhận nhiệm vụ tìm đường đi cho dữ liệu đến các đích khác nhau trong mạng.
 
-**Tầng 4: Tầng vận chuyển (Transport Layer)**
-Tầng này đảm bảo truyền tải dữ liệu giữa các quá trình. Dữ liệu gởi đi được đảm bảo không có lỗi, theo đúng trình tự, không bị mất mát, trùng lắp. Đối với các gói tin có kích thước lớn, tầng này sẽ phân chia chúng thành các phần nhỏ trước khi gởi đi, cũng như tập hợp lại chúng khi nhận được.
+**Tầng 4: Tầng giao vận (Transport Layer)**
+Tầng này đảm bảo truyền tải dữ liệu giữa các quá trình. Dữ liệu gửi đi được đảm bảo không có lỗi, theo đúng trình tự, không bị mất mát, trùng lặp. Đối với các gói tin có kích thước lớn, tầng này sẽ phân chia chúng thành các phần nhỏ trước khi gửi đi, cũng như tập hợp lại chúng khi ở máy nhận.
 
 **Tầng 5: Tầng phiên (Session Layer)**
 Quản lý các phiên làm việc giữa các người sử dụng. Tầng phiên cung cấp cơ chế và chức năng bảo mật thông tin khi truyền qua mạng máy tính.
 
-**Tầng 6: Tầng trình bày (Presentation Layer)**
-Tầng này đảm bảo các máy tính có kiểu định dạng dữ liệu khác nhau vẫn có thể trao đổi  thông tin cho nhau. Thông thường các mày tính sẽ thống nhất với nhau về một kiểu định dạng dữ liệu trung gian để trao đổi thông tin giữa các máy tính. Một dữ liệu cần gửi đi sẽ được tầng trình bày chuyển sang định dạng trung gian trước khi nó được truyền lên mạng. Ngược lại, khi nhận dữ liệu từ mạng, tầng trình bày sẽ chuyển dữ liệu sang định dạng riêng của nó.
+**Tầng 6: Tầng trình diễn (Presentation Layer)**
+Tầng này đảm bảo các máy tính có kiểu định dạng dữ liệu khác nhau vẫn có thể trao đổi  thông tin cho nhau. Thông thường các mày tính sẽ thống nhất với nhau về một kiểu định dạng dữ liệu trung gian để trao đổi thông tin giữa các máy tính. Một dữ liệu cần gửi đi sẽ được tầng trình diễn chuyển sang định dạng trung gian trước khi nó được truyền lên mạng. Ngược lại, khi nhận dữ liệu từ mạng, tầng trình diễn sẽ chuyển dữ liệu sang định dạng riêng của nó.
 
 **Tầng 7: Tầng ứng dụng (Application Layer)**
-Đây là tầng trên cùng, cung cấp các ứng dụng truy xuất đến các dịch vụ mạng. Nó bao gồm các ứng dụng của người dùng, ví dụ như Web Browser,Mail User Agent ... hoặc các chương trình làm server cung cấp các dịch vụ mạng như Web Server, FTP Server, Mailserver... Người dùng mạng giao tiếp trực tiếp với tầng này.
+Đây là tầng trên cùng, nó cung cấp các ứng dụng truy xuất đến các dịch vụ mạng, bao gồm các ứng dụng của người dùng như Web Browser,Mail User Agent ... hoặc các chương trình làm server cung cấp các dịch vụ mạng như Web Server, FTP Server, Mailserver... Người dùng mạng giao tiếp trực tiếp với tầng này.
 
 
 ### 1.2.2 Mô hình TCP/IP
@@ -114,7 +118,7 @@ Tầng này đảm bảo các máy tính có kiểu định dạng dữ liệu k
 # Chương 2: LAN
 ## 2.1 Nhiệm vụ của LAN
 
-**LAN là gì?**
+**LAN**
 
  LAN(Local Address Network) là một hệ thống máy tính được kết nối với nhau để truyền tải dữ liệu và chia sẻ tập tin cho nhau.
 ## 2.2 Đình dạng gói tin trong LAN
@@ -123,28 +127,33 @@ Tầng này đảm bảo các máy tính có kiểu định dạng dữ liệu k
 
 ## 2.3 Phân biệt giữa Hub, Switch 
 
+Hai thiết bị thường được dùng trong mạng LAN là Hub và Switch. Ta sẽ tìm hiểu ở dưới đây.
+
 ### Hub
 
-**Hub** thường là thiết bị được dùng để nối mạng, thông qua những đầu cắm của nó người ta liên kết với các máy tính dưới dạng hình sao. Vai trò  của Hub là đại tín hiệu vật lí ở đầu vào và cung cấp năng lượng cho tín hiệu ở đầu ra.
+**Hub** thường là thiết bị được dùng để nối mạng, thông qua những đầu cắm của nó người ta liên kết với các máy tính dưới dạng hình sao. Vai trò  của Hub là khuyếch đại tín hiệu vật lí ở đầu vào và cung cấp năng lượng cho tín hiệu ở đầu ra.
 
->Câu hỏi: Tại sao lại sinh ra hub? -Do giới hạn của cáp mạng, sự suy hao trên đường ⇒ hub ra đời để truyền tín hiệu đi xa hơn và đảm bảo độ ổn định của tín hiệu
+>Câu hỏi: Tại sao cần có Hub? 
+- Đó là do giới hạn của cáp mạng, và sự suy hao cuả tín hiệu trên đường ⇒ Hub ra đời để truyền tín hiệu đi xa hơn và đảm bảo độ ổn định của tín hiệu trên đường truyền (cũng như là tới các máy).
 
->Note: Khi một máy truyền tín hiệu đến Hub thì Hub sẽ chuyển tín hiệu đó cho tất cả các máy khác có kết nối với nó, hiểu nôm na là nếu có gói tin được truyền tới hub thì hub sẽ gửi nó cho tất cả các máy khác có nối với nó
+Đặc điểm của Hub: Khi một máy truyền tín hiệu đến Hub thì Hub sẽ chuyển tín hiệu đó cho tất cả các máy khác có kết nối với nó, hiểu đơn giản là nếu có máy truyền gói tin tới Hub thì hub sẽ gửi gói tin đó cho tất cả các máy khác có nối với nó.
 
 
 ### Switch
 
-Switch là 1 thiết bị mạng Lan nhiều cổng, các máy trạm nối với switch thông qua các cổng của chúng (các switch cũng có thể nối với các switch khác để tạo thành mạng Lan lớn hơn) qua đó hình thành các các liên kết giữa các máy với nhau:
-+ Switch sẽ quan sát các gói tin trên mạng đồng thời cũng học thông tin của mạng qua các gói tin mà nó nhận được, sử dụng thông tin này để xây dựng **bảng đ/c MAC** (Đ/c MAC máy trạm, số hiệu cổng, TTL) cho biết máy nào ở cổng nào để từ đó chuyển tiếp gói tin đến đúng đich.
-+ Điểm nổi bật của switch là **cơ chế tự học**: nó tự nhận biết được địa chỉ MAC của các máy nối vào.
+Switch là 1 thiết bị mạng Lan nhiều cổng, các máy trạm nối với switch thông qua các cổng của chúng (các switch cũng có thể nối với các switch khác để tạo thành mạng Lan lớn hơn) qua đó hình thành các các cặp liên kết giữa các máy với nhau.
+
+Đặc điêmt của switch:
++ Switch quan sát các gói tin trên mạng đồng thời nó cũng học thông tin của mạng qua các gói tin mà nó nhận được, sử dụng thông tin này để xây dựng bảng địa chỉ MAC (gồm: địa chỉ MAC máy trạm, số hiệu cổng, TTL), qua đó cho biết máy nào ở cổng nào để từ đó chuyển tiếp gói tin đến đúng đích.
++ Điểm nổi bật của switch là nó có cơ chế tự học tức là nó sẽ tự nhận biết được địa chỉ MAC của các máy nối vào.
 
 
 #### Bài toán chuyển gói tin trong 1 mạng Lan
 
-Khi gói tin đi qua 1 port của Switch, tại đây Switch sẽ mở nó ra, đọc địa chỉ MAC nguồn và lưu vào đ/c MAC của nó với số port và MAC nguồn kết nối trực tiếp với port đó của switch; Tiếp đó đọc địa chỉ MAC đích của gói tin, tiến hành tìm kiếm trong bảng đ/c MAC của nó:
-+ Nếu MAC đích tồn tại trong bảng đ/c MAC, switch sẽ gửi gói tin qua port tương ứng và máy đích sẽ nhận được
-+ Nếu MAC đích không tồn tại trong bảng đ/c MAC, hoặc nó là 1 địa chỉ broadcast thì switch sẽ gửi gói tin đến tất cả các port trừ cổng nhận vào, gói tin được truyền đến tất cả các máy, được bóc ra và so sánh địa chỉ MAC đích trên gói tin, nếu máy nào trùng với ddiacj chỉ MAC của mình thì gói tin được giữ lại, nếu không gói tin sẽ bị hủy
-+ Nếu MAC đích trùng MAC nguồn thì gói tin sẽ bị drop
+Khi gói tin đi qua 1 port của Switch, tại đây Switch sẽ mở nó ra, đọc địa chỉ MAC nguồn và lưu vào bảng địa chỉ MAC của nó với số port tương ứng và khi đó máy tính sẽ kết nối trực tiếp với port đó của switch. Tiếp đó Switch đọc địa chỉ MAC đích của gói tin, tiến hành tìm kiếm trong bảng địa chỉ MAC của nó:
++ Nếu MAC đích tồn tại trong bảng địa chỉ MAC, switch sẽ gửi gói tin qua port tương ứng nối với máy có MAC đích, khi đó máy đích sẽ nhận được gói tin.
++ Nếu MAC đích không tồn tại trong bảng địa chỉ MAC, hoặc nó là 1 địa chỉ broadcast thì switch sẽ gửi gói tin đến tất cả các port còn lại trên nó, lúc này gói tin được chuyển đến tất cả các máy, được bóc ra và lấy địa chỉ MAC đích trên gói tin so sánh với địa chỉ MAC của các máy này, nếu máy nào có MAC trùng với MAC đích thì gói tin được giữ lại, ngược lại gói tin sẽ bị hủy.
++ Nếu MAC đích trùng MAC nguồn thì gói tin sẽ bị drop.
 
 
 Ví dụ: Máy 1 gửi gói tin tới Máy 4
@@ -157,26 +166,26 @@ Ví dụ: Máy 1 gửi gói tin tới Máy 4
 
 Là một giao thức tầng mạng.
 Có 2 chức năng cơ bản:
-+ Chọn đường(Routing): Xác định đường đi của gói tin từ nguồn tới đích
-+ Chuyển tiếp(Forwarding): Chuyển tiếp dữ liệu từ đầu vào tới đầu ra của bộ định tuyến
++ Chọn đường(Routing): Xác định đường đi của gói tin từ nguồn tới đích.
++ Chuyển tiếp(Forwarding): Chuyển tiếp dữ liệu từ đầu vào tới đầu ra của bộ định tuyến.
 
 
 Đặc điểm của giao thức IP:
-+ Là giao thức truyền tin nhanh: truyền dữ liệu theo phương thức "best offort"
-+ Là giao thức không tin cậy: không có cơ chế phục hồi lỗi, khi cần sẽ sử dụng dịch vụ tầng trên để đảm bảo độ tin cậy
++ Là giao thức truyền tin nhanh: truyền dữ liệu theo phương thức "best effort"
++ Là giao thứctruyền tin không tin cậy: do không có cơ chế phục hồi lỗi. Khi cần sẽ sử dụng dịch vụ tầng trên để đảm bảo độ tin cậy
 + Là giao thức không liên kết: các gói tin được xử lý độc lập
 
 ## 3.2 Địa chỉ IP
-**Địa chỉ IP là gì?**
-Để gửi gói tin ta cần phải biết địa chỉ của máy đích, luôn phải có một loại địa chỉ để xác định vị trí, từ đó trao đổi thông ti chính xác từ máy nguồn tới máy đích. Vậy nên trong Internet địa chỉ IP là duy nhất.
+**Địa chỉ IP**
+Để gửi gói tin ta cần phải biết địa chỉ của máy đích, luôn phải có một loại địa chỉ để xác định vị trí, từ đó trao đổi thông ti chính xác từ máy nguồn tới máy đích. Địa chỉ này gọi là địa chỉ IP và trong Internet địa chỉ IP là duy nhất.
 
 **Cấu trúc địa chỉ IP**
 
-Địa chỉ IP là một dải nhị phân dài 32 bit, gồm Network ID dùng để xác định mạng mà thiết bị kết nối vào và phần Host ID để xác định thiết bị của mạng đó.
+Địa chỉ IP là một dải nhị phân dài 32 bit, gồm 2 phần: Network ID dùng để xác định mạng mà thiết bị kết nối vào và phần Host ID để xác định thiết bị của mạng đó.
 
 ![H3](http://i.imgur.com/aIQnEDq.png)
 
-Để cho đơn giản người ta thường viế lại địa chỉ IP dưới dạng 4 số thập phân được cách nhau bởi dấu chấm.
+Để đơn giản địa chỉ IP thường được viết dưới dạng 4 số thập phân(tương ứng với 4 chuỗi con 8 bit nhị phân) và được cách nhau bởi dấu chấm.
 >Ví dụ: 11001011 10110010 10001111 01100100 sẽ có dạng thập phân là  203.178.143.10
 
 **Subnet mask**
@@ -239,23 +248,23 @@ Các loại địa chỉ IP:
 
 > Địa chỉ Unicast: khi bạn muốn gửi gói tin đến một máy tính cụ thể, khi đó địa chỉ để bạn gửi tới sẽ là một địa chỉ unicast. Đây đơn giản là địa chỉ IP của một thiết bị nào đó trong cùng mạng cục bộ hoặc khác mạng cục bộ.
 
-> Địa chỉ Multicast: trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, ta sẽ gửi một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị
+> Địa chỉ Multicast: là địa chỉ mà trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, bạn sẽ dùng một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị trong mạng.
 > + Địa chỉ multicast này chính là các địa chỉ trong dải địa chỉ lớp D (224.x.x.x – 239.x.x.x)
 
->  Địa chỉ Broadcast: dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
+>  Địa chỉ Broadcast: là địa chỉ dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
 > + Ví dụ: 192.168.1.255/24 là địa chỉ Broadcast của mạng 192.168.1.0/24.
 
-> Địa chỉ mạng: dùng để xác định mạng này so với mạng khác. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
+> Địa chỉ mạng: là địa chỉ dùng để xác định mạng này so với mạng khác. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
 > + Ví dụ: 192.168.1.0/24 là địa chỉ mạng của mạng 192.168.1.0/24.
 
 
-> Default Gateway: trước tiên là một địa chỉ (còn được gọi là cổng mặc định).Địa chỉ này được cấu hình cho máy tính và khi một gói tin được gửi đến một địa chỉ không cùng mạng, hoặc đơn giản là không biết gửi đi đâu thì gói tin sẽ được gửi đến địa chỉ này để tiếp tục đi đến nơi khác.Default Gateway thường là địa chỉ IP có thể sử dụng đầu tiên của mạng đó.
+> Default Gateway: là một địa chỉ (còn được gọi là cổng mặc định).Địa chỉ này được cấu hình cho máy tính và khi một gói tin được gửi đến một địa chỉ không cùng mạng, hoặc đơn giản là không biết gửi đi đâu thì gói tin sẽ được gửi đến địa chỉ này để tiếp tục đi đến nơi khác.Default Gateway thường là địa chỉ IP có thể sử dụng đầu tiên của mạng đó.
 
 > + Ví dụ: Default gateway của mạng 192.168.1.0/24 là 192.168.1.1/24
 
 ## 3.3 Giao thức ARP
 
-Là giao thức phân giải địa chỉ: chuyển đổi từ địa chỉ IP sang địa chỉ MAC.
+Là giao thức phân giải địa chỉ: dùng để chuyển đổi từ địa chỉ IP sang địa chỉ MAC.
 
 ### Cơ chế hoạt động
 
@@ -272,7 +281,7 @@ Các bước để A xác định MAC của B:
 
 Router là một thiết bị hoạt động trên tầng mạng, nó có thể tìm được đường đi tốt nhất cho các gói tin qua nhiều kết nối để đi từ trạm gửi thuộc mạng đầu đến trạm nhận thuộc mạng cuối. Router có thể được sử dụng trong việc nối nhiều mạng với nhau và cho phép các gói tin có thể đi theo nhiều đường khác nhau để tới đích.
 
-Router có địa chỉ riêng biệt và nó chỉ tiếp nhận và xử lý các gói tin gửi đến nó mà thôi. Khi một trạm muốn gửi gói tin qua Router thì nó phải gửi gói tin với địa chỉ trực tiếp của Router (Trong gói tin đó phải chứa các thông tin khác về đích đến) và khi gói tin đến Router thì Router mới xử lý và gửi tiếp.
+Router có địa chỉ riêng biệt và nó chỉ tiếp nhận và xử lý các gói tin gửi đến nó. Khi một trạm muốn gửi gói tin qua Router thì nó phải gửi gói tin với địa chỉ trực tiếp của Router (trong gói tin này phải chứa các thông tin về đích đến) và khi gói tin đến Router thì Router sẽ xử lý và gửi tiếp.
 
 Khi xử lý một gói tin Router phải tìm được đường đi của gói tin qua mạng. Để làm được điều đó Router phải tìm được đường đi tốt nhất trong mạng dựa trên các thông tin nó có về mạng, thông thường trên mỗi Router có một bảng chỉ đường (Router table). Dựa trên dữ liệu về Router gần đó và các mạng trong liên mạng, Router tính được bảng chỉ đường (Router table) tối ưu dựa trên một thuật toán xác định trước.
 
@@ -354,22 +363,15 @@ TCP :
 + Dùng cho mạng WAN 
 + Không cho phép mất gói tin 
 + Đảm bảo việc truyền dữ liệu 
-+ Tốc độ truyền thấp hơn UTài liệu tham khảo :
++ Tốc độ truyền thấp hơn UDP
 
-Slide Mạng máy tính thầy Bùi Trọng Tùng
-Slide Mạng máy tính cô Trương diệu Linh
-Computer Network tanenabun
-https://quantrimang.com/network-address-translation-nat-hoat-dong-nhu-the-nao-phan-1-118495
-https://quantrimang.com/tim-hieu-ve-cau-hinh-nat-phan-2-118501
-https://quantrimang.com/dynamic-nat-nat-dong-va-overloading-nat-hoat-dong-nhu-the-nao-phan-3-118518
-https://quantrimang.com/tim-hieu-ve-nat-phan-cuoi-118574
-Giáo trình nhập môn mạng máy tính thầy Hồ Đắc PhươDP
+
 
 UDP: 
 + Dùng cho mạng LAN 
 + Cho phép mất dữ liệu 
 + Không đảm bảo.
-+ Tốc độ truyền cao, VolP truyền tốt qua UDP
++ Tốc độ truyền cao, VoIP truyền tốt qua UDP
 
 ## 4.2 NAT
 
@@ -427,6 +429,7 @@ IP nguồn| IP đích| Port nguồn| Port đích| Dữ liệu
 
 
 + Bước 4: Router chuyển tiếp gói tin đến trang Facebook (thông qua cơ chế định tuyến và chuyển tiếp).
+
 
 
 
