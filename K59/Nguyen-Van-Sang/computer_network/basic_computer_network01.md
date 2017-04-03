@@ -71,7 +71,7 @@ Khi 2 máy khác nhau muốn giao tiếp với nhau thì chúng cần một prot
 **Tâng là gì?**
 Tầng(layer) là cách tổ chức chương trình thành các thành phần chức năng riêng biệt theo một cách nhất định và theo thứ bậc. Mỗi tầng thường có một giao diện duy nhất cung cấp cho tầng bên trên và sử dụng giao thức do tầng bên dưới cung cấp, và nó sẽ độc lập với các tầng khác.
 
->Vậy tại sao cần phải phân tầng?
+>Lí do cần phân tầng:
 >+ Để chia hệ thống phức tạp thành nhiều phần đơn giản hơn
 >+ Cho phép xác định rõ nhiệm vụ của mỗi bộ phận và quan hệ giữa chúng
 >+ Cho phép dễ dàng bảo trì và nâng cấp hệ thống
@@ -143,7 +143,7 @@ Hai thiết bị thường được dùng trong mạng LAN là Hub và Switch. T
 
 Switch là 1 thiết bị mạng Lan nhiều cổng, các máy trạm nối với switch thông qua các cổng của chúng (các switch cũng có thể nối với các switch khác để tạo thành mạng Lan lớn hơn) qua đó hình thành các các cặp liên kết giữa các máy với nhau.
 
-Đặc điêmt của switch:
+Đặc điểm của Switch:
 + Switch quan sát các gói tin trên mạng đồng thời nó cũng học thông tin của mạng qua các gói tin mà nó nhận được, sử dụng thông tin này để xây dựng bảng địa chỉ MAC (gồm: địa chỉ MAC máy trạm, số hiệu cổng, TTL), qua đó cho biết máy nào ở cổng nào để từ đó chuyển tiếp gói tin đến đúng đích.
 + Điểm nổi bật của switch là nó có cơ chế tự học tức là nó sẽ tự nhận biết được địa chỉ MAC của các máy nối vào.
 
@@ -246,21 +246,21 @@ Lớp E
 
 Các loại địa chỉ IP:
 
-> Địa chỉ Unicast: khi bạn muốn gửi gói tin đến một máy tính cụ thể, khi đó địa chỉ để bạn gửi tới sẽ là một địa chỉ unicast. Đây đơn giản là địa chỉ IP của một thiết bị nào đó trong cùng mạng cục bộ hoặc khác mạng cục bộ.
++ Địa chỉ Unicast: khi bạn muốn gửi gói tin đến một máy tính cụ thể, khi đó địa chỉ để bạn gửi tới sẽ là một địa chỉ unicast. Đây đơn giản là địa chỉ IP của một thiết bị nào đó trong cùng mạng cục bộ hoặc khác mạng cục bộ.
 
-> Địa chỉ Multicast: là địa chỉ mà trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, bạn sẽ dùng một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị trong mạng.
-> + Địa chỉ multicast này chính là các địa chỉ trong dải địa chỉ lớp D (224.x.x.x – 239.x.x.x)
++ Địa chỉ Multicast: là địa chỉ mà trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, bạn sẽ dùng một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị trong mạng.
+   >  Địa chỉ multicast này chính là các địa chỉ trong dải địa chỉ lớp D (224.x.x.x – 239.x.x.x)
 
->  Địa chỉ Broadcast: là địa chỉ dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
-> + Ví dụ: 192.168.1.255/24 là địa chỉ Broadcast của mạng 192.168.1.0/24.
++ Địa chỉ Broadcast: là địa chỉ dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
+   > Ví dụ: 192.168.1.255/24 là địa chỉ Broadcast của mạng 192.168.1.0/24.
 
-> Địa chỉ mạng: là địa chỉ dùng để xác định mạng này so với mạng khác. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
-> + Ví dụ: 192.168.1.0/24 là địa chỉ mạng của mạng 192.168.1.0/24.
++ Địa chỉ mạng: là địa chỉ dùng để xác định mạng này so với mạng khác. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
+  > Ví dụ: 192.168.1.0/24 là địa chỉ mạng của mạng 192.168.1.0/24.
 
 
-> Default Gateway: là một địa chỉ (còn được gọi là cổng mặc định).Địa chỉ này được cấu hình cho máy tính và khi một gói tin được gửi đến một địa chỉ không cùng mạng, hoặc đơn giản là không biết gửi đi đâu thì gói tin sẽ được gửi đến địa chỉ này để tiếp tục đi đến nơi khác.Default Gateway thường là địa chỉ IP có thể sử dụng đầu tiên của mạng đó.
++ Default Gateway: là một địa chỉ (còn được gọi là cổng mặc định).Địa chỉ này được cấu hình cho máy tính và khi một gói tin được gửi đến một địa chỉ không cùng mạng, hoặc đơn giản là không biết gửi đi đâu thì gói tin sẽ được gửi đến địa chỉ này để tiếp tục đi đến nơi khác.Default Gateway thường là địa chỉ IP có thể sử dụng đầu tiên của mạng đó.
 
-> + Ví dụ: Default gateway của mạng 192.168.1.0/24 là 192.168.1.1/24
+   >  Ví dụ: Default gateway của mạng 192.168.1.0/24 là 192.168.1.1/24
 
 ## 3.3 Giao thức ARP
 
