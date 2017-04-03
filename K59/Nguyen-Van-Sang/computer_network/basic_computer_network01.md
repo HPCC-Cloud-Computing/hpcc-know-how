@@ -179,7 +179,24 @@ Có 2 chức năng cơ bản:
 Để cho đơn giản người ta thường viế lại địa chỉ IP dưới dạng 4 số thập phân được cách nhau bởi dấu chấm.
 >Ví dụ: 11001011 10110010 10001111 01100100 sẽ có dạng thập phân là  203.178.143.10
 
-Phân lớp địa chỉ IP:
+**Subnet mask**
+
+Subnet mask cũng là một dải nhị phân 32 bit luôn đi kèm với mỗi địa chỉ IP. Nó dùng để xác định phần Network ID của địa chỉ đó. 
+
+Subnet mask bao gồm phần các bit 1 và phần còn lại là các bit 0, subnet mask có bao nhiêu bit 1 thì địa chỉ IP tương ứng sẽ có bấy nhiêu bit ở phần Network ID.
+
+>Ví dụ: với subnet mask như sau: 11111111 11111111 11111111 00000000 (255.255.255.0) bao gồm 24 bit 1, thì địa chỉ IP mang subnet mask này cũng sẽ có 24 bit phần Network ID.
+
+Khi muốn viết subnet mask cho 1 IP ta có thể viết như ví dụ sau:
++ Cách 1: 192.168.1.3 - 255.255.255.0
++ Cách 2: 192.168.1.3/24 (/24 gọi là mặt nạ mạng, ở đâ nó cho biết địa chỉ IP này có 24 bit thuộc phần mạng)
+
+Dựa vào subnet mask ta có thể biết được địa chỉ IP mà ta đang xét thuộc mạng nào bằng cách AND bit với subnet mask của nó (như vậy là ta giữ nguyên các bit phần mạng, và chuyển tất cả các bit phần host về 0)
+>Ví dụ: IP 192.168.1.3/24 sẽ thuộc mạng 192.168.1.0/24
+
+
+**Phân lớp địa chỉ IP**
+
 ![h3](imageNet/h3.jpg)
 
 Lớp A
@@ -218,7 +235,6 @@ Lớp E
 
 
 
-
 Các loại địa chỉ IP:
 
 > Địa chỉ Unicast: khi bạn muốn gửi gói tin đến một máy tính cụ thể, khi đó địa chỉ để bạn gửi tới sẽ là một địa chỉ unicast. Đây đơn giản là địa chỉ IP của một thiết bị nào đó trong cùng mạng cục bộ hoặc khác mạng cục bộ.
@@ -248,7 +264,7 @@ Trong 1 mạng lan, máy A muốn gửi 1 gói tin cho máy B nhưng chỉ biế
 Các bước để A xác định MAC của B:
 
 + A sẽ kiểm tra cache của mình(APR table: <IP address, MAC address, TTL>),nếu tìm thấy MAC của B thì sẽ tiến hành thêm MAC đích vào gói tin rồi truyền đi
-+ Nếu không tìm thấy, A sẽ gửi 1 gói tin broadcast (APR Request)đến các máy khác trong mạng( trong đó có MAC nguồn, IP nguồn của A, IP đích của B và MAC đích mặc định là: ff:ff:ff:ff:ff:ff)
++ Nếu không tìm thấy, A sẽ gửi 1 gói tin broadcast (APR Request)đến các máy khác trong mạng( trong đó có MAC nguồn, IP nguồn của A, IP đích của B và MAC đích mặc định là: FF:FF:FF:FF:FF:FF)
 + Các máy còn lại trong mạng sẽ so sánh IP của mình với IP đích,B biết được máy A cần tìm là nó, khi đó B sẽ tạo gói tin APR Replay (chứa MAC của B) rồi gửi lại cho A, đồng thời nhập MAC, IP của A vào APR Table của mình.
 + Khi A nhận được gói tin do B gửi tới, nó sẽ cập nhật MAC, IP của B vào ARP Table (lần dùng sau nó sẽ không phải gửi gói tin request nữa)
 
@@ -413,6 +429,8 @@ IP nguồn| IP đích| Port nguồn| Port đích| Dữ liệu
 + Bước 4: Router chuyển tiếp gói tin đến trang Facebook (thông qua cơ chế định tuyến và chuyển tiếp).
 
 
+
+---------------------------------------------
 
 Tài liệu tham khảo :
 
