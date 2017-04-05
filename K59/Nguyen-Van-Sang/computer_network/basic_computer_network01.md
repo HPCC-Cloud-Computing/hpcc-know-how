@@ -67,7 +67,7 @@ Khi 2 máy khác nhau muốn giao tiếp với nhau thì chúng cần một prot
 + Protocol xác định khuôn dạng dữ liệu, thông điệp; thứ tự truyền nhận thông điệp giữa các thực thể trên mạng; cũng như các hành động tương ứng khi nhận được thông điệp
 + Ví dụ một vài giao thức mạng: TCP, UDP, IP, HTTP, Telnet, Ethernet, ...
 
-## 1.2 Tầng
+## 1.2 Tầng 
 **Tâng là gì?**
 Tầng(layer) là cách tổ chức chương trình thành các thành phần chức năng riêng biệt theo một cách nhất định và theo thứ bậc. Mỗi tầng thường có một giao diện duy nhất cung cấp cho tầng bên trên và sử dụng giao thức do tầng bên dưới cung cấp, và nó sẽ độc lập với các tầng khác.
 
