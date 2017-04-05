@@ -50,7 +50,7 @@ Có các thành phần chính sau:
 + Kết nối các thiết bị với nhau bằng một phương tiện truyền (như cáp mạng,..) -> tạo ra đường truyền vật lí để liên kết các nút mạng, truyền dẫn các tín hiệu điện hay quang
 + Theo một kiến trúc mạng (topology + protocol)
 ###  Topology 
-Là cẩu trúc hình học không gian của mạng (thực chất là cách bố trí các phần tử của mạng cũng như cách nối giữa chúng với nhau).
+Là cấu trúc hình học không gian của mạng (thực chất là cách bố trí các phần tử của mạng cũng như cách nối giữa chúng với nhau).
 
 Có 3 dạng topology(hình trạng) cơ bản:
 + Mạng hình sao(star topology): các máy tính được nối vào cùng một thiết bị trung tâm (như hub, switch, ...).
