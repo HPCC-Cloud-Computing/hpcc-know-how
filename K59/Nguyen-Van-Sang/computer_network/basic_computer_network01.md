@@ -5,7 +5,7 @@
     - [1.1 Các khái niệm cơ bản](#1-1-c-c-kh-i-ni-m-c-b-n)
         - [Mạng máy tính](#m-ng-m-y-t-nh)
         - [Topology](#topology)
-        - [Protocal](#protocal)
+        - [Protocol](#protocol)
     - [1.2 Tầng](#1-2-t-ng)
         - [1.2.1  Mô hình OSI(7 tầng)](#1-2-1-m-h-nh-osi-7-t-ng)
         - [1.2.2 Mô hình TCP/IP](#1-2-2-m-h-nh-tcp-ip)
@@ -59,7 +59,7 @@ Có 3 dạng topology(hình trạng) cơ bản:
 
 Tuy nhiên trên thực tế luôn có sự kết hợp giữa các hình topology để tạo thành mạng phức tạp hơn như StarBus, StarRing ...
 
-### Protocal 
+### Protocol 
 Khi 2 máy khác nhau muốn giao tiếp với nhau thì chúng cần một protocol(giao thức). Có thể hiểu đơn giản protocol là sự thống nhất về cách thức trao đổi thông tin giữa các máy.
 
 Để chuẩn hơn protocol được định nghĩa như sau:
