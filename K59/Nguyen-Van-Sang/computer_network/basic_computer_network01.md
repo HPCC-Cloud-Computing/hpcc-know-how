@@ -273,8 +273,8 @@ Trong 1 mạng lan, máy A muốn gửi 1 gói tin cho máy B nhưng chỉ biế
 Các bước để A xác định MAC của B:
 
 + A sẽ kiểm tra cache của mình(APR table: <IP address, MAC address, TTL>),nếu tìm thấy MAC của B thì sẽ tiến hành thêm MAC đích vào gói tin rồi truyền đi
-+ Nếu không tìm thấy, A sẽ gửi 1 gói tin broadcast (APR Request)đến các máy khác trong mạng( trong đó có MAC nguồn, IP nguồn của A, IP đích của B và MAC đích mặc định là: FF:FF:FF:FF:FF:FF)
-+ Các máy còn lại trong mạng sẽ so sánh IP của mình với IP đích,B biết được máy A cần tìm là nó, khi đó B sẽ tạo gói tin APR Replay (chứa MAC của B) rồi gửi lại cho A, đồng thời nhập MAC, IP của A vào APR Table của mình.
++ Nếu không tìm thấy, A sẽ gửi 1 gói tin broadcast (APR Request) đến tất cả các máy khác trong mạng( trong đó có MAC nguồn, IP nguồn của A, IP đích và MAC đích mặc định là: FF:FF:FF:FF:FF:FF)
++ Các máy còn lại trong mạng sẽ so sánh IP của mình với IP đích,B biết được máy A cần tìm là nó (do có IP đích trùng với IP của nó), khi đó B sẽ tạo gói tin APR Replay (chứa MAC của B) rồi chỉ gửi lại cho máy yêu cầu là A, đồng thời nhập MAC, IP của A vào APR Table của mình.
 + Khi A nhận được gói tin do B gửi tới, nó sẽ cập nhật MAC, IP của B vào ARP Table (lần dùng sau nó sẽ không phải gửi gói tin request nữa)
 
 ## 3.4 Router
