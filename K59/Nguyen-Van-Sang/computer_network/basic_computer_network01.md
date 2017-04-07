@@ -3,7 +3,7 @@
 - [Mạng máy tính](#m-ng-m-y-t-nh)
 - [Chương 1: Giới thiệu cơ bản về mạng máy tính](#ch-ng-1-gi-i-thi-u-c-b-n-v-m-ng-m-y-t-nh)
     - [1.1 Các khái niệm cơ bản](#1-1-c-c-kh-i-ni-m-c-b-n)
-        - [Mạng máy tính](#m-ng-m-y-t-nh)
+        - [Mạng máy tính](#m-ng-m-y-t-nh) 
         - [Topology](#topology)
         - [Protocol](#protocol)
     - [1.2 Tầng](#1-2-t-ng)
