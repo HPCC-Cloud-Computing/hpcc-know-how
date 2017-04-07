@@ -224,7 +224,7 @@ Mỗi tệp tin trong thư mục làm việc của bạn sẽ có thể ở mộ
 - Untracked: Các file còn lại. Cụ thể là các file trong thư mục làm việc mà không có ảnh(lần commit) trước hoặc các file không thuộc vùng staging. Ban đầu khi bạn clone một kho chứa về tất cả các file sẽ ở trạng thái tracked và unmodified vì bạn mới tải chúng về và chưa thực hiện thay đổi nào.
 
 Khi bạn chỉnh sửa các tệp tin chúng sẽ chuyển sang trạng thái modified sau đó nếu bạn muốn commit các tệp tin đó bạn cần đưa chúng vào khu vực stage và thực hiện commit. Cứ như vậy lặp lại.
-![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/File%20Status%20LifeCycle.PNG)
+![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/lifecycle.png)
 
 
 ##### **Để kiểm tra trạng thái của tệp tin bạn có thể sử dụng lệnh`git status`**
@@ -454,7 +454,7 @@ Git cũng có chức năng cho phép bạn giữ một file trong thư mục là
 
 
 Sau khi đã tìm hiểu cơ bản về các câu lệch của git sau đây sẽ đi vào một ví dụ cụ thể áp dụng các câu lệch thường gặp trong khi sử dụng git minh họa các trạng thái theo sơ đồ sau:
-![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/File%20Status%20LifeCycle.PNG)
+![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/lifecycle.png)
 Ban đầu bạn có một project đã được quản lý bởi git và các file của bạn đã được commit. Thực hiện câu lệch `git status` ta có kết quả như sau:
 
 ```txt
