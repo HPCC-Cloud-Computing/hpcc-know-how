@@ -1,8 +1,8 @@
-# Basic Git
+# Git Basic Part 1
 
 Trong bài báo cáo ta sẽ đi làm rõ một số vấn đề cơ bản về git. Cụ thể git là gì, sự khác biệt của git với các hệ thốn quản lý phiên bản khác, các chức năng cơ bản mà git cung cấp cho lập trình viên và cách sử các chức năng đó trong một dự án thực tế. Báo cáo sẽ chỉ nêu những chức năng thường được sử dụng ở mức cơ bản.
 
-## Chương 1: Git là gì
+## Chương 1: VCS và Git
 
 Trước khi tìm hiểu git là gì ta cần tìm hiểu về Quản lý phiên bản (Version Control). Vậy Quản lý phiên bản là gì ?
 
@@ -42,14 +42,14 @@ Trong các DVCS các máy khách không chỉ sao chép về máy cục bộ cá
 
 ![DVCS](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/DVCS.PNG)
 
-### 2 Git cơ bản
+### 2. Git
 
 #### 2.1 Điểm khác biệt giữa Git và các VCS khác
 
 - Các hệ thống VCS khác mỗi khi người sử dụng commit VCS sẽ lưu lại toàn bộ các file. Còn với Git hệ thống sẽ lưu lại một **ảnh chụp(snapshot)** các file. Với những file đã thay đổi git sẽ tạo một phiên bản mới còn với những file không thay đổi git sẽ ánh xạ file đó vào file cũ đã không thay đổi.
 - Phần lớn các thao tác trên git diễn ra cục bộ: Điều này có nghĩa là người dùng có thể thay đổi và commit thay đổi của mình ngay cả khi không có kết nối với mạng. Sau khi người dùng kết nối với mạng git sẽ tự đồng bộ với hệ thông. Điều này giúp người dùng có thể làm việc trong điều kiện không có kết nối internet.
 
-#### 2.2 Ba trạng thái của Git
+#### 2.2 Ba trạng thái của một tệp tin do git quản lý
 
 Mỗi tệp tin trong git được quản lý dựa trên 3 trạng thái:
 
@@ -57,19 +57,19 @@ Mỗi tệp tin trong git được quản lý dựa trên 3 trạng thái:
 - Staged : Trạng thái bạn đã đánh dấu là sẽ commit phiên bản hiện tại vào lần commit sắp tới.
 - Committed: Trạng thái dữ liệu đã được lưu trữ an toàn trong cơ sở dữ liệu
 
-Tương ứng với ba trạng thái là ba phần riêng biệt của một dự án sử dụng Git:
+Tương ứng với ba trạng thái là ba phần riêng biệt của một project sử dụng Git:
 
-- Thư mục git : Tương ứng với trạng thái commit. Nơi lưu trữ các metadata và cơ sở dữ liệu của dự án. Là phần được sao lưu về khi bản clone một dự án.
-- Khu vực tổ chức(staging area): Tương ứng với trạng thái staged. B
-- Thư mục làm việc: Tương ứng với trạng thái modified. Bản sao một phiên làm việc của dự án. Những tệp tin được pull về từ cơ sở dữ liệu và lưu trong ổ cứng để có thể sử dụng và chỉnh sủa.
+- Thư mục .git : Tương ứng với trạng thái commit. Nơi lưu trữ các metadata và cơ sở dữ liệu của dự án. Là phần được sao lưu về khi bản clone một dự án.
+- Khu vực staging area: Tương ứng với trạng thái staged.
+- Thư mục làm việc: Tương ứng với trạng thái modified. Chứa các file đang được người dùng chỉnh sửa. Những tệp tin được pull về từ cơ sở dữ liệu và lưu trong ổ cứng để có thể sử dụng và chỉnh sủa.
 
 ![Ba trạng thái Git](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/Ba%20tr%E1%BA%A1ng%20th%C3%A1i%20Git.PNG)
 
 Tiến trình công việc cơ bản của Git:
 
-- Bạn thay đổi các tệp tin trong thư mục làm việc. Trạng thái modified
-- Bạn tổ chức các tệp tin, tạo ảnh mới của tệp tin đó vào thư mục staged. Trạng thái stagad. Tương ứng với câu lênh : "Git add`
-- Bạn commit ảnh của các tệp tin trong khu vực staged sẽ được lưu trữ vĩnh viện vào thư mục git. Tương ứng với câu lệnh :`Git commit -m "status"`
+- Bạn thay đổi các tệp tin trong thư mục làm việc. Trạng thái modified.
+- Bạn đưa các tệp tin đó vào khu vực stage để git theo dõi. Trạng thái stagad. Tương ứng với câu lênh : "Git add`
+- Bạn commit các tệp tin trong khu vực staged sẽ được lưu trữ vĩnh viện vào thư mục git. Tương ứng với câu lệnh :`Git commit -m "status"`
 
 ## Chương 2: Sử dụng cơ bản git
 
@@ -189,9 +189,9 @@ branch.master.merge=refs/heads/master
 
 ```
 
-### 3. Tạo một kho chứa git
+### 3. Tạo một kho chứ git
 
-Có hai cách để tạo một kho chứa git
+Có hai cách để tạo một kho chứ git
 
 - Tạo kho chứa từ thư mục cũ
 - Sao chép một kho chứa đã tồn tại
@@ -226,6 +226,7 @@ Mỗi tệp tin trong thư mục làm việc của bạn sẽ có thể ở mộ
 Khi bạn chỉnh sửa các tệp tin chúng sẽ chuyển sang trạng thái modified sau đó nếu bạn muốn commit các tệp tin đó bạn cần đưa chúng vào khu vực stage và thực hiện commit. Cứ như vậy lặp lại.
 ![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/File%20Status%20LifeCycle.PNG)
 
+
 ##### **Để kiểm tra trạng thái của tệp tin bạn có thể sử dụng lệnh`git status`**
 
 ```bat
@@ -243,7 +244,7 @@ $ git status
 #
 ```
 
-Để theo dõi một tệp tin mới bạn sẽ sử dụng lệnh `git add <teentfile>` khi đó file sẽ đưa vào khu vực staging và sẽ được commit vào thư mục git tại lần commit sau.
+Để theo dõi một tệp tin mới bạn sẽ sử dụng lệnh `git add <tênfile>` khi đó file sẽ đưa vào khu vực staging và sẽ được commit vào thư mục git tại lần commit sau.
 
 Quản lý tệp tin đã thay đổi:
 Giả sử bạn có một file muốn thay đổi và bạn tiến hành thay đổi file đó. Sau khi thay đổi xong bạn thực hiện câu lệnh `git status` và bạn thấy kết quả như sau:
@@ -311,7 +312,7 @@ $ git status
 #
 ```
 
-##### **Bỏ qua các tệp tin**
+##### **Bỏ qua các tệp tin**.
 
 Trong một số trường hợp bạn sẽ không muốn đưa một số file vào thư mục git khi đó bạn có thể liệt kê các tệp tin này trong một thư mục có tên là `.gitignore`. Đây là một ví dụ
 
@@ -370,7 +371,7 @@ index 0000000..03902a1
 +Grit is a Ruby library for extracting information from a Git repository
 ```
 
-##### **Bỏ qua khu vực tổ chức:**
+##### **Bỏ qua khu vực staging**
 
 Mặc dù khu vực tổ chức là một cách làm việc hay nhưng đôi khi chúng khiến quy trình làm việc trở nên phức tạp. Nếu bạn muốn bỏ qua bước này git cung cấp sắn cho bạn một lỗi tắt. Chỉ cần thêm `-a` vào trước khi thực hiện `git commit` git sẽ tự động thêm tất cả các file đã được theo dõi trước đó vào thư mục git, cho phép bạn bỏ qua bước `git add`. ví dụ
 
@@ -452,7 +453,63 @@ Git cũng có chức năng cho phép bạn giữ một file trong thư mục là
 `$ git rm --cached readme.txt`
 
 
+Sau khi đã tìm hiểu cơ bản về các câu lệch của git sau đây sẽ đi vào một ví dụ cụ thể áp dụng các câu lệch thường gặp trong khi sử dụng git minh họa các trạng thái theo sơ đồ sau:
+![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/File%20Status%20LifeCycle.PNG)
+Ban đầu bạn có một project đã được quản lý bởi git và các file của bạn đã được commit. Thực hiện câu lệch `git status` ta có kết quả như sau:
+
+```txt
+
+On branch master
+Your branch is up-to-date with 'origin/master'.
+nothing to commit, working directory clean
+
+```
+
+- Sau đó bạn tiến hành thêm một file vào trong project đó ví dụ file `test.txt`. Thực hiện câu lệch `git status` sẽ có kết quả như sau:
+
+```txt
+
+On branch master
+Your branch is up-to-date with 'origin/master'.
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+test.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+```
+
+File `test.txt` đang ở trạng thái untracked tức là file đó chưa được git theo dõi. Nếu bạn muốn file đó được git theo dõi ta thực hiện câu lệch git `add test.txt`((tương ứng với mũi tên add the file trong sơ đồ). Sau đó thực hiện `git status` có kết quả như sau:
+
+```txt
+
+`On branch master
+Your branch is up-to-date with 'origin/master'.
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+new file:   test.txt`
+
+```
+
+Lúc này file test.txt đã được đưa vào khu vực staged và được git quản lý(tương ứng với trạng thái unmodified trong sơ đồ).
+File này đã được git theo dõi nhưng nếu bạn không muốn git theo dõi file đó nữa bạn có thể thực hiện câu lệch `git reset HEAD test.txt` (tương ứng với mũi tên romove the file trong hình) để đưa file đó ra khỏi khu vực staged( không được theo dõi bởi git nữa trạng thái untracked). Nếu bạn thực hiện lệch `git status` sẽ có kết quả như sau:
+
+```txt
+
+On branch master
+Your branch is up-to-date with 'origin/master'.
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+test.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
 
 
+```
 
+Đó là trường hợp bạn muốn git ngừng theo dõi file đó còn nếu bạn thay đổi nội dung file. File sẽ chuyển từ trạng thái unmodified sang trạng thái modidied(tương ứng với mũi tên edit the file trong hình). Sau khi chỉnh sửa file bạn cần tiến hành thêm file đã chỉnh sửa vào khu vực staged để commit vào thư mục git bằng cách thực hiện các câu lệch : `git add test.txt`(mũi tên stage the file trong hình) và `git commit -m "thêm file test.txt"`(mũi tên commit trong hình).
 
+Khi đó file quay về trạng thái unmodified và bạn cứ tiếp tục các chỉnh sửa trên file sau đó lặp lại quy trình đó.
