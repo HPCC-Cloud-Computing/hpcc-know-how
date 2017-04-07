@@ -1,6 +1,6 @@
 # Git Basic Part 2
 
-Ở phần trước ta đã tìm hiểu các khái niệm bơ bản về các VCS và git cũng như các câu lệch để làm việc với một project được quản lý bởi git. Trong part 1 chỉ đề cập đến việc làm việc với git một cách đơn lẻ nhưng một tính năng quan trọng của git là giúp mọi người cùng làm việc, hợp tác với nhau trong một project. Phần hai sẽ đi làm rõ cách để có thể cùng nhau hợp tác làm một project với git.
+Ở phần trước ta đã tìm hiểu các khái niệm cơ bản về các VCS và git cũng như các câu lệch cơ bản để làm việc với một project được quản lý bởi git. Trong part 1 chỉ đề cập đến việc làm việc với git một cách độc lập nhưng một tính năng quan trọng của git là giúp mọi người cùng làm việc, hợp tác với nhau trong một project. Phần hai sẽ đi làm rõ cách để có thể cùng nhau hợp tác làm một project với git.
 
 ## Phân nhánh trong git
 
@@ -307,6 +307,7 @@ Tóm tắt: tóm tắt nội dung thay đổi của commit
 git không tự động wrap text nên bạn cần làm việc đó một cách thủ công. Khuyến cáo 72 ký tự một dòng là hợp lý(do một terminal có 80 cột sử dụng 4 cột để căn lề trái, 4 cột để căn lề phải vậy còn 72 ký tự).
 
 Phần này trình bày cụ thể về thay đổi như tại sao lại thay đổi và thay đổi như thế nào.
+
 
 
 
