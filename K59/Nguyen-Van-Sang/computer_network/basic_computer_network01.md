@@ -251,7 +251,7 @@ Các loại địa chỉ IP:
 + Địa chỉ Multicast: là địa chỉ mà trong trường hợp bạn muốn gửi gói tin đến nhiều máy tính, bạn sẽ dùng một địa chỉ multicast, địa chỉ này đại diện cho một nhóm các thiết bị trong mạng.
    >  Địa chỉ multicast này chính là các địa chỉ trong dải địa chỉ lớp D (224.x.x.x – 239.x.x.x)
 
-+ Địa chỉ Broadcast: là địa chỉ dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host IP bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
++ Địa chỉ Broadcast: là địa chỉ dùng để gửi thông điệp đến tất cả các máy trong mạng nội bộ, địa chỉ Broadcast có toàn bộ các bits phần Host ID bằng 1 và dại diện cho toàn bộ các thiết bị trong mạng
    > Ví dụ: 192.168.1.255/24 là địa chỉ Broadcast của mạng 192.168.1.0/24.
 
 + Địa chỉ mạng: là địa chỉ dùng để xác định mạng này so với mạng khác. Địa chỉ mạng địa chỉ có tất cả các bits phần Host đều bằng 0
