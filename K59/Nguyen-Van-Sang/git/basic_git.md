@@ -186,18 +186,21 @@ Quá trình này cứ thế lặp đi lặp lại tạo ra một vòng đời tr
 Để kiểm tra trạng thái của của file bạn có thể sử dụng lệnh `git status`:
 
 - $ git status 
-![h8](imageGit/h8g.png)
+
+  ![h8](imageGit/h8g.png)
 - Như vậy khi sử dụng lệnh git status bạn sẽ thấy được trạng thái của các file (file nào được chỉnh sửa, file nào được thêm mới hay bị xóa...) và các thư mục/khu vực chứa chúng. 
 
 Tuy nhiên git status chỉ cho bạn biết các thay đổi một cách chung chung. Để xem các thay đổi một cách chi tiết, Git cung cấp cho bạn một câu lệnh khác là git diff:
 - `git diff` không sử dụng tham số: Câu lệnh này so sánh những gì bạn đã thay đổi trong working directory với những gì đã được lưu ở staging area. Ví dụ sau cho thấy nội dung một dòng trong first_file.md được chỉnh sửa từ "1" thành "1 2 3":
-![h9](imageGit/h9git.png)
+
+  ![h9](imageGit/h9git.png)
 - `git diff --staged` : để so sánh những thay đổi giữa file được lưu vào staged và file đã được commit.
 
 ## 6. Theo dõi file
 Để có thể theo dõi các file mới tạo, hoặc các file bị chỉnh sửa, bạn dùng lệnh `git add`:
 - $ git add README.md
-![h10](imageGit/h10g.png)
+
+  ![h10](imageGit/h10g.png)
 
 
 - Khi đó README.md ở trạng thái staged và nó nằm trong danh sách các thay đổi chuẩn bị được commit, nếu bạn tiến hành commit thì Git sẽ tạo một snapshot mới để lưu lại phiên bản này. Khi đó READE.md ở dạng Unmodified.
@@ -211,7 +214,8 @@ Khi bạn chỉnh sửa một file mà file đó nằm trong khu vực staging t
 
   ![h11](imageGit/h11g.png)
 - Bạn có thể kiểm tra lại thay đổi của mình trong file README.md bằng `git diff`. Ví dụ như trường hợp này bạn thêm nội dung "789" vào README.md thì kết quả thông báo như sau:
-![h12](imageGit/h12g.png)
+
+  ![h12](imageGit/h12g.png)
 
 Nếu bây giờ bạn tiến hành commit ngay, thì thay đổi vừa rồi trong file README.md sẽ không được lưu xuống cơ sở dữ liệu bởi vì những thay đổi đó chưa được nằm trong khu vực staging.
    - ![h13](imageGit/h13g.png)
