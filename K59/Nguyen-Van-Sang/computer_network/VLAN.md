@@ -75,6 +75,12 @@ IP Subnet  | vlan |
  
 ### 1.4.1 Cấu trúc khung Ethernet khi được gán VLAN Idea
 
+## Cấu trúc khung ethernet khi có gán thêm vlan id
+
+![cau truc khung](imageNet/vlan01.png)
+
+![chi tiet khung ethernet](imageNet/vlan02.png)
+
 
 ## Trunk link
 Khi nhu cầu lớn hơn, các máy trong các VLAN khác nhau muốn giao tiếp với nhau. Khi đó, giữa các switch phải hình thành một trunk link. Trunk link là một đường kết nối mà mỗi đầu được cấu hình port kiểu trunk. Trunk link cho phép vận chuyển frame giữa các VLAN khác nhau.
