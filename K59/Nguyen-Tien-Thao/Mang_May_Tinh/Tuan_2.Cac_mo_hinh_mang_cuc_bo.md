@@ -1,12 +1,5 @@
 # Các mô hình mạng cục bộ
 
-Báo cáo sẽ đi tìm hiểu chi tiết về bốn loại mạng cục bộ được sử dụng trong thực tế là:
-
-1. Flat
-1. VLAN
-1. VXLAN
-1. GRE
-
 ## Flat
 
 Mạng flat là một mạng không cung cấp bất kỳ một tùy chọn thêm nào. Nó là mạng truyền thống được sử dụng ở Layer2. Mạng flat phân tách miền quảng bá bằng cách sử dụng router và mội máy kết nối đến cùng một router đều thuộc cùng một miền quản bá. Nói chung là tất cả các thiết bị trong một mạng flat có cùng một miền quảng bá.
@@ -63,10 +56,71 @@ Bây giờ nếu hai máy tính muốn gửi tin cho nhau chúng sẽ thực hi�
 
 Giải pháp đó có một vấn đề nếu một switch có nhiều mạng VLAN kết nối sẽ tốn nhiều cổng cho và sẽ không hiệu quả. Một giải pháp khác là sử dụng một cổng đặc biệt trên mỗi switch gọi là trunk port để kết nối giữa hai switch. Trunk port không thuộc một mạng VLAN nào mà thuộc về tất cả các VLANs và do đó gửi từ  bất kỳ VLAN nào sẽ được chuyển qua trunk port để đến switch khác. Để có thể xác đinh VLAN nào sẽ được gửi tới sẽ thêm VLAN-tag theo giao thức 802.1Q đã trình bày ở trên.
 
-![TRunk](http://www.technologuepro.com/reseaux/Configuration-d-un-switch/images/Configuration-des-VLAN-1.gif)
+![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/trunk.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/trunk.png)
 
 ## VXLAN
 
+Ta có thể thấy mạng VLAN có một số nhược điêm như sau:
+
+- Giới hạn 4094 VLANs là không đủ.
+- Hạn chế về khoảng cách và triển khai.
+- Bảng địa chỉ MAC của switch quá lớn.
+
+Ta thấy mạng VLAN giúp tạo ra các mạng miền quảng bá độc lập trong cùng một mạng LAN nhưng VLAN có một số nhược điểm như chỉ có thể có 4094 VLANs trong một mạng LAN, bảng địa chỉ MAC của switch là quá hơn. Một giải pháp được sử dụng cải thiện những nhược điểm trên là VXLAN.
+
+Mạng VXLAN cung cấp một cơ chế để kết hợp hai hay nhiều layer3 network domain và làm cho chúng giống như một layer2 domain. Điều này cho phép hai máy tính trên hai mạng khác nhau nếu chúng cùng ở trong một layer2 subnet.
+![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN1.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN1.png)
+
+### VXLAN đóng gói và packet format
+
+VXLAN sử dụng MAC Address-in-User Datagram Protocol (MAC-in-UDP) đóng gói để mở rộng layer2 segment. VXLAN đinh nghĩ MAC-in-UDP được đóng gói bảo gồm gói tin gốc của layer2+ VXLAN header sau đó thêm vào UDP-IP Packet.
+
+
+Định dạng packet VXLAN:
+
+![VXLANPACketformat](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLANpacketformat.png)
+
+VXLAN sử dụng 8 byte cho trường VXLAN header trong đó  bit để đánh địa chỉ VNID. Với 24 bit này VXLAN có thể hỗ trợ 16 triệu LAN.
+
+### VXLAN tunnel Endpoint(VTEP)
+
+VTEP là một thiết bị được VXLAN sử dụng để encapsulation and de-encapsulation các gói tin vận chuyển và ánh xạ các máy trong VXLAN. VTEP cung cấp hai interface một là switch interface trong mạng LAN hai là IP interface dùng trong IP network.
+
+![VTEP](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VTEP.png)
+
+### Cách để chuyển gói tin giưã hai máy trong VXLAN
+
+![VXLAN2](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN2.png)
+
+Trong hình giả sử máy A muốn gửi gói tin cho máy B gói tin từ máy A đến máy B sẽ thay đổi và được đóng gói và bóc tách cụ thể là:
+
+- Máy A tạo một Ethernet frame với địa chỉ nguồn là IP và MAC của A và địa chỉ đích là IP và MAC của B sau đó gửi tới VTEP-1.
+- VTEP-1 dựa vào mapping table để map giữa máy B và VTEP-2 và tiến hành đóng gói packet bằng cách thêm các trường: VXLAN,UDP and outer address header. Cụ thể trong outer address header IP nguồn và MAC nguồn là của VTEP-1 còn IP đích và MAC đích là của STEP-2. Sau đó VTEP-1 sử dụng địa chỉ IP của VTEP-2 để xác định nột tiếp theo sẽ chuyển tiếp.
+- Gói tin được chuyển tới VTEP-2. Sau khi tới VTEP-2 các trường outer Ethernet, IP, UDP, and VXLAN headers được loại bỏ và chuyển tới hostB
+
+
+## GRE
+
+Giao thức này sẽ đóng gói một số kiểu gói tin vào bên trong các IP tunnels để tạo thành các kết nối điểm-điểm ảo.
+
+Ví dụ: Có thể đóng gói IPX packet vào trong gói tin IP.
+
+Gói tin sau khi đóng gói được truyền qua mạng và sử dụng GRE header để định tuyến.
+
+GRE thêm ít nhất 24 bytes vào gói tin trong đó gồm 20 byte IP header và 4 byte là GRE header. GRE cũng có thể thêm vào 12 byte để cung cấp các tính năng như: checksum, key chứng thực, sequence number.
+![GRE](https://sirpremier.files.wordpress.com/2012/05/a.png)
+
+Cấu trúc của GRE header:
+
+- bit thứ nhất : Checksum. Bit này cho biết có sử dụng checksum hay không. Nếu giá trị là 1, 4 byte checksum sẽ được thêm vào GRE header sau trường Protocol type.
+- bit 13-15: GRE version
+- 2 byte còn lại sử dụng cho trường giao thức. 16 bit này xác định kiểu gói tin sẽ được mang trong GRE tunnel.
+
+![GRE](https://sirpremier.files.wordpress.com/2012/05/c.png)
+
+
+
 ## Tài liệu tham khảo
 
-[https://en.wikipedia.org/wiki/Virtual_LAN](https://en.wikipedia.org/wiki/Virtual_LAN)
+- [https://en.wikipedia.org/wiki/Virtual_LAN](https://en.wikipedia.org/wiki/Virtual_LAN)
+- [https://github.com/NTT-TNN/Basic_knowledge/blob/master/Mang_may_tinh/white-paper-c11-729383.pdf](https://github.com/NTT-TNN/Basic_knowledge/blob/master/Mang_may_tinh/white-paper-c11-729383.pdf)

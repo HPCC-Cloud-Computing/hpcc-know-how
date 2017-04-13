@@ -44,6 +44,8 @@ Trong các DVCS các máy khách không chỉ sao chép về máy cục bộ cá
 
 ### 2. Git
 
+Git là một VCS, cụ thể hơn là một DVCS sau đây ta sẽ đi vậy git khác với các VCS khác như thế nào, tại sao ta nên sử dụng git cũng như cách sử dụng git cơ bản.
+
 #### 2.1 Điểm khác biệt giữa Git và các VCS khác
 
 - Các hệ thống VCS khác mỗi khi người sử dụng commit VCS sẽ lưu lại toàn bộ các file. Còn với Git hệ thống sẽ lưu lại một **ảnh chụp(snapshot)** các file. Với những file đã thay đổi git sẽ tạo một phiên bản mới còn với những file không thay đổi git sẽ ánh xạ file đó vào file cũ đã không thay đổi.
