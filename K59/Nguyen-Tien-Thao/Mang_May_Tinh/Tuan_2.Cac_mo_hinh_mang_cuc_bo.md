@@ -2,7 +2,7 @@
 
 ## Flat
 
-Mạng flat là một mạng không cung cấp bất kỳ một tùy chọn thêm nào. Nó là mạng truyền thống được sử dụng ở Layer2. Mạng flat phân tách miền quảng bá bằng cách sử dụng router và mội máy kết nối đến cùng một router đều thuộc cùng một miền quản bá. Nói chung là tất cả các thiết bị trong một mạng flat có cùng một miền quảng bá.
+Mạng flat là một mạng không cung cấp bất kỳ một tùy chọn thêm nào. Nó là mạng truyền thống được sử dụng ở Layer2. Tất cả các thiết bị trong một mạng flat có cùng một miền quảng bá.
 
 
 ## VLAN(virtual LAN)
@@ -90,13 +90,13 @@ VTEP là một thiết bị được VXLAN sử dụng để encapsulation and d
 
 ### Cách để chuyển gói tin giưã hai máy trong VXLAN
 
-![VXLAN2](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN2.png)
+![VXLAN](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN.png)
 
 Trong hình giả sử máy A muốn gửi gói tin cho máy B gói tin từ máy A đến máy B sẽ thay đổi và được đóng gói và bóc tách cụ thể là:
 
-- Máy A tạo một Ethernet frame với địa chỉ nguồn là IP và MAC của A và địa chỉ đích là IP và MAC của B sau đó gửi tới VTEP-1.
-- VTEP-1 dựa vào mapping table để map giữa máy B và VTEP-2 và tiến hành đóng gói packet bằng cách thêm các trường: VXLAN,UDP and outer address header. Cụ thể trong outer address header IP nguồn và MAC nguồn là của VTEP-1 còn IP đích và MAC đích là của STEP-2. Sau đó VTEP-1 sử dụng địa chỉ IP của VTEP-2 để xác định nột tiếp theo sẽ chuyển tiếp.
-- Gói tin được chuyển tới VTEP-2. Sau khi tới VTEP-2 các trường outer Ethernet, IP, UDP, and VXLAN headers được loại bỏ và chuyển tới hostB
+- Máy A tạo một L2 Frame với các trường IP và MAC như trong hình vẽ.
+- L2 Frame được gửi đến VTEP-1. Tại VTEP-1 dựa vào bảng ánh xạ cho biết máy B tại VTEP-2. VTEP-1 đóng gói thêm các trường VXLAN,UDP, outer IP header vào L2 Frame. Cụ thể trong trường outer IP header, IP nguồn là IP của VTEP-1, IP đích là IP của VTEP-2. VTEP-1 sau đó thực hiện tra cứu địa chỉ IP của VTEP-2 để chọn đường tiếp theo cho gói tin. Sau đó sử dụng địa chỉ MAC của nút kế tiếp đóng gói vào gói tin và gửi tới nút kế tiếp.
+- Gói tin được định tuyến và chuyển tới VTEP-2 dựa vào địa chỉ VTEP-2 trong outer IP header. Sau khi VTEP-2 nhận được gói tin nó tiếp hành loại bỏ các trường outer IP header, UDP, VXLAN và tiến hành chuyển tới máy B dựa trên địa chỉ MAC đích trong L2 frame.
 
 
 ## GRE

@@ -151,7 +151,7 @@ IP Public là địa chỉ IP được cung cấp bởi ISP(Nhà cung cấp dị
 
 #### Các bước một gói tin TCP từ một máy tính cục bộ đi tới trang facebook.com.vn (IP là 191.58.58.59, port 433) thông qua giao thức overload NAT
 
-![gửi tới facebook](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/Screenshot%20from%202017-03-30%2014-59-42.png)
+![gửi tới facebook](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/Facebook.png)
 
 Quá trình gửi gói tin thực hiện qua các bước:
 Bước 1: Gói tin được gửi từ host 1 có địa chỉ IP Private 10.0.0.2 cổng 1000 gửi tới NAT.
