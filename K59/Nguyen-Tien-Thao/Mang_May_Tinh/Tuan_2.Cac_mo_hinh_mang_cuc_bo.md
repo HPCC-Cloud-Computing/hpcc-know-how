@@ -54,7 +54,7 @@ Bây giờ nếu hai máy tính muốn gửi tin cho nhau chúng sẽ thực hi�
 
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/2Switch.pnghttps://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/2Switch.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/2Switch.png)
 
-Giải pháp đó có một vấn đề nếu một switch có nhiều mạng VLAN kết nối sẽ tốn nhiều cổng cho và sẽ không hiệu quả. Một giải pháp khác là sử dụng một cổng đặc biệt trên mỗi switch gọi là trunk port để kết nối giữa hai switch. Trunk port không thuộc một mạng VLAN nào mà thuộc về tất cả các VLANs và do đó gửi từ  bất kỳ VLAN nào sẽ được chuyển qua trunk port để đến switch khác. Để có thể xác đinh VLAN nào sẽ được gửi tới sẽ thêm VLAN-tag theo giao thức 802.1Q đã trình bày ở trên.
+Giải pháp đó có một vấn đề nếu một switch có nhiều mạng VLAN kết nối sẽ tốn nhiều cổng cho và sẽ không hiệu quả. Một giải pháp khác là sử dụng một cổng đặc biệt trên mỗi switch gọi là trunk port để kết nối giữa hai switch hoặc switch với router. Trunk port không thuộc một mạng VLAN nào mà thuộc về tất cả các VLANs và do đó gửi từ  bất kỳ VLAN nào sẽ được chuyển qua trunk port để đến switch khác hoặc đến router. Để có thể xác đinh VLAN nào sẽ được gửi tới sẽ thêm VLAN-tag theo giao thức 802.1Q đã trình bày ở trên.
 
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/trunk.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/trunk.png)
 
@@ -64,7 +64,6 @@ Ta có thể thấy mạng VLAN có một số nhược điêm như sau:
 
 - Giới hạn 4094 VLANs là không đủ.
 - Hạn chế về khoảng cách và triển khai.
-- Bảng địa chỉ MAC của switch quá lớn.
 
 Ta thấy mạng VLAN giúp tạo ra các mạng miền quảng bá độc lập trong cùng một mạng LAN nhưng VLAN có một số nhược điểm như chỉ có thể có 4094 VLANs trong một mạng LAN, bảng địa chỉ MAC của switch là quá hơn. Một giải pháp được sử dụng cải thiện những nhược điểm trên là VXLAN.
 
