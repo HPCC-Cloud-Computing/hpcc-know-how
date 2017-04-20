@@ -456,7 +456,7 @@ Git cũng có chức năng cho phép bạn giữ một file trong thư mục là
 
 
 Sau khi đã tìm hiểu cơ bản về các câu lệch của git sau đây sẽ đi vào một ví dụ cụ thể áp dụng các câu lệch thường gặp trong khi sử dụng git minh họa các trạng thái theo sơ đồ sau:
-![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/File%20Status%20LifeCycle.PNG)
+![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/Gitlifecycle.png)
 Ban đầu bạn có một project đã được quản lý bởi git và các file của bạn đã được commit. Thực hiện câu lệch `git status` ta có kết quả như sau:
 
 ```txt

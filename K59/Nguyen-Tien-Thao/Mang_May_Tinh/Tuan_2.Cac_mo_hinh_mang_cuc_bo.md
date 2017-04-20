@@ -88,6 +88,8 @@ VTEP là một thiết bị được VXLAN sử dụng để encapsulation and d
 
 ![VTEP](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VTEP.png)
 
+- Tương ứng với hai interface VTEP gồm hai thành phần. Thành phần thứ nhất là switch cung cấp switch interface. Thành phần thứ hai cung cấp IP interface. Thành phần này có một địa chỉ IP duy nhất cho phép xác định VTEP trong mạng (IP tầng 3). Địa chỉ IP của VTEP này được sử dụng để đóng gói thêm vào Ethernet frame và chuyển gói tin đã được đóng gói đó lên qua mạng thông qua IP interface.
+
 ### Cách để chuyển gói tin giưã hai máy trong VXLAN
 
 ![VXLAN](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN.png)
