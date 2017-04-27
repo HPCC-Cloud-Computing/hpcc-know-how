@@ -51,7 +51,7 @@ Chúng ta sẽ xem tính consistency của một hệ thống phân tán đượ
 
 Phương pháp ACID đánh giá tính nhất quán của một hệ thống phân tán thông qua việc phân tích xem các giao dịch được thực hiện trong hệ thống phân tán đó được các tiêu chí nào trong 4 tiêu chí sau: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 
-**\*Chú thích:** Trong phương pháp ACID thì khái niệm **giao dịch** chính là chỉ các thao tác thay đổi các đối tượng dữ liệu mà các thực thể tác động lên hệ thống như: Tạo đối tượng dữ liệu mới, cập nhật nội dung đối tượng, xóa đối tượng,...
+**Chú thích:** Trong phương pháp ACID thì khái niệm **giao dịch** chính là chỉ các thao tác thay đổi các đối tượng dữ liệu mà các thực thể tác động lên hệ thống như: Tạo đối tượng dữ liệu mới, cập nhật nội dung đối tượng, xóa đối tượng,...
 
 **Atomicity** - Tính toàn vẹn / tính nguyên tố: Tiêu chí này đề cập tới sự toàn vẹn của một giao dịch. Một giao dịch được coi là có tính toàn vẹn khi nó thỏa mãn cả 2 điều kiện sau trong mọi điều kiện, kể cả khi hệ thống gặp sự cố:
 
