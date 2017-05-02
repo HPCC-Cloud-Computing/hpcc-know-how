@@ -197,6 +197,7 @@ Sự khác biệt giữa 2 chế độ Level-Triggered và Edge-Triggered đư�
 
 Qua phân tích trên, chúng ta có thể thây chúng ta cần cẩn thận khi sử dụng Edge-Triggered mode, tránh tạo ra các dead lock blocking.
 
+Như vậy, chúng ta có thể thấy rằng, Edge-Triggered mode có vẻ phức tạp và khó dùng hơn Level-Triggered Mode. Vậy tại sao chế độ này vẫn được sử dụng trong thực tế, nó có ưu điểm gì? 
 (to be continue)
 
 ## Tài liệu tham khảo
@@ -208,3 +209,7 @@ Qua phân tích trên, chúng ta có thể thây chúng ta cần cẩn thận kh
 [3] <http://man7.org/linux/man-pages/man7/epoll.7.html>
 
 [4] <https://eklitzke.org/blocking-io-nonblocking-io-and-epoll>
+
+[5] <https://lwn.net/Articles/25137/>
+
+[6] <https://lwn.net/Articles/14168/>
