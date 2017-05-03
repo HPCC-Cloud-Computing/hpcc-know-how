@@ -1,6 +1,6 @@
 # Basic Linux
 
-Linux có giao diện đồ họa cho người dùng và nó cũng làm việc tốt như nhưng GUI tương tự khác trên Windows và OSX. Vậy tại sao ta cần tìm hiểu về command line trong linux. Tìm hiểu về command line không có nghĩa là sẽ từ bỏ hẳn không sử dụng GUI. Có một số task sẽ thích hợp với GUI (chỉnh sửa video), một số khác lại thích hợp với command line(quản lý file). Trong bài này sẽ tập trung vào cách sử dụng command line trong linux.
+Linux có giao diện đồ họa cho người dùng và nó cũng làm việc tốt như những GUI tương tự khác trên Windows và OSX. Vậy tại sao ta cần tìm hiểu về command line trong linux. Tìm hiểu về command line không có nghĩa là sẽ từ bỏ hẳn không sử dụng GUI. Có một số task sẽ thích hợp với GUI (chỉnh sửa video), một số khác lại thích hợp với command line(quản lý file). Trong bài này sẽ tập trung vào cách sử dụng command line trong linux.
 
 ## Command line là gì
 
@@ -282,5 +282,78 @@ total 17732
 -rw-rw-r--   1 nguyentienthao nguyentienthao     2299 Th02 15 18:34 app.js
 -rw-rw-r--   1 nguyentienthao nguyentienthao     5825 Th02 15 18:28 computeBLEU.py
 
+```
+
+### Quản lý user, group
+
+Một số file liên quan đến user và group. Lưu ý không tự tiện chỉnh sủa các file này.
+
+- /etc/shadow: lưu trữ mật khẫu đã được mã hóa và chỉ có superuser mới có quyền đọc.
+- /etc/passwd: lưu tất cả thông tin về người sử dụng
+- /etc/group: lưu trữ danh sách các nhóm.
+
+#### User
+
+User là người có thể truy cập hệ thống. Một user có user name và password. Với mỗi user có một định danh nhanh nhất định gọi UID. Việc quản lý user nhằm đảm bảo tính bảo mật bằng các giới hạn các quyền truy cập cho các users. User có thể chia làm hai loại là superuser(root) có toàn quyền truy cập vào hệ điều hành và cấu hình. Superuser thường chỉ được sử dụng bởi người quản trị hệ thống. Loại user thứ hai là người dùng thông thường mỗi người dùng lại được đặc tả các giới hạn truy cập. Người dùng thuộc loại thứ hai có thể sử dụng các câu su và sudo để sử dụng quyền của superuser.
+
+Tạo user
+`useradd -m -g initial_group -G additional_groups username`
+
+- `-m`: tạo mới thư mục user `/home/username`.
+- `-g`: tên của group. Nếu được đặc tả thì tên group phải là tên của một group đã tồn tại. Nếu tên group không được đặc tả một group mặc định sẽ được tạo ra với tên group trùng với tên của user và GID băng UID.
+- `-G`: danh sách các group mà user cũng thuộc vào. Các group được phân tách bởi dấu `;`.
+
+Đổi tên user:
+`usermod -l newname oldname`
+
+Xóa user:
+ `userdel -r username`
+
+ tham sood -r cho biết thư mục home của user cũng sẽ được xóa.
+
+#### Group
+
+Group là tập hợp của một số user. Mỗi user sẽ luôn luôn thuộc ít nhất một group. Khi user được tạo ra thì mặc định một group cũng được tạo ra.
+
+ Kiểm tra user thuộc group nào
+ `groups <username>`
+
+ví dụ:
+
+```sh
+ntt@NTT:~$ groups testuser                                                                                 testuser : testuser
+```
+
+Tạo group mới
+`groupadd <tên group>`
+
+Thêm user vào group
+`gpasswd -a <username> <tên group>`
+
+ví dụ:
+
+```sh
+root@NTT:/home/ntt# gpasswd -a test1 testuser
+Adding user test1 to group testuser
+```
+
+Đổi tên group:
+`groupmod -n new_group old_group`
+
+ví dụ:
+`root@NTT:/home/ntt# groupmod -n test2 testuser`
+
+Xóa group
+`groupdel group`
+
+Loại bỏ user ra khỏi group
+`gpasswd -d user group`
+
+ví dụ:
+
+```sh
+root@NTT:/home/ntt# gpasswd -d testuser test2
+Removing user testuser from group test2
+gpasswd: user 'testuser' is not a member of 'test2'
 ```
 

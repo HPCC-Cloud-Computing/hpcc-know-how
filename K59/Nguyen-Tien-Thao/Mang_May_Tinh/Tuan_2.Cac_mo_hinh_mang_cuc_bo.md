@@ -65,7 +65,7 @@ Ta có thể thấy mạng VLAN có một số nhược điêm như sau:
 - Giới hạn 4094 VLANs là không đủ.
 - Hạn chế về khoảng cách và triển khai.
 
-Ta thấy mạng VLAN giúp tạo ra các mạng miền quảng bá độc lập trong cùng một mạng LAN nhưng VLAN có một số nhược điểm như chỉ có thể có 4094 VLANs trong một mạng LAN, bảng địa chỉ MAC của switch là quá hơn. Một giải pháp được sử dụng cải thiện những nhược điểm trên là VXLAN.
+Ta thấy mạng VLAN giúp tạo ra các mạng miền quảng bá độc lập trong cùng một mạng LAN nhưng VLAN có một số nhược điểm như chỉ có thể có 4094 VLANs trong một mạng LAN. Một giải pháp được sử dụng cải thiện những nhược điểm trên là VXLAN.
 
 Mạng VXLAN cung cấp một cơ chế để kết hợp hai hay nhiều layer3 network domain và làm cho chúng giống như một layer2 domain. Điều này cho phép hai máy tính trên hai mạng khác nhau nếu chúng cùng ở trong một layer2 subnet.
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN1.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN1.png)
@@ -91,7 +91,7 @@ VTEP là một thiết bị được VXLAN sử dụng để encapsulation and d
 
 ### Cách để chuyển gói tin giưã hai máy trong VXLAN
 
-![VXLAN](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLAN.png)
+![VXLAN](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/VXLANupdate.png)
 
 Trong hình giả sử máy A muốn gửi gói tin cho máy B gói tin từ máy A đến máy B sẽ thay đổi và được đóng gói và bóc tách cụ thể là:
 
