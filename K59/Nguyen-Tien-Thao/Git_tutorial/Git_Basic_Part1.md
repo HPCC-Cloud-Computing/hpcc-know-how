@@ -44,9 +44,11 @@ Trong các DVCS các máy khách không chỉ sao chép về máy cục bộ cá
 
 ### 2. Git
 
+Git là một VCS, cụ thể hơn là một DVCS.
+
 #### 2.1 Điểm khác biệt giữa Git và các VCS khác
 
-- Các hệ thống VCS khác mỗi khi người sử dụng commit VCS sẽ lưu lại toàn bộ các file. Còn với Git hệ thống sẽ lưu lại một **ảnh chụp(snapshot)** các file. Với những file đã thay đổi git sẽ tạo một phiên bản mới còn với những file không thay đổi git sẽ ánh xạ file đó vào file cũ đã không thay đổi.
+- Các hệ thống VCS khác mỗi khi người sử dụng commit VCS sẽ lưu lại sự khác biệt giữa file lần commit đó và lần commit trước đó. Còn với Git hệ thống sẽ lưu lại một **ảnh chụp(snapshot)** các file. Với những file đã thay đổi git sẽ tạo một phiên bản mới còn với những file không thay đổi git sẽ ánh xạ file đó vào file cũ đã không thay đổi.
 - Phần lớn các thao tác trên git diễn ra cục bộ: Điều này có nghĩa là người dùng có thể thay đổi và commit thay đổi của mình ngay cả khi không có kết nối với mạng. Sau khi người dùng kết nối với mạng git sẽ tự đồng bộ với hệ thông. Điều này giúp người dùng có thể làm việc trong điều kiện không có kết nối internet.
 
 #### 2.2 Ba trạng thái của một tệp tin do git quản lý
@@ -454,7 +456,7 @@ Git cũng có chức năng cho phép bạn giữ một file trong thư mục là
 
 
 Sau khi đã tìm hiểu cơ bản về các câu lệch của git sau đây sẽ đi vào một ví dụ cụ thể áp dụng các câu lệch thường gặp trong khi sử dụng git minh họa các trạng thái theo sơ đồ sau:
-![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/File%20Status%20LifeCycle.PNG)
+![Lifecycle](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/Gitlifecycle.png)
 Ban đầu bạn có một project đã được quản lý bởi git và các file của bạn đã được commit. Thực hiện câu lệch `git status` ta có kết quả như sau:
 
 ```txt
