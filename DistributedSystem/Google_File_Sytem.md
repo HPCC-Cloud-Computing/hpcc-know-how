@@ -30,7 +30,7 @@
         - [4.4 Thao tác thu hồi các replica bị xóa bỏ - Garbage Collection](#44-thao-tác-thu-hồi-các-replica-bị-xóa-bỏ---garbage-collection)
             - [4.4.1 Cơ chế Garbage Collection](#441-cơ-chế-garbage-collection)
             - [4.4.2 Các phân tích về cơ chế Garbage Collection](#442-các-phân-tích-về-cơ-chế-garbage-collection)
-    - [4.5 Phương thức phát hiện các Stale Replica](#45-phương-thức-phát-hiện-các-stale-replica)
+        - [4.5 Phương thức phát hiện các Stale Replica](#45-phương-thức-phát-hiện-các-stale-replica)
     - [5. Cơ chế chống lỗi và phát hiện lỗi trong GFS](#5-cơ-chế-chống-lỗi-và-phát-hiện-lỗi-trong-gfs)
         - [5.1 Phương thức đảm bảo khả năng sẵn sàng phục vụ cao (High Availability) của GFS](#51-phương-thức-đảm-bảo-khả-năng-sẵn-sàng-phục-vụ-cao-high-availability-của-gfs)
             - [5.1.1 Chiến lược phục hồi nhanh - Fast Recovery](#511-chiến-lược-phục-hồi-nhanh---fast-recovery)
@@ -39,7 +39,7 @@
         - [5.2 Phương thức GFS đảm bảo tính toàn vẹn của dữ liệu](#52-phương-thức-gfs-đảm-bảo-tính-toàn-vẹn-của-dữ-liệu)
         - [5.3 Các công cụ chẩn đoán và phát hiện các lỗi trong GFS](#53-các-công-cụ-chẩn-đoán-và-phát-hiện-các-lỗi-trong-gfs)
     - [6. Phân tích và đánh giá hiệu năng của hệ thống GFS](#6-phân-tích-và-đánh-giá-hiệu-năng-của-hệ-thống-gfs)
-        - [6.1 MỘt số bài đánh giá hiệu năng nhỏ cho hệ thống GFS](#61-một-số-bài-đánh-giá-hiệu-năng-nhỏ-cho-hệ-thống-gfs)
+        - [6.1Một số bài đánh giá hiệu năng nhỏ cho hệ thống GFS](#61một-số-bài-đánh-giá-hiệu-năng-nhỏ-cho-hệ-thống-gfs)
             - [6.1.1 Thao tác đọc dữ liệu](#611-thao-tác-đọc-dữ-liệu)
             - [6.1.2 Thao tác ghi dữ liệu - Record Write](#612-thao-tác-ghi-dữ-liệu---record-write)
             - [6.1.3 Thao tác Record Append](#613-thao-tác-record-append)
@@ -396,7 +396,7 @@ Sử dụng cơ chế garbage colletion để thu hồi lại tài nguyên lưu 
 
 Trong thực tiễn khi hệ thống hoạt động thực tế, thì cơ chế garbage colletion cũng bộ lộ ra một nhược điểm chính, đó là do cơ chế này trì hoãn việc xóa hoàn toàn nội dung của file với yêu cầu xóa file của Client application trong 3 ngày, do đó có thể xảy ra trường hợp sự trì hoãn này thỉnh thoảng ảnh hưởng đến việc một số người dùng cố gắng điều chỉnh lại kho dữ liệu lưu trữ của họ, trong trường hợp dung lượng lưu trữ mà hệ thống cấp cho họ có kích thước khá nhỏ. Nếu như trong trường hợp các Client Application thường xuyên lặp lại việc tạo mới và xóa bỏ các file tạm trong quá trình hoạt động có thể dẫn tới việc dung lượng cấp cho Client application đó bị đầy, và Client application đó có thể tạm thời không tiếp tục được sử dụng được thêm dung lượng lưu trữu nữa. Để khắc phục điều này, GFS cho phép các Client Application có thể sử dụng một thao tác để ngay lập tức xóa bỏ dữ liệu của file cần xóa chứ không cần chờ delay 3 ngày nữa, bằng cách thực hiện thao tác xóa file một lần nữa lên file bị đánh dấu xóa. Đồng thời, GFS cũng cho phép các Client Application có thể áp dụng các chính sách sao lưu cũng như chính sách thu hồi tài nguyên khác nhau lên các khu vực khác nhau của namespace. Ví dụ, Client Application có thể thiết lập để các file nằm trong một vùng namespace nào đó có thể được tạo ra mà không cần phải có bản sao, hoặc có thể cho phép các file bị đánh dấu xóa được thu hồi tài nguyên ngay lập tức mà không cần chờ delay 3 ngày.
 
-## 4.5 Phương thức phát hiện các Stale Replica
+### 4.5 Phương thức phát hiện các Stale Replica
 
 Các replica của các chunk trên GFS có thể chuyển sang trạng thái **stale** nếu như chunkserver chứa các replica này gặp sự cố và khiến cho trong thời gian chunkserver bị hỏng, các replica này bỏ lỡ mất một số thay đổi do các Client thực hiện lên các chunk của các replica đó. Để phát hiện ra các replica bị stale, GFS sử dụng **chunk version number** cho các chunk trong cluster để phân biệt giữa các chunk áp dụng thành công thay đổi và ở phiên bản mới nhất với các stale chunk.
 
@@ -457,7 +457,7 @@ Sự ảnh hưởng của logging tới hiệu năng của hệ thống là rấ
 
 Trong phần này, chúng ta sẽ xem các nhà thiết kế GFS sử dụng một số bài kiểm tra nhỏ (micro-benchmarks) để kiểm tra hiệu năng, cũng như phát hiện các điểm tắc nghẽn trong kiến trúc GFS khi hệ thống vận hành các thí nghiệm nhỏ. Và sau đó chúng ta sẽ xem một số thông số thu được từ kết quả chạy thực tế của các GFS cluster được sử dụng trong hoạt động của Google.
 
-### 6.1 MỘt số bài đánh giá hiệu năng nhỏ cho hệ thống GFS
+### 6.1Một số bài đánh giá hiệu năng nhỏ cho hệ thống GFS
 
 Để đánh giá hiệu năng của GFS, các nhà thiết kế xây dựng một GFS cluster nhỏ bao gồm các thành phần sau: 1 master node, 2 shadow master (master replica) và 16 chunkserver, 16 Client. Đây là GFS cluster được sử dụng để kiểm tra hệ thống, còn trong thực tế, như đã nói một GFS cluster thực có thể có tới hàng trăm chunkserver và hàng trăm client.
 
@@ -468,6 +468,8 @@ Các máy tính được sử dụng để xây dựng GFS cluster này có cấ
 N Client trên hệ thống sẽ cùng một lúc đọc các file trên GFS. Mỗi một client sẽ lựa chọn ngẫu nhiên một khối dữ liệu có kích thước 4 MB từ một file 320 GB. Client sẽ lặp lại 256 lần thao tác đọc này, do đó mỗi một client sẽ đọc tổng cộng 1 GB dữ liệu. Tổng cộng số lượng RAM trên các chunkserver là 32 GB, do đó chúng ta sẽ giả sử rằng có 10% dữ liệu sẽ có trên bộ đệm Linux trên RAM. Bài benchmark này được thiết kế để làm sao cho lượng bộ nhớ đệm này không ảnh hưởng quá lớn tới kết quả kiểm tra hiệu năng hệ thống.
 
 Hình 3 chỉ ra kết quả tốc độ đọc của N client và tốc độ đọc tối đa mà N Client này có thể đạt được theo lý thuyết. Vì kết nối giữa 2 switch là 1GBps, do đó tốc độ tối đa giữa tất cả client với hệ thống GFS là 125 MB/s (1000/8), và với một Client là 12.5 MB/s, vi kết nối từ client tới switch là kết nối có tốc độ 100 Mbps. Trong bài kiểm tra, tốc độ dữ liệu mà Client nhận được theo quan sát là 10 MB/s, tức là 80% giới hạn tối đa của kết nối, trong bài test chỉ có một client sử dụng hệ thống. Khi tất cả các client đồng thời đọc thì tổng tốc độ đọc quan sát được là 94 MB/s, tức là khoảng 75% giới hạn tối đa của kết nối. Vì chúng ta có 16 client, nên trong bài test này mỗi client có tốc độ đọc dữ liệu là 6 MB/s. Lý do mà hiệu quả đọc dữ liệu giảm từ 80% xuống 75% là do trong bài test thứ 2 nhiều Client cùng một lúc sử dụng hệ thống GFS, do đó có thể xảy ra trường hợp một chunkserver cùng lúc phục vụ yêu cầu đọc cho nhiều Client.
+
+![figure_3.png](./images/figure_3.png)
 
 #### 6.1.2 Thao tác ghi dữ liệu - Record Write
 
