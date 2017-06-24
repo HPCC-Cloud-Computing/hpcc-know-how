@@ -46,7 +46,7 @@ Một snapshot là một trạng thái của máy ảo được lưu lại. Vi�
 
 `Desktop Virtualization` là khái niệm chỉ sự tách biệt giữa `desktop` với máy vật lý.
 
-Một kiểu của `desktop virtualization` là `virtual desktop infratructure` (VDI), có thể coi là một kiểu tiên tiến hơn là `hardware virtualization`. Thay vì tương tác trực tiếp với `host computer` thông qua bàn phím, chuột và màn hình thì bây giờ người sử dụng sẽ tương tác với `host computer` thông qua một kết nối mạng sử dụng desktop khác hoặc một thiết bị di động. Thêm vào đó, `host computer` trong trường hợp này trở thành một server có khả năng làm máy chủ của nhiều máy ảo trong cùng một thời điểm cho nhiều người dùng 
+Một kiểu của `desktop virtualization` là `virtual desktop infratructure` (VDI), có thể coi là một kiểu tiên tiến hơn là `hardware virtualization`. Thay vì tương tác trực tiếp với `host computer` thông qua bàn phím, chuột và màn hình thì bây giờ người sử dụng sẽ tương tác với `host computer` thông qua một kết nối mạng sử dụng desktop khác hoặc một thiết bị di động. Thêm vào đó, `host computer` trong trường hợp này trở thành một server có khả năng làm máy chủ của nhiều máy ảo trong cùng một thời điểm cho nhiều người dùng
 
 ### Memory virtualization
 
@@ -59,4 +59,7 @@ Network virtualization là quá trình kết hợp các phần cứng, phần m�
 - External virtualization: kết hợp nhiều mạng hay thành phần của mạng vào trong một đơn vị ảo hóa.
 - Internal virtualization: cung cấp một chức năng giống như mạng đến các software container trên một hệ thống.
 
-## Docker
+## Tài liệu tham khảo
+
+1. [https://www.linkedin.com/pulse/introduction-cloud-openstack-virtualization-layman-aayush-shrut](https://www.linkedin.com/pulse/introduction-cloud-openstack-virtualization-layman-aayush-shrut)
+2. [https://www.linkedin.com/pulse/what-virtual-machine-technology-jim-simpson](https://www.linkedin.com/pulse/what-virtual-machine-technology-jim-simpson)

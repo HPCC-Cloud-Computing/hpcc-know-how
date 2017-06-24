@@ -131,3 +131,17 @@ Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
 
   ```
   - Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `sudo systemctl status networking.service`.
+
+## OpenSSH
+
+OpenSSH cho phép mở shell trên một server linux khác, cho phép bạn thực hiện các lệch như thể bạn đang thực hiện trực tiếp trên máy đó.
+
+Để có thể kết sử dụng ta cần phải cài các package ở cả phía client(máy dùng để  nhập câu lệnh và gửi tới máy server) và máy server(máy nhận câu lệnh từ client và thực hiện trả kết quả lại cho client)
+- Phía server: `# apt-get install openssh-server `
+- Phía client: `# apt-get install openssh-client`
+
+Để kết nối tới máy chủ bằng ssh ta có thể sử dụng tên hoặc địa chỉ IP của máy chủ như sau:
+
+Cách 1:` ssh < địa chỉ IP>` Mặc định tên người sử dụng được dùng sẽ là tên đang được logged.
+Cách 2: `ssh <username>@<địa chỉ IP>` Ngoài ra có thể tùy chỉnh tên người dùng.
+Cách 3: `ssh -p <số hiệu cổng> <username>@<địa chỉ IP>` Theo mặc định ssh sẽ sử dụng cổng 22 nhưng t cũng có thể tùy chỉnh cổng này.
