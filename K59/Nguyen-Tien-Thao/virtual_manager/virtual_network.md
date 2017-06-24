@@ -130,7 +130,8 @@ Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
       dns-nameservers 8.8.8.8 8.8.4.4 # Địa chỉ máy chủ phân giải tên miền
       broadcast 192.168.10.255 # Địa chỉ IP để quảng bá gói tin đến toàn bộ các máy trong cùng subnet
 
-  ```
+    ```
+
   - Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `sudo systemctl status networking.service`.
 
 ## OpenSSH
@@ -173,3 +174,9 @@ Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.8.0-36-generic x86_64)
 com2@com2:~$
 
 ```
+
+## Tài liệu tham khảo
+
+1. [https://www.swiftstack.com/docs/install/configure_networking.html](https://www.swiftstack.com/docs/install/configure_networking.html)
+1. [https://www.howtogeek.com/117635/how-to-install-kvm-and-create-virtual-machines-on-ubuntu/](https://www.howtogeek.com/117635/how-to-install-kvm-and-create-virtual-machines-on-ubuntu/)
+1. Sách Mastering ubuntu server
