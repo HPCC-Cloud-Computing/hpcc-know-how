@@ -9,6 +9,7 @@
 Khi sử dụng chế độ bridged mode toàn bộ các máy ảo sẽ ở trong cùng một subnet như một máy chủ vật lý(các máy tính trong mạng sẽ coi máy ảo như một máy chủ vật lý). Tất cả các máy chủ vật lý khác có thể  biết được sự xuất hiện của các máy ảo đó trong mạng và có thể  truy cập vào các máy ảo đó. Chế độ này họat động trên layer2 trong mô hình OSI. Sơ đồ chế độ này như hình sau:![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/vn-Bridged-Mode-Diagram.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/vn-Bridged-Mode-Diagram.png)
 
 Các kịch bản sử dụng bridged mode:
+
 - Triển khai các máy ảo trong một mạng với các máy chủ vật lý làm cho sự khác biệt giữa máy vật lý và máy ảo là trong suốt với người dùng.
 - Triển khai các máy ảo mà không muốn thực hiện bất kỳ thay đổi cấu hình nào với các máy vật lý hiện có.
 - Triển khai các máy ảo có thể dễ dàng truy cập vào các máy chú vật lý hiện có.
@@ -36,7 +37,8 @@ Trong chế độ này máy chủ vật lý họat động như một router cho
 Khi sử dụng chế  độ isolated máy ảo có thể giao tiếp với nhau và giao tiếp với máy chủ vật lý nhưng chúng không thể giao tiếp với các máy chủ bên ngoài máy chủ vật lý(cả vào và ra đều không thể). Sử dụng `dnsmasq` là bắt buộc cho những chức năng như DHCP. Tuy nhiên ngay cả khi bị cô lập với tất cả các mạng vật lý các tên DNS vẫn được giải quyết(resolved). Do đó một tình huống xảy ra khi các tên DNS được giải quyết nhưng các yêu cầu ICMP (ping) lại không thể thực hiện được.
 
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/vn-07-isolated-switch.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/vn-07-isolated-switch.png)
-# Tạo 2 máy ảo với cấu hình:
+
+## Tạo 2 máy ảo với cấu hình
 
 - RAM: 1GB
 - Ổ cứng: 20GB
@@ -58,7 +60,6 @@ Bước 1: Tạo máy ảo với card mạng mặc định(NAT mode)
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/may_ao_4.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/may_ao_4.png)
 
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/may_ao_5.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/may_ao_5.png)
-
 
 Bước 2: Tạo virtual network(isolated mode)
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/vn_1.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/vn_1.png)
@@ -83,7 +84,7 @@ Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
  `sudo vim /etc/network/interfaces`
   với nội dung như sau
 
-  ```ssh
+```ssh
   auto lo
   iface lo inet loopback
   auto ens3  # ens3 tên của card mạng cần cấu hình
@@ -137,7 +138,9 @@ Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
 OpenSSH cho phép mở shell trên một server linux khác, cho phép bạn thực hiện các lệch như thể bạn đang thực hiện trực tiếp trên máy đó.
 
 Để có thể kết sử dụng ta cần phải cài các package ở cả phía client(máy dùng để  nhập câu lệnh và gửi tới máy server) và máy server(máy nhận câu lệnh từ client và thực hiện trả kết quả lại cho client)
+
 - Phía server: `# apt-get install openssh-server `
+
 - Phía client: `# apt-get install openssh-client`
 
 Để kết nối tới máy chủ bằng ssh ta có thể sử dụng tên hoặc địa chỉ IP của máy chủ như sau:
@@ -145,3 +148,28 @@ OpenSSH cho phép mở shell trên một server linux khác, cho phép bạn th�
 Cách 1:` ssh < địa chỉ IP>` Mặc định tên người sử dụng được dùng sẽ là tên đang được logged.
 Cách 2: `ssh <username>@<địa chỉ IP>` Ngoài ra có thể tùy chỉnh tên người dùng.
 Cách 3: `ssh -p <số hiệu cổng> <username>@<địa chỉ IP>` Theo mặc định ssh sẽ sử dụng cổng 22 nhưng t cũng có thể tùy chỉnh cổng này.
+
+## Connect tới máy ảo thông qua ssh.
+
+Bước 1: Ở máy server ta tiến hành cái đặt package openssh-server như sau:
+    `sudo apt-get install openssh-server`
+Bước 2: Ở máy client ta sử dụng câu lệnh
+`ssh-copy-id -i ~/.ssh/id_rsa.pub com2@192.168.100.11`
+Hệ thống sẽ yêu cầu bạn xác nhận yes/no. Chọn yes để tiếp tục
+Tiếp theo hệ thống yêu cầu mật khẩu `com2@192.168.100.11's password:` bạn tiến hành nhập mật khẩu (mật khẩu của user có tên là com2 trên máy server)
+Bước 3: Sử dụng câu lệnh `ssh com2@192.168.100.11 ` và kết quả như sau:
+
+```shell
+thao-nt@thao-nt:~$ ssh com2@192.168.100.11
+Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.8.0-36-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+128 packages can be updated.
+128 updates are security updates.
+
+com2@com2:~$
+
+```
