@@ -79,8 +79,55 @@ Bước 3: Add thêm card mạng isolated mode cho máy ảo
 ![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/ad_2.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/ad_2.png)
 Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
 
-![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/cf_1.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/cf_1.png)
+- Chỉnh sửa file /etc/network/interfaces
+ `sudo vim /etc/network/interfaces`
+  với nội dung như sau
 
-![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/cf_2.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/cf_2.png)
+  ```ssh
+  auto lo
+  iface lo inet loopback
+  auto ens3  # ens3 tên của card mạng cần cấu hình
+  iface ens3 inet static # static cho biết đây là địa chỉ IP tĩnh được cấu hình với các tham số như ở dưới
+  	address 192.168.10.10 # Địa chỉ IP của máy ảo
+  	netmask 255.255.255.0 # Mặt nạ mạng của subnet chứa máy ảo
+  	gateway 192.168.10.1  # Cổng mặc định sử dụng khi chuyển gói tin ra ngoài subnet
+    dns-nameservers 8.8.8.8 8.8.4.4 # Địa chỉ máy chủ phân giải tên miền
+    broadcast 192.168.10.255 # Địa chỉ IP để quảng bá gói tin đến toàn bộ các máy trong cùng subnet
 
-![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/cf_3.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/cf_3.png)
+```
+
+- Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `sudo systemctl status networking.service`.
+
+## Các câu lệnh và các file liên quan đến cấu hình mạng trong ubuntu
+
+- Hostname
+  - Câu lệnh thay đổi tên của host
+  `hostnamectl set-hostname <tên hostname>`
+  - File chứa tên của host `/etc/hostname`
+- Quản lý network interfaces
+  - Liệt kê tất cả các card mạng trong máy tính
+  `ip addr`
+  - Quản lý trạng thái của từng card mạng
+    - Romove địa chỉ IP đã được gán cho card mạng và không cho phép card kết nối tới networks
+    `ip link set <tên card mạng> down`
+    - Back up lại một card mạng
+    `ip link set <tên card mạng> up`
+
+- Gán địa chỉ IP tĩnh
+  - Chỉnh sửa file /etc/network/interfaces
+   `sudo vim /etc/network/interfaces`
+    với nội dung như sau
+
+    ```ssh
+    auto lo
+    iface lo inet loopback
+    auto ens3  # ens3 tên của card mạng cần cấu hình
+    iface ens3 inet static # static cho biết đây là địa chỉ IP tĩnh được cấu hình với các tham số như ở dưới
+    	address 192.168.10.10 # Địa chỉ IP của máy ảo
+    	netmask 255.255.255.0 # Mặt nạ mạng của subnet chứa máy ảo
+    	gateway 192.168.10.1  # Cổng mặc định sử dụng khi chuyển gói tin ra ngoài subnet
+      dns-nameservers 8.8.8.8 8.8.4.4 # Địa chỉ máy chủ phân giải tên miền
+      broadcast 192.168.10.255 # Địa chỉ IP để quảng bá gói tin đến toàn bộ các máy trong cùng subnet
+
+  ```
+  - Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `sudo systemctl status networking.service`.
