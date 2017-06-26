@@ -175,8 +175,11 @@ com2@com2:~$
 
 ```
 
+Chú ý: Nếu sử dụng `passpharse` thì sao khi sử dụng câu lệnh ở bước 3 bạn cần cung cấp passpharse để kết nối bằng ssh
+
 ## Tài liệu tham khảo
 
 1. [https://www.swiftstack.com/docs/install/configure_networking.html](https://www.swiftstack.com/docs/install/configure_networking.html)
 1. [https://www.howtogeek.com/117635/how-to-install-kvm-and-create-virtual-machines-on-ubuntu/](https://www.howtogeek.com/117635/how-to-install-kvm-and-create-virtual-machines-on-ubuntu/)
 1. Sách Mastering ubuntu server
+1. [https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Virtualization_Administration_Guide/chap-Virtualization_Administration_Guide-Remote_management_of_virtualized_guests.html#sect-Virtualization-Remote_management_of_virtualized_guests-Remote_management_with_SSH](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Virtualization_Administration_Guide/chap-Virtualization_Administration_Guide-Remote_management_of_virtualized_guests.html#sect-Virtualization-Remote_management_of_virtualized_guests-Remote_management_with_SSH)
