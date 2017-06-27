@@ -19,7 +19,7 @@ Hình trên cho ta thấy mối quan hệ giữa các containers với host syst
 ### Ưu điểm chính của Docker
 
 - Sử dụng ít tài nguyên(lightweight): Thay vì ảo hóa toàn bộ hệ điều hành, container cô lập ở mức process và sử dụng nhân của máy chủ.
-- Khả năng di chuyển: Tất cả các thứ cần thiết cho một ứng dụng đã được đóng gói trong một container cho phép ứng dụng có thể chạy trên bất kỳ máy chủ Docker nào. Đây là sự khác biệt giữa Docker container với virtual machine.
+- Khả năng di chuyển: Tất cả các thứ cần thiết cho một ứng dụng đã được đóng gói trong một container cho phép ứng dụng có thể chạy trên bất kỳ máy nào khác đã cài docker. Đây là sự khác biệt giữa Docker container với virtual machine.
 - Predictability: host không cần quan tâm đến cái gì chạy bên trong của container và container cũng không cần quan tâm đến cái gì chạy trên host. Giao diện chuẩn hóa giúp giải quyết vấn đề này
 
 Thông thường khi thiết kế một ứng dụng sử dụng Docker cách tốt nhất là tách các chức năng thành các container riêng biệt. Điều này cho phép dễ dàng mở rộng và cập nhật trong tương lai. Tính linh hoạt này là một trong những lý do khiến nhiều người sử dụng Docker để phát triển và triển khai.

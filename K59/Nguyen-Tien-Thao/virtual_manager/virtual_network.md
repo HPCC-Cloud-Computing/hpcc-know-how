@@ -96,9 +96,7 @@ Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
     broadcast 192.168.10.255 # Địa chỉ IP để quảng bá gói tin đến toàn bộ các máy trong cùng subnet
 
 ```
-
-- Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `sudo systemctl status networking.service`.
-
+s
 ## Các câu lệnh và các file liên quan đến cấu hình mạng trong ubuntu
 
 - Hostname
