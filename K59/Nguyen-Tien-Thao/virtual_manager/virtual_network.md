@@ -130,7 +130,7 @@ s
 
     ```
 
-  - Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `sudo systemctl status networking.service`.
+  - Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `ifdown -a && ifup -a`.
 
 ## OpenSSH
 
