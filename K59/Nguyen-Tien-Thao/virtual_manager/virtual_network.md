@@ -2,7 +2,7 @@
 
 ## 1. Virtual network switches
 
- virtual network switch là một phần mềm hoạt động trên một máy chủ vật lý giúp cho các máy ảo(guests)kết nối.
+ virtual network switch là một phần mềm hoạt động trên một máy chủ vật lý giúp kết nối các máy ảo với nhau hoặc kết nối máy ảo với internet.
 
 ## 2. Bridged Mode
 
@@ -96,7 +96,9 @@ Bước 4: Tạo IPv4 tĩnh cho từng máy ảo
     broadcast 192.168.10.255 # Địa chỉ IP để quảng bá gói tin đến toàn bộ các máy trong cùng subnet
 
 ```
-s
+  - Sau khi đã cấu hình xong tiến hành restart network bằng câu lệnh: `ifdown -a && ifup -a`.
+
+  Chú ý: Ngoài việc khởi động lại toàn bộ các card mạng như trên ta có thể tiến hành khởi động lại từng card mạng cụ thệ như sau: `ifdown <tên card mạng> && ifup <tên card mạng>`
 ## Các câu lệnh và các file liên quan đến cấu hình mạng trong ubuntu
 
 - Hostname
