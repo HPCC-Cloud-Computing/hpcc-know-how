@@ -45,6 +45,8 @@ Luồng của các L2 frame sẽ như sau:
 
 - Khi cần chuyển tiếp một gói tin L2 Frame từ một máy ảo tới một máy ảo khác thuộc cùng mạng nội bộ nhưng nằm trên node khác, Linux bridge chuyển tiếp gói tin này tới VXLAN-Device. VXLAN-Device sẽ thực hiện công việc thêm VXLAN header với ID là ID của mạng VXLAN, rồi đóng gói gói tin vào UDP +IP packet. Cuối cùng gói tin IP packet này được vận chuyển với IP nguồn là IP của card vật lý mà mạng VXLAN được triển khai trên đó, IP đích là IP của card mạng vật lý triển khai VXLAN đó của node chứa máy ảo đích.
 
+![https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/neutron/vxlan_flow1.png](https://raw.githubusercontent.com/NTT-TNN/Basic_knowledge/master/images/neutron/vxlan_flow1.png)
+
 - Khi tiếp nhận một gói tin IP packet từ mạng bên ngoài gửi vào, gói tin sẽ đi qua các card mạng vật lý và vào các VXLAN-Device. VXLAN-Device sẽ mở gói và kiểm tra VXLAN ID của gói tin L2 Frame. Nếu gói tin có VXLAN ID hợp lệ với mạng VXLAN này, VXLAN-Device sẽ chuyển tiếp gói tin L2 Frame nguyên bản tới Linux-bridge. Ở đây dựa theo dữ liệu mà gói tin được chuyển tiếp tới cổng kết nối với máy có MAC đích.
 
 - Trong trường hợp chuyển tiếp giữa các máy cùng mạng VXLAN và cùng nằm trên một node, gói tin được chuyển tiếp thông qua Linux Bridge.
