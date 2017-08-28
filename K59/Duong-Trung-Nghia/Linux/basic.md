@@ -92,12 +92,12 @@
 #Tạo Links
 * Mục đích của links trên Linux là tạo ra nhiều tên hoặc alias cho file và thư mục. Có 2 loại links: **hard link** và **soft link (symbolic link)**
 * Inote (index node): Trong hệ thống, file được phân biệt bằng chỉ số index node, viết tắt là inode. Mỗi file name có 1 inode đi kèm. Chỉ số inode tham chiếu đến 1 vùng nhớ trong đó có chứa địa chỉ vùng nhớ lưu trữ data
-* Hard link:
-    ![hard_link](https://kythuatmaytinh.files.wordpress.com/2012/02/hard.png?w=300&h=78)
+* Hard link:  
+    ![hard_link](images/img_1.png)  
     - File gốc có tên là _filename_, số inode là inode#, vùng dữ liệu là data.
     - Khi tạo hard link với tên là _othername_ thì inode đi kèm với nó = inode#. Do đó cả _othername_ và _filename_ đều cùng tham chiếu đến vùng dữ liệu data. 
-* Soft link: 
- ![soft_link](https://kythuatmaytinh.files.wordpress.com/2012/02/soft.png?w=300&h=143)
+* Soft link:   
+ ![soft_link](images/img_2.png)  
     - Khi tạo soft link với tên là _othername_ thì inode đi kèm sẽ là 1 inode## khác. Inode## này tham chiếu đến vùng nhớ chứa địa chỉ dẫn đến vùng data của soft link. Trong data này chứa đường dẫn đến file gốc.
 * Tạo  link: ln [-s] filename linkname
     * -s: tạo soft link
