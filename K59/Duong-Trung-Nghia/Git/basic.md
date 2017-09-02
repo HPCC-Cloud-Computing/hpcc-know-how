@@ -136,7 +136,7 @@
     ![Hình minh hoạ](images/img_2.png)  
 * Nếu bạn thực hiện một số thay đổi và commit lại thì commit tiếp theo sẽ lưu một con trỏ tới commit ngay trước nó  
     ![Hình minh hoạ](images/img_3.png)  
-* Một nhánh trong Git đơn thuần là một con trỏ có khả năng di chuyển được, trỏ đến một trong những commit này. Tên nhánh mặc định của Git là master. Như trong những lần commit đầu tiên, chúng đều được trỏ tới nhánh master. Và mỗi lần bạn thực hiện commit, nó sẽ được tự động ghi vào theo hướng tiến lên
+* Một nhánh trong Git đơn thuần là một con trỏ có khả năng di chuyển được, trỏ đến một trong những commit này. Tên nhánh mặc định của Git là master. Như trong những lần commit đầu tiên, chúng đều được trỏ tới nhánh master. Và mỗi lần bạn thực hiện commit, con trỏ này sẽ trỏ tới commit mới nhất ( là commit bạn vừa thực hiện).
 * Khi bạn tạo 1 nhánh mới, git sẽ tạo một con trỏ mới, cùng trỏ tới commit hiện tại (mới nhất) của bạn. 
 * Làm sao git biết bạn làm việc với nhánh nào? Git giữ một con trỏ đặc biệt có tên HEAD - đây là một con trỏ tới nhánh nội bộ mà bạn đang làm việc
     ```git
