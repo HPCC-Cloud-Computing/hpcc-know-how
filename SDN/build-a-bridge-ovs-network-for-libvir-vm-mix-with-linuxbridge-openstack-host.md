@@ -202,3 +202,9 @@ ip link set dev ovs-storage-tap up
 ```
 
 Sau khi thực hiện các câu lệnh trên, chúng ta tiến hành cấu hình địa chỉ IP mạng cho các mấy ảo vừa được tạo ra bằng libvirt rồi kích hoạt cấu hình mạng trên các máy ảo và kiểm tra lại kết quả.
+
+Update: Có một phương pháp nữa cho phép chúng ta có thể cấu hình được các thiết lập các thông số mạng kết nối các máy ảo, đó là sử dụng Neutron QoS để thiết lập chế độ kết nối cho một máy ảo trong hệ thống Cloud:
+
+- <https://docs.openstack.org/mitaka/networking-guide/config-qos.html>
+
+Triển khai chi tiết của giải pháp này sẽ được trình bày trong một bài viết khác.
