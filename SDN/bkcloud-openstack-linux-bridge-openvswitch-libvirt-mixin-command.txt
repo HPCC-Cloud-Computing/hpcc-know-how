@@ -1,0 +1,285 @@
+# bkcloud15
+
+ip: 
+
+bkcloud15-vm-1 192.168.50.31
+bkcloud15-vm-2 192.168.50.32
+bkcloud15-vm-3 192.168.50.33
+
+
+auto enp11s0f0
+iface enp11s0f0 inet manual
+
+auto br-ex
+iface br-ex inet static
+    # Use the MAC address identified above.
+    address 192.168.60.15
+    netmask 255.255.255.0
+    gateway 192.168.60.1
+    dns-nameservers 8.8.8.8
+
+    bridge_ports enp11s0f0
+    # If you want to turn on Spanning Tree Protocol, ask your hosting
+    # provider first as it may conflict with their network.
+    bridge_stp off
+    # If STP is off, set to 0. If STP is on, set to 2 (or greater).
+    bridge_fd 0
+ 
+    
+ip link add br-storage-tap type veth peer name ovs-storage-tap
+ip link set dev br-storage-tap up
+ip link set dev ovs-storage-tap up
+
+brctl addif br-ex br-storage-tap
+ovs-vsctl add-br br-ovs-bridge
+ovs-vsctl add-port br-ovs-bridge ovs-storage-tap
+#ip addr add 192.168.50.25/24 dev br-ovs-bridge
+ip link set dev br-ovs-bridge up
+
+root@bkcloud15-00:~# brctl show
+bridge name	bridge id		STP enabled	interfaces
+br-ex		8000.2ad6c3e3b8d3	no		br-storage-tap
+							enp11s0f0
+virbr0		8000.5254001bc11e	yes		virbr0-nic
+
+root@bkcloud15-00:~# ovs-vsctl show
+e856525e-b1db-4fef-87b2-d25259ce9e88
+    Bridge br-ovs-bridge
+        Port br-ovs-bridge
+            Interface br-ovs-bridge
+                type: internal
+        Port ovs-storage-tap
+            Interface ovs-storage-tap
+    ovs_version: "2.6.1"
+
+
+
+ip tuntap add mode tap tap-15-vm1
+ip link set dev tap-15-vm1 up
+ifconfig tap-15-vm1 up
+ovs-vsctl add-port br-ovs-bridge tap-15-vm1
+
+sudo virt-install \
+--virt-type=kvm \
+--name bkcloud15-vm-1 \
+--ram 3072 \
+--vcpus=4 \
+--cpu host-model-only,force=vmx \
+--os-variant ubuntu16.04 \
+--virt-type=kvm \
+--hvm \
+--cdrom=/var/lib/libvirt/boot/ubuntu-16.04.2-server-amd64.iso \
+--graphics vnc,listen=0.0.0.0 --noautoconsole \
+--disk path=/var/lib/libvirt/images/bkcloud15-vm-1.qcow2,size=80,bus=virtio,format=qcow2
+
+
+virsh edit bkcloud15-vm-1
+
+    <interface type='bridge'>
+      <source bridge='br-ovs-bridge'/>
+      <virtualport type='openvswitch'>
+      </virtualport>
+      <target dev='tap-15-vm1'/>
+      <model type='virtio'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+
+ip tuntap add mode tap tap-15-vm2
+ip link set dev tap-15-vm2 up
+ifconfig tap-15-vm2 up
+ovs-vsctl add-port br-ovs-bridge tap-15-vm2
+
+virsh vol-clone --pool images bkcloud15-vm-1.qcow2 bkcloud15-vm-2.qcow2
+
+sudo virt-install \
+--virt-type=kvm \
+--name bkcloud15-vm-2 \
+--ram 3072 \
+--vcpus=4 \
+--cpu host-model-only,force=vmx \
+--os-variant ubuntu16.04 \
+--virt-type=kvm \
+--hvm \
+--graphics vnc,listen=0.0.0.0 --noautoconsole \
+--boot=hd \
+--disk path=/var/lib/libvirt/images/bkcloud15-vm-2.qcow2,bus=virtio,format=qcow2 
+
+
+
+virsh edit bkcloud15-vm-2
+
+    <interface type='bridge'>
+      <source bridge='br-ovs-bridge'/>
+      <virtualport type='openvswitch'>
+      </virtualport>
+      <target dev='tap-15-vm2'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+
+
+
+ip tuntap add mode tap tap-15-vm3
+ip link set dev tap-15-vm3 up
+ifconfig tap-15-vm2 up
+ovs-vsctl add-port br-ovs-bridge tap-15-vm3
+
+virsh vol-clone --pool images bkcloud15-vm-2.qcow2 bkcloud15-vm-3.qcow2
+
+sudo virt-install \
+--virt-type=kvm \
+--name bkcloud15-vm-3 \
+--ram 3072 \
+--vcpus=4 \
+--cpu host-model-only,force=vmx \
+--os-variant ubuntu16.04 \
+--virt-type=kvm \
+--hvm \
+--graphics vnc,listen=0.0.0.0 --noautoconsole \
+--boot=hd \
+--disk path=/var/lib/libvirt/images/bkcloud15-vm-3.qcow2,bus=virtio,format=qcow2 
+
+
+
+virsh edit bkcloud15-vm-3
+
+    <interface type='bridge'>
+      <source bridge='br-ovs-bridge'/>
+      <virtualport type='openvswitch'>
+      </virtualport>
+      <target dev='tap-15-vm3'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+
+
+
+
+
+# bkcloud11
+
+ip: 
+
+bkcloud11-vm-1 192.168.50.34
+bkcloud11-vm-2 192.168.50.35
+bkcloud11-vm-3 192.168.50.36
+
+cp /home/bkcloud11/ubuntu-16.04.2-server-amd64.iso  /mnt/libvirt_images/ubuntu-16.04.2-server-amd64.iso
+
+ip link add br-storage-tap type veth peer name ovs-storage-tap
+ip link set dev br-storage-tap up
+ip link set dev ovs-storage-tap up
+
+brctl addif brq2923663b-9d br-storage-tap
+ovs-vsctl add-br br-ovs-bridge
+ovs-vsctl add-port br-ovs-bridge ovs-storage-tap
+#ip addr add 192.168.50.21/24 dev br-ovs-bridge
+ip link set dev br-ovs-bridge up
+
+ip tuntap add mode tap tap-11-vm1
+ip link set dev tap-11-vm1 up
+ifconfig tap-11-vm1 up
+ovs-vsctl add-port br-ovs-bridge tap-11-vm1
+
+sudo virt-install \
+--virt-type=kvm \
+--name bkcloud11-vm-1 \
+--ram 3072 \
+--vcpus=3 \
+--cpu host-model-only,force=vmx \
+--os-variant ubuntu16.04 \
+--virt-type=kvm \
+--hvm \
+--cdrom=/mnt/libvirt_images/ubuntu-16.04.2-server-amd64.iso \
+--graphics vnc,listen=0.0.0.0 --noautoconsole \
+--disk path=/mnt/libvirt_images/bkcloud11-vm-1.qcow2,size=80,bus=virtio,format=qcow2
+
+
+virsh edit bkcloud11-vm-1
+
+    <interface type='bridge'>
+      <source bridge='br-ovs-bridge'/>
+      <virtualport type='openvswitch'>
+      </virtualport>
+      <target dev='tap-11-vm1'/>
+      <model type='virtio'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+
+ip tuntap add mode tap tap-11-vm2
+ip link set dev tap-11-vm2 up
+ifconfig tap-11-vm2 up
+ovs-vsctl add-port br-ovs-bridge tap-11-vm2
+
+virsh vol-clone --pool libvirt_images bkcloud11-vm-1.qcow2 bkcloud11-vm-2.qcow2
+
+sudo virt-install \
+--virt-type=kvm \
+--name bkcloud11-vm-2 \
+--ram 3072 \
+--vcpus=4 \
+--cpu host-model-only,force=vmx \
+--os-variant ubuntu16.04 \
+--virt-type=kvm \
+--hvm \
+--graphics vnc,listen=0.0.0.0 --noautoconsole \
+--boot=hd \
+--disk path=/mnt/libvirt_images/bkcloud11-vm-2.qcow2,bus=virtio,format=qcow2
+
+
+
+virsh edit bkcloud11-vm-2
+
+    <interface type='bridge'>
+      <source bridge='br-ovs-bridge'/>
+      <virtualport type='openvswitch'>
+      </virtualport>
+      <target dev='tap-11-vm2'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+
+
+
+ip tuntap add mode tap tap-11-vm3
+ip link set dev tap-11-vm3 up
+ifconfig tap-11-vm3 up
+ovs-vsctl add-port br-ovs-bridge tap-11-vm3
+
+virsh vol-clone --pool libvirt_images bkcloud11-vm-2.qcow2 bkcloud11-vm-3.qcow2
+
+sudo virt-install \
+--virt-type=kvm \
+--name bkcloud11-vm-3 \
+--ram 3072 \
+--vcpus=4 \
+--cpu host-model-only,force=vmx \
+--os-variant ubuntu16.04 \
+--virt-type=kvm \
+--hvm \
+--graphics vnc,listen=0.0.0.0 --noautoconsole \
+--boot=hd \
+--disk path=/mnt/libvirt_images/bkcloud11-vm-3.qcow2,bus=virtio,format=qcow2
+
+
+
+virsh edit bkcloud11-vm-3
+
+    <interface type='bridge'>
+      <source bridge='br-ovs-bridge'/>
+      <virtualport type='openvswitch'>
+      </virtualport>
+      <target dev='tap-11-vm3'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+
+
+
