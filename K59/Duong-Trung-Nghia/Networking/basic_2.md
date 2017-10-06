@@ -2,16 +2,36 @@
 
 ## Tầng Liên kết dữ liệu ( `L2 - Data Link Layer`)
 
-1. Các chức năng chính
-    * Đóng gói:
-        * Đơn vị dữ liệu: khung tin (frame)
-        * Bên gửi: thêm header, trailer cho gói tin nhận được từ tầng mạng
-        * Bên nhận: bỏ header và trailer, đẩy lên tầng mạng
-    * Địa chỉ hóa: sử dụng địa chỉ MAC
-    * Điều khiển truy nhập đường truyền
-    * Kiểm soát luồng: đảm bảo bên nhận không bị quá tải
-    * Kiểm soát lỗi: phát hiện và sửa lỗi bit trong các khung tin  
-        * Kiểm soát lỗi ntn? : Sử dụng mã phát hiện lỗi: (Mã CRC - Cyclic Redundancy Check)
+1. Nhiệm vụ của lớp con MAC  
+    Ta nhắc lại nhiệm vụ của tầng MAC trong tầng L2 là:
+    * Quy định việc đánh địa chỉ MAC cho các thiết bị mạng 
+    * Đưa ra cơ chế chia sẻ môi trường vật lý kết nối nhiều máy tính
+    * Phỏng tạo kênh truyền song công (duplex channel) - truyền tín hiệu theo cả 2 hướng tại cùng một thời điểm, đa điểm (multipoint)
+
+1. Cấu trúc MAC Frame chuẩn IEEE 802.3 
+    1. Cấu trúc Frame  
+        ![MAC Frame](./images/img_4.jpg)
+        * MAC Header: 
+            * Mỗi Frame sẽ thường được bắt đầu bởi một synchronization pattern. Pattern này bao gồm Preamble Pattern + 1 flag byte hoặc chỉ đơn giản là 1 flag byte
+            * The Preamble: Ta có thể hiểu 1 cách đơn giản là: đây như là 1 bộ phận giúp đồng bộ clock của người gửi và người nhận, sự đồng bộ này được cung cấp ở mức bit. Vd. Ethernet sử dụng 7 bytes preamble
+            * The SFD (Start Frame Delimiter) Flag: Có giá trị 1 byte, giúp bên nhận biết được nội dung thực sự, đó là ngay sau SFD này.
+            Ví dụ: Ethernet sử dụng byte SFD với giá trị 10101011 
+        * MAC Address: theo ngay sau SFD
+        * LLC(Logical Link Control) Header: đóng vai trò là định danh duy nhất cho phần data được giữ trong frame này. 
+        * Frame Data (Payload): 
+            * Là nơi chứa nội dung gói tin cho L3 (Network Layer), sau LLC Header và trước MAC Trailer
+        * MAC Trailer: 
+            * CRC/checksum: Là mã 32 bit để check gói tin bên nhận nhận được có lỗi hay không.
+
+    1. Cấu trúc địa chỉ MAC
+        * Địa chỉ MAC được quản lý bởi IEEE
+        * 6 bytes ~ 48 bits và  được biểu diễn bằng 1 nhóm 6 số hex, vd: **01:23:45:67:89:ab**
+        * Là địa chỉ _duy nhất_ và _cố định_. Nhà sản xuất sẽ mua dải địa chỉ và gán cho giao diện mạng (Network Interface Card - NIC)
+        * Địa chỉ MAC _không có cấu trúc_ (flat address)
+        * Địa chỉ MAC dùng để: nhận biết trạm gửi (tại bên gửi) và kiểm tra địa chỉ đích để biết các frame có phải đang được gủi đến cho mình hay không (bên nhận)
+        * Địa chỉ quảng bá (broadcast) trong mạng LAN: FF-FF-FF-FF-FF-FF
+
+    1. Các tạo Mã CRC - Cyclic Redundancy Check
         * Phía gửi
             * Chọn 1 đa thức sinh bậc k
             * Biểu diễn đa thức dưới dạng chuỗi bit P
@@ -28,28 +48,30 @@
         R = Fk mod P = 1110
         Gửi : 11010110111110
         ```
-    * Chế độ truyền: simplex, half-duplex, full-duplex
+1. Miền quảng bá (broadcast domain) & Miền đụng độ (Collision domain)
+    * Collision domain: Miền đụng độ được định nghĩa là các đoạn mạng Ethernet hay Fast Ethernet nằm giữa một cặp Bridge hay các thiết bị lớp 2 khác. Vì lý do đó toàn bộ lưu lượng chia sẻ chung đường truyền kết nối đến thiết bị lớp 2. Trong miền đụng độ một thiết bị gửi tín hiệu đến Hub (bộ tập trung) thì tất cả các thiết bị khác đều nhận được. Các Hub mở rộng Collision domain, trong khi đó các Bridge và Switch tạo ra các Collision domain.
 
-1. Triển khai trên các nút mạng
-    * ![NIC](./images/img_3.png)
-    * Tầng liên kết dữ liệu được đặt trên cạc mạng (NIC - Network Interface Card) hoặc trên chip tích hợp 
-    * Cùng với tầng vật lý
-    * NIC được kết nối với hệ thống bus
+    * Broadcast domain: Gọi là miền quảng bá, nó là một vùng trong đó thông tin được gửi tới tất cả các thiết bị được kết nối. Thiết bị giới hạn miền quảng bá là các Router. Và cũng chính Router tạo ra các miền quảng bá. Như vậy mỗi một giao diện của Router là một Broadcast domain. Một Broadcast domain có thể gồm nhiều Collision domain.
 
-1. Triển khai trên hệ thống mạng
-    * Điều khiển truyền dữ liệu trên liên kết vật lý giữa 2 nút mạng kế tiếp
-    * Triển khai trên mọi nút mạng
-    * Cách thức triển khai và cung cấp dịch vụ phụ thuộc vào đường truyền(WiFi, Wimax, 3G, cáp quang, cáp đồng...)
-    * Truyền thông tin cậy (cơ chế giống TCP nhưng đơn giản hơn) hoặc không
-    * Đơn vị truyền: frame (khung tin)
+    * Ví dụ: Ethernet LANs là các miền quảng bá, mọi thiết bị kết nối vào mạng LAN đều có thể gửi thông tin tới các thiết bị khác trong mạng. Ngoài ra các thiết bị như Repeater, Hub chúng mở rộng mạng LAN tức là mở rộng miền quảng bá. Các thiết bị như Bridge, Switch làm nhiệm vụ kết nối các LAN với nhau nên chỉ mở rộng miền quảng bá chứ không ngăn được các bản tin phát quảng bá.
 
-1. Các thiết bị kết nối trong mạng LAN
+1. KẾT NỐI MẠNG Ở TẦNG MAC
+* Vấn đề gì sẽ xảy ra nếu xây dựng một mạng LAN với số nút lớn và bảo phủ một vùng địa lý rộng?
+    * VĐ1: Do chiều dài kênh truyền lớn -> chất lượng tín hiệu không đảm bảo do suy hao
+    * VĐ2: Chiều dài kênh truyền càng lớn, hiệu suất kênh truyền càng giảm do xác suất va đập tăng
+    * VĐ3: Trong một miền quảng bá, số nút lớn dẫn đến băng thông chia sẻ cho một nút giảm
+
+* Các thiết bị kết nối trong mạng LAN
+    * Tầng vật lý: Repeater và Hub
+    * Tầng liên kết dữ liệu: Bridge và Switch
+    * Tầng mạng: router (sẽ được nhắc đến ở tầng Mạng)
+
     1. Repeater (bộ lặp)
-        * Đảm nhiệm chức năng tầng 1
         * Tín hiệu vật lý ở đầu vào sẽ được khuếch đại, từ đó cung cấp tín hiệu ổn định và mạnh hơn cho đầu ra, để có thể đến được những vị trí xa hơn
         * <= 4 repeater/1 đoạn mạng
+        * Giải quyết được **VĐ1** nhưng không giải quyết được 2 vấn đề còn lại.
     1. Hub
-        * Hub sở hữu nhiều cổng từ 4 lên tới 24 cổng, và được coi như là một Repeater nhiều cổng.
+        * Hub được coi như là một Repeater nhiều cổng. Nó chỉ khác biệt với Repeater ở chỗ là Repeater thì khuếch đại âm thanh, Hub thường là không.
         * Khi nhận được gói tin, hub lưu trữ và chuyển tiếp gói tin tới các cổng khác.
         * Không thể tạo virtual LAN khi sử dụng Hub
         * Chỉ truyền tính hiệu điện hoặc các bit (Vì hoạt động ở tầng vật lý)
@@ -58,39 +80,50 @@
         * **Active Hub**: loại Hub này thường được sử dụng phổ biến, cần được cấp nguồn khi hoạt động. **Active Hub** dùng để khuếch đại tín hiện đến và chia ra những cổng còn lại để đảm bảo tốc độ tín hiệu cần thiết khi sử dụng.
         * **Smart Hub**: hay còn gọi là **Intelligent Hub** cũng có chức năng làm việc tương tự như Active Hub, nhưng được tích hợp thêm chip có khả năng tự động dò lỗi trên mạng.
     1. Bridge
-        * Đảm nhiệm chức năng tầng 2
-        * Dùng để kết nối giữa hai mạng để tạo thành một mạng lớn, chẳng hạn cầu nối giữa hai mạng Ethernet
-        * Khi có một máy tính này truyền tín hiệu tới một máy khác với hai mạng hoàn toàn khác nhau, thì **Bridge** sẽ sao chép lại gói tin và gửi nó tới mạng đích.
+        * Dùng để kết nối giữa hai mạng LAN có topology khác nhau để tạo thành một mạng lớn
+        * Cho phép phân mảnh một mạng LAN lớn thành nhiều segment hay nhiều vùng Collision domain nhỏ
     1. Switch
         * Được coi như một Bridge nhiều cổng.
         * Có thể tạo virtual LAN
-        * Khi gói một gói tin được gói tới một port của switch, các bước sau đây sẽ được xử lý:
-            * Switch kiểm tra địa chỉ bên trong gói tin (nằm trong frame – dữ liệu của lớp 2 trong mô hình OSI)
-            * Switch có bảng CAM (content-addressable memory, bảng CAM thường chứa 3 thông tin: địa chỉ MAC, port đích và VLAN) và sử dụng bảng này để so khớp thông tin địa chỉ MAC và port. Do đó, switch sẽ biết được chính xác một máy tính đang kết nối với port nào (trong switch) để gửi gói tin đi. Thao tác này thường được gọi bằng thuật ngữ “filter and forwarding” (lọc và chuyển gói tin).
-            * Bởi vì có tính năng “filter and forwarding” cho nên switch không có xuất hiện việc tranh chấp gói tin
+        * Nhận xét: Vì địa chỉ MAC có dạng phẳng (flat address), không có cấu trúc -> không định tuyến được bằng địa chỉ MAC khi gửi MAC frame liên mạng LAN. Do đó Switch cần có một cơ chế khác để trao đổi MAC Frame giữa các máy.
+        * Nguyên tắc hoạt động:
+            * "Store-and-Forward", kiểm tra trạng thái kênh trước khi gửi gói sang một segment khác (no-frill bridge)
+            * Tự "học" (learning bridge)
+            * Cho phép tạo cây bắc cầu tối thiểu (MST – minimum spanning tree)
+        * **No-frill bridge**
+            * Khi nhận được một frame trên một interface, bridge kiểm tra trạng thái các kênh nằm trên các interface còn lại, nếu kênh truyền rỗi -> gửi dữ liệu
+        * **Learning bridge**
+            * Để tăng hiệu suất kênh truyền, learning bridge sử dụng cơ chế lọc gói (frame filtering). Nguyên tắc lọc là: _Frame tới một trạm trong cùng 1 segment sẽ không được gửi sang các segment khác_ Vậy làm sao để biết địa chỉ đích của 1 frame nằm ở segment nào? 
+            * Bridge “ghi nhớ” vị trí của một trạm với cổng tương ứng
+                * Khi nhận một Frame, bridge liền ghi nhớ vị trí của máy gửi bằng cách là lưu giữ vị trí của máy gửi vào bảng chuyển tiếp (_forwarding table_)
+                * Cấu trúc của _Forwarding table_ là: {Địa chỉ MAC của trạm, số cổng tương ứng, thời gian sống }
+            ```ma gia
+            if địa chỉ đích nằm trong cùng Segment LAN
+            then bỏ Frame
+            else { 
+                tìm địa chỉ đích trong Forwarding table;
+                if tìm thấy địa chỉ đích
+                then chuyển tiếp Frame tới cổng tương ứng;
+                else gửi Frame tới tất cả các cổng; 
+                /* trừ cổng trên đó bridge nhận được khung*/
+            }
+            ```
+            * Cơ chế gửi & nhận một Frame qua 2 segments khác nhau trong LAN: 
+                * ![sending frame](./images/img_13.png)
+                * C gửi Frame
+                * Switch B1 nhận Frame tại cổng 1. B1 không có thông tin về vị trí của D -> B1 chuyển tiếp frame qua cổng 2 và 3
+                * B1 cập nhật vị trí của C ở cổng 1 vào Forwarding table
+                * Segment 3 bỏ qua Frame do không có địa chỉ MAC nào phù hợp với des MAC trong Frame, D nhận khung          
+                * ![response frame](./images/img_14.png)
+                * D gửi Frame
+                * B1 nhận frame tại cổng 2. B1 tìm được vị trí của C ở Forwarding table -> chuyển Frame qua cổng 1
+                * B1 cập nhật vị trí của D ở cổng 2 vào Forwarding table. C nhận frame.
+        * **Spanning tree**
+            * Vì cơ chế lọc gói chỉ hoạt động khi đồ hình mạng (topology) không xuất hiện vòng lặp.   
+                ![vong lap](./images/img_15.png)
+            * Để giải quyết cho các mô hình vòng lặp người ta sử dụng Spanning tree protocol
     1. Router (Sẽ được nói đến trong `Tầng Mạng`)
-
-1. Địa chỉ MAC
-    * Địa chỉ MAC: 48 bit, được quản lý bởi IEEE
-    * Mỗi cổng mạng được gán một MAC
-    * Không phân cấp, có tính di động
-        * Không cần thay đổi địa chỉ MAC khi host chuyển sang mạng khác
-        * (Không như địa chỉ IP có tính di động)
-    * Địa chỉ quảng bá (broadcast) trong mạng LAN: FF-FF-FF-FF-FF-FF
-1. Cấu trúc 1 `Frame` trong Tầng Liên kết dữ liệu
-    * ![Frame](./images/img_4.jpg)
-    * MAC Header: 
-        * Mỗi Frame sẽ thường được bắt đầu bởi một synchronization pattern. Pattern này bao gồm Preamble Pattern + 1 flag byte hoặc chỉ đơn giản là 1 flag byte
-        * The Preamble: Ta có thể hiểu 1 cách đơn giản là: đây như là 1 bộ phận giúp đồng bộ clock của người gửi và người nhận, sự đồng bộ này được cung cấp ở mức bit. Vd. Ethernet sử dụng 7 bytes preamble
-        * The SFD (Start Frame Delimiter) Flag: Có giá trị 1 byte, giúp bên nhận biết được nội dung thực sự, đó là ngay sau SFD này.
-        Ví dụ: Ethernet sử dụng byte SFD với giá trị 10101011 
-        * MAC Address: theo ngay sau SFD
-    * LLC(Logical Link Control) Header: đóng vai trò là định danh duy nhất cho phần data được giữ trong frame này. 
-    * Frame Data (Payload): 
-        * Là nơi chứa nội dung gói tin cho L3 (Network Layer), sau LLC Header và trước MAC Trailer
-    * MAC Trailer: 
-        * CRC/checksum: Là mã để check gói tin bên nhận nhận được có lỗi hay không.
-
+    
 ## Tầng mạng ( `L3 - Network Layer`)
 
 1. Khái quát về L3
@@ -156,6 +189,7 @@
     * Router hay còn gọi là thiết bị định tuyến hoặc bộ định tuyến, là thiết bị mạng máy tính dùng để chuyển các gói dữ liệu qua một liên mạng và đến các đầu cuối, thông qua việc định tuyến và chuyển tiếp (_Định tuyến và chuyển tiếp đã được nói ở trên_).
     * Router dựa vào bảng định tuyến (routing table) để tìm đường đi cho gói dữ liệu
     * Bảng định tuyến được quản trị mạng cấu hình tĩnh (`static`), nghĩa là được thiết lập 1 lần và thường do quản trị mạng nhập bằng tay, hoặc động (`dynamic`), nghĩa là bảng tự học đường đi và nội dung tự động thay đổi theo sự thay đổi của topo mạng
+
 1. Giao thức ARP - Address Resolution Protocol
     * ARP được sử dụng để từ một địa chỉ mạng (vd một địa chỉ IPv4) tìm ra địa chỉ MAC, hay còn có thể gọi là phân giải địa chỉ IP sang địa chỉ máy
     * Tại sao cần ARP?
@@ -168,11 +202,26 @@
         * Mỗi nút trong mạng LAN sử dụng bảng ARP Table
             * Ánh xạ <Địa chỉ IP, Địa chỉ MAC, TTL)
             * TTL: Thời gian giữ ánh xạ trong bảng
-        * • Khi cần biết địa chỉ MAC tương ứng với địa chỉ IP không có trong ARP Table, nút mạng gửi quảng bá gói tin ARP Request lên trên mạng để hỏi
-        * Nút mạng mang địa chỉ IP được hỏi sẽ gửi ARP Reply trả lời
-    * Thí dụ:
-        * Host to host: Hai máy tính trong một văn phòng (M1 và M2) được kết nối với nhau trong một mạng cục bộ (LAN) bằng cáp Ethernet và Switch, không có Gateway hoặc Router đứng giữa. M1 có một gói tin để gửi tới M2. Thông qua DNS, nó xác định rằng M2 có địa chỉ IP 192.168.0.55. Để gửi tin nhắn, nó cũng cần địa chỉ MAC của M2. Đầu tiên, M1 sử dụng một bảng ARP lưu trữ để tìm kiếm địa chỉ 192.168.0.55 cho bất kỳ ghi nhận nào hiện có của địa chỉ MAC của M2 (00: eb: 24: b2: 05: ac). Nếu địa chỉ MAC được tìm thấy, nó sẽ gửi một khung Ethernet (Frame Ethernet) với địa chỉ đích 00: eb: 24: b2: 05: ac, chứa gói tin IP. Nếu bảng ARP không có kết quả cho 192.168.0.55, M1 phải gửi một ARP broadcast (đích FF: FF: FF: FF: FF: FF MAC address), được chấp nhận bởi tất cả các máy tính, yêu cầu địa chỉ 192.168.0.55 trả lời. M2 trả lời với địa chỉ MAC và địa chỉ IP của nó. M 2 có thể ghi một mục vào bảng ARP của nó cho M1 để sử dụng trong tương lai. M1 lưu trữ các thông tin phản hồi trong bảng ARP của nó và bây giờ có thể gửi gói tin
-        * Router to router: Router dùng routing table để tìm ra địa chỉ IP của router đích, rồi từ đó tìm ra địa chỉ MAC.
+        * Với hình vẽ bên dưới A sẽ làm như thế nào để lấy được địa chỉ MAC của B?   
+            ![ARP](./images/img_16.png)
+            * A kiểm tra IP của B -> nhận ra B nằm trong cùng một LAN với A. A tìm địa chỉ MAC của B trong bảng ARP (tương ứng với IP của B)
+            * Nếu tìm thấy: A đóng gói IP vào khung MAC với địa chỉ MAC nguồn của A và địa chỉ MAC đích của B
+            * Nếu không tìm thấy: A quảng bá bản tin ARP request với địa chỉ MAC đích là địa chỉ quảng bá (FF-FF-FF-FF-FF-FF) kèm theo địa chỉ IP của máy cần tìm B 
+            * Các máy trạm trong LAN nhận được bản tin _ARP request_. Chỉ B trả lời bằng bản tin ARP reply tới A có chứa địa chỉ MAC của B
+            * A nhận được bản tin _ARP reply_ từ B -> cập nhật bảng ARP, gửi gói IP trong khung MAC
+            * Hình dạng MAC Frame sẽ giống như hình bên dưới  
+            ![MAC Frame](./images/img_17.png)
+        * Trong trường hợp các máy không cùng một mạng LAN, A chỉ có thể biết IP của E, mà không biết được địa chỉ MAC của E, vậy làm sao A có thể gửi tin cho E?  
+            ![ARP](./images/img_18.png)
+            * A kiểm tra địa chỉ IP của E -> nhận ra E nằm trên mạng khác (LAN2)  -> quyết định gửi gói tới default router (R1) thông qua IP gateway được cấu hình sẵn trong máy A. Nhưng để gửi gói tin tới R1, A cần biết MAC của R1. 
+            * A tìm địa chỉ MAC của R1 trong bảng ARP (tương ứng với địa chỉ IP của B)
+            * Nếu tìm thấy: A đóng gói IP vào MAC Frame với địa chỉ MAC đích là R1
+            * Nếu không tìm thấy: A quảng bá bản tin _ARP request_ với địa chỉ MAC đích là địa chỉ quảng bá (FF-FF-FF-FF-FF-FF) kèm theo địa chỉ IP của máy cần tìm R1
+            * Các máy trạm trong LAN nhận được bản tin ARP request. Chỉ R1 trả lời bằng bản tin _ARP reply_ tới A có chứa địa chỉ MAC của R1
+            * A nhận được bản tin _ARP reply_ từ R1 -> cập nhật bảng ARP, gửi gói tin IP trong MAC Frame
+            * R1 nhận được khung MAC từ A -> lấy gói IP, tìm chặng tiếp theo để gửi gói (LAN2) 
+            * R1 lại thực hiện cơ chế ARP trên LAN 2 như các bước 1 - 6
+            
 1. **NAT (Network address translation)**
     * NAT là 1 kỹ thuật chuyển tiếp các gói tin giữa những lớp mạng khác nhau trên một mạng lớn. NAT thay đổi một (IP) hoặc cả hai địa chỉ (IP + port) bên trong một gói tin khi gói tin đó đi qua một router, hay một số thiết bị khác. Thông thường, NAT thường thay đổi IP (thường là private IP) được dùng bên trong một mạng sang public IP.
     * NAT cũng có thể coi như một firewall cơ bản. Để thực hiện được công việc đó, NAT duy trì một bảng thông tin về mỗi gói tin được gửi qua. Khi một PC trên mạng kết nối đến 1 website trên Internet, header của địa chỉ IP nguồn được thay đổi và thay thế bằng địa chỉ Public mà đã được cấu hình sẵn trên NAT server, sau khi có gói tin trở về NAT dựa vào bảng record mà nó đã lưu về các gói tin, thay đổi địa chỉ IP đích thành địa chỉ của PC trong mạng và chuyển tiếp vào trong mạng.
@@ -192,6 +241,29 @@
         1. NAT che giấu IP bên trong LAN
         1. NAT giúp quản trị mạng lọc các gói tin được gửi đến hay gửi từ một địa chỉ IP và cho phép hay cấm truy cập đến một port cụ thể.
 
+1. Internet Protocol (IP)
+    * Định dạng gói tin IP  
+    ![IP format](./images/img_19.png)
+    * Phân mảnh gói tin:
+        * Vì mỗi các mạng đều giới hạn kích thước lớn nhất mỗi gói tin (vd. với Ethernet là 1500 bytes), nên để truyền 1 gói tin lớn đi, router nguồn cần phân mảnh IP datagram thành nhiều datagram ngắn hơn. Việc ghép mảnh sẽ được thực hiện ở thiết bị đầu cuối
+        * Phân mảnh sử dụng các trường: identification, flags, fragment offset
+            * _Identification_: 16bit - các offset của cùng 1 gói lớn có cùng 1 ID
+            * _Flags_: 3bit
+                * #1 bit: không sử dụng
+                * #2 bit - Don't fragment (DF) bit  
+                    DF = 1: Không được phân mảnh   
+                    DF = 0: Được phép phân mảnh
+                * #3 bit - More fragment (MF) bit: Nếu DF = 0  
+                    MF = 1: còn phân mảnh tiếp theo  
+                    MF = 0: phân mảnh cuối cùng.  
+        * Offset: 13 bit
+            * Vị trí của gói tin phân mảnh trong gói ban đầu.  
+    * Một số trường trong IP header
+        * Total length: 16 bit - Độ dài toàn bộ, tính cả phần đầu. Max = 65536
+        * Protocol: 8 bit - cho biết các giao thức đóng gói vào IP datagram  
+            Giao thức L2: TCP (6), UDP (17)  
+            Giao thức L3: ICMP (1), IP (IP in IP)(4)
+            
 ## Tầng giao vận (`Transport Layer - L4`)
 
 1. Tổng quan
@@ -253,13 +325,6 @@
 
 ## Tài liệu tham khảo
 
-1. Slide Mạng máy tính thầy Bùi Trọng Tùng 
+1. Slide Mạng máy tính thầy Bùi Trọng Tùng, Slide Mạng máy tính thầy Nguyễn Hữu Thanh
 1. Google
 1. Wikipedia
-
-## Các câu hỏi ứng dụng
-
-1. Các bước để 2 máy trong cùng một mạng LAN gửi gói tin cho nhau?
-1. Các bước để 2 máy trong 2 mạng LAN khác nhau gửi gói tin IP cho nhau?
-1. Các bước để gửi một gói tin lớn (1GB) từ một máy có IP là A tới 1 máy có IP là B?
-1. Trình bày một ví dụ về các bước 1 gói tin TCP từ một máy tính nội bộ đi tới trang facebook.com.vn (IP là 191.58.58.59, Port 433) thông qua giao thức Overload NAT?

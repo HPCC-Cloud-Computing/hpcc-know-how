@@ -19,7 +19,77 @@
         1. Chi phí cao và quản trị phức tạp hơn LAN
         1. Có thể hỗ trợ chung vận chuyển dữ liệu, đàm thoại, hay ngay cả truyền hình. Ngày nay người ta có thể dùng kỹ thuật cáp quang (fiber optical) để truyền tín hiệu. Vận tốc có hiện nay thể đạt đến 10 Gbps.
 1. WAN (`Wide Area Network`)  
+    * Kích cỡ vài trăm đến vài nghìn km. 
     * Dùng trong vùng địa lý lớn thường cho quốc gia hay cả lục địa, phạm vi vài trăm cho đến vài ngàn km. Chúng bao gồm tập hợp các máy nhằm chạy các chương trình cho người dùng. Các máy này thường gọi là máy chủ(host), máy đầu cuối (end system). Các máy chính được nối nhau bởi các mạng truyền thông con (**communication subnet**) hay gọn hơn là mạng con (**subnet**). Nhiệm vụ của mạng con là chuyển tải các thông điệp (message) từ máy chủ này sang máy chủ khác.
+
+## Protocol là gì
+
+* Protocol là một giao thức mạng được tập hợp tất cả các quy ước, quy tắc điều khiển việc trao đổi thông tin của người dùng giữa các hệ thống máy tính với nhau.
+* Ví dụ một số giao thức như: TCP/IP, SPX/IPX, v.v…   
+    _**(SPX/IPX ?????)**_
+* Các dạng liên kết:
+    * **Connectionless & Connection- Oriented protocols**: Giao thức hướng kết nối và giao thức không kết nối
+    * **Routable & non-Routable protocols**: Giao thức có khả năng định tuyến và giao thức không có khả năng định tuyến
+    * Giao thức không kết nối:
+        * Không thiết lập liên kết, chỉ có giai đoạn truyền dữ liệu
+        * “Best effort”: truyền ngay với khả năng tối đa
+        * Không tin cậy
+    * Giao thức hướng kết nối
+        * Dữ liệu được truyền qua một liên kết đã được thiết lập
+        * Ba giai đoạn: Thiết lập liên kết, Truyền dữ liệu, Hủy liên kết
+        * Tin cậy
+    * Giao thức có khả năng định tuyến:   
+        Là các giao thức cho phép đi qua các thiết bị liên mạng như Router để xây dựng các mạng lớn có qui mô lớn hơn
+    * Giao thức không có khả năng định tuyến:   
+        Các giao thức này không cho phép đi qua các thiết bị liên mạng như Router để xây dựng các mạng lớn.
+
+## Mô hình OSI và TCP/IP
+
+### Sơ lược về 2 mô hình
+
+1. Mô hình OSI 
+    * ![OSI](./images/img_1.jpg)
+    * Tầng Vật lý (`Physical`): Chuyển dữ liệu (bit) thành tín hiệu phù hợp với đường truyền vật lý (bên phát) và ngược lại: biến đổi, khôi phục tín hiệu (bên thu)
+    * Tầng Liên kết dữ liệu (`Data link`):
+        * Phát hiện và sửa lỗi khi truyền dữ liệu giữa các thực thể trong mạng (switch, router, thiết bị đầu cuối)
+        * Nhận dữ liệu từ tầng Mạng, đóng gói dữ liệu tầng Mạng vào các khung (frame) phù hợp với mạng vật lý
+        * Tổ chức các bit trong frame theo thứ tự định nghĩa sẵn
+    * Tầng Mạng (`Network`): 
+        * Định tuyến trên một mạng gồm nhiều nút trung gian giữa nguồn và đích
+        * Đánh địa chỉ tầng mạng. 
+    * Tầng Giao vận (`Transport`):  
+        * Đảm bảo truyền dữ liệu tin cậy giữa 2 thiết bị đầu cuối (end-to-end)
+        * Điều khiển luồng (flow control)
+        * Chia nhỏ hoặc ghép các khối dữ liệu từ tầng Phiên
+    * Tầng Phiên(`Session`): 
+        * Quản lý các kết nối (connection) được thiết lập trên cùng một máy tính, từ một hay nhiều ứng dụng khác nhau
+        * Ghép kênh nhiều kết nối và gửi xuống tầng Giao vận
+    * Tầng Trình diễn (`Presentation`): 
+        * Biến đổi dữ liệu được gửi từ tầng Application sang dạng Fomat chung. Và tại máy tính nhận, lớp này lại chuyển từ Fomat chung sang định dạng của tầng Application. Tầng trình diễn thực hiện các chức năng: dịch các mã ký tự từ ASCII sang EBCDIC. - Chuyển đổi dữ liệu, ví dụ từ số interger sang số dấu phảy động. - Nén dữ liệu để giảm lượng dữ liệu truyền trên mạng. - Mã hoá và giải mã dữ liệu để đảm bảo sự bảo mật trên mạng.
+    * Tầng Ứng dụng (`Application`): cung cấp các ứng dụng trên mạng (web, email, truyền file…)
+
+1. Mô hình TCP/IP
+    * ![TCP](./images/img_2.png)
+    * Tầng Network Access (Một số sách gọi là Internet Layer)
+        * ![network access](./images/img_10.png)
+        * Tầng vật lý - (PHY): tương ứng với tầng vật lý trong mô hình OSI
+        * MAC - Medium Access Control (Tầng điều khiển truy nhập):
+            * Quy định việc đánh địa chỉ MAC cho các thiết bị mạng
+            * Đưa ra cơ chế chia sẻ môi trường vật lý kết nối nhiều máy tính
+            * Phỏng tạo kênh truyền song công (duplex channel), đa điểm (multipoint)
+        * LLC - Logical Link control (Tầng điều khiển kênh logic) 
+            * Ghép kênh & Điều khiển luồng
+            * -> Cho phép các giao thức lớp trên (IP, IPX) được truyền trên cùng một cơ sở hạ tầng mạng vật lý.
+    * Để tiện trình bày, trong nội dung của tài liệu này ta sẽ chia mô hình TCP/IP ra làm 5 tầng, tức là vẫn phân tách tầng vật lý và tầng liên kết dữ liệu chứ không gộp lại như hình minh họa bên trên. 
+    * Trao đổi thông tin giữa các tầng
+        * ![encapsulation](./images/img_11.png)
+        * Bên gửi: Mỗi tầng thêm vào các thông tin điều khiển vào phần đầu gói tin (header) và truyền xuống tầng dưới
+        * Bên nhận: Mỗi tầng xử lý gói tin dựa trên thông tin trong phần đầu, sau đó bỏ phần đầu, lấy phần dữ liệu chuyển lên tầng trên.
+
+1. Triền khai
+    * Mô hình OSI được coi là mô hình tham chiếu chức năng. Các mô hình khác phải tham chiếu từ mô hình này.
+    * Mô hình OSI không được sử dụng trên thực tế.
+    * Mô hình TCP/IP: mô hình Internet, được sử dụng trên hầu hết các hệ thống mạng.
 
 ## Các phương pháp truyền tin
 
@@ -56,7 +126,6 @@
             * Multicast: chuyển tiếp gói tin tới một nhóm các nút mạng
             * Broadcast: chuyển tiếp gói tin tới tất cả các nút trong mạng
 
-
 ## Thông số mạng
 
 1. Băng thông (Bandwidth - B)
@@ -70,48 +139,3 @@
     * Thông lượng là lượng dữ liệu đi qua đường truyền trong một đơn vị thời gian. Hay thông lượng là băng thông thực sự mà các ứng dụng mạng được sử dụng trong một thời gian cụ thể
     * Thông lượng thường nhỏ hơn nhiều so với băng thông tối đa có thể có của môi trường truyền dẫn được sử dụng (Throughput ≤ Bandwidth).
     * Thông lượng của mạng máy tính phụ thuộc vào các yếu tố như khoảng cách liên kết, môi trường truyền dẫn, các công nghệ mạng, dạng dữ liệu được truyền, số lượng người dùng trên mạng, máy tính người dùng, máy chủ, …
-
-## Protocol là gì
-
-* Protocol là một giao thức mạng được tập hợp tất cả các quy ước, quy tắc điều khiển việc trao đổi thông tin của người dùng giữa các hệ thống máy tính với nhau.
-* Ví dụ một số giao thức như: TCP/IP, SPX/IPX, v.v…   
-    _**(SPX/IPX ?????)**_
-* Các dạng liên kết:
-    * **Connectionless & Connection- Oriented protocols**: Giao thức hướng kết nối và giao thức không kết nối
-    * **Routable & non-Routable protocols**: Giao thức có khả năng định tuyến và giao thức không có khả năng định tuyến
-    * Giao thức không kết nối:
-        * Không thiết lập liên kết, chỉ có giai đoạn truyền dữ liệu
-        * “Best effort”: truyền ngay với khả năng tối đa
-        * Không tin cậy
-    * Giao thức hướng kết nối
-        * Dữ liệu được truyền qua một liên kết đã được thiết lập
-        * Ba giai đoạn: Thiết lập liên kết, Truyền dữ liệu, Hủy liên kết
-        * Tin cậy
-    * Giao thức có khả năng định tuyến:   
-        Là các giao thức cho phép đi qua các thiết bị liên mạng như Router để xây dựng các mạng lớn có qui mô lớn hơn
-    * Giao thức không có khả năng định tuyến:   
-        Các giao thức này không cho phép đi qua các thiết bị liên mạng như Router để xây dựng các mạng lớn.
-
-## Mô hình OSI và TCP/IP
-
-### Sơ lược về 2 mô hình
-
-1. Mô hình OSI 
-    * ![OSI](./images/img_1.jpg)
-    * Tầng Vật lý (`Physical`): Chuyển dữ liệu (bit) thành tín hiệu và truyền
-    * Tầng Liên kết dữ liệu (`Data link`): Truyền dữ liệu trên các liên kết vật lý giữa các nút mạng kế tiếp nhau
-    * Tầng Mạng (`Network`): Chọn đường (định tuyến), chuyển tiếp gói tin từ nguồn đến đích
-    * Tầng Giao vận (`Transport`): Xử lý việc truyền-nhận dữ liệu cho các ứng dụng chạy trên nút mạng đầu cuối
-    * Tầng Phiên(`Session`): quản lý phiên làm việc, đồng bộ hóa phiên, khôi phục quá trình trao đổi dữ liệu
-    * Tầng Trình diễn (`Presentation`): dịch dữ liệu được gửi từ tầng Application sang dạng Fomat chung. Và tại máy tính nhận, lớp này lại chuyển từ Fomat chung sang định dạng của tầng Application. Tầng trình diễn thực hiện các chức năng: dịch các mã ký tự từ ASCII sang EBCDIC. - Chuyển đổi dữ liệu, ví dụ từ số interger sang số dấu phảy động. - Nén dữ liệu để giảm lượng dữ liệu truyền trên mạng. - Mã hoá và giải mã dữ liệu để đảm bảo sự bảo mật trên mạng.
-    * Tầng Ứng dụng (`Application`): cung cấp các ứng dụng trên mạng (web, email, truyền file…)
-
-1. Mô hình TCP/IP
-    * ![TCP](./images/img_2.png)
-    * Trong mô hình TCP/IP (Internet), chức năng 3 tầng trên được phân định cho một tầng duy nhất
-
-1. Triền khai
-    * Mô hình OSI được coi là mô hình tham chiếu chức năng. Các mô hình khác phải tham chiếu từ mô hình này.
-    * Mô hình OSI không được sử dụng trên thực tế.
-    * Mô hình TCP/IP: mô hình Internet, được sử dụng trên hầu hết các hệ thống mạng.
-    
