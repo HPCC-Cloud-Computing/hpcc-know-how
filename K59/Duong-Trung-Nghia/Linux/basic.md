@@ -24,6 +24,7 @@
     * -F option: thêm ký tự / vào cuối mỗi thư mục
     * -r: hiển thị theo thứ tự ngược (abc)
     * -R: hiển thị toàn bộ danh sách cây thư mục với nút cha là thư mục hiện tại
+    * -h: hiển thị size theo KB, MB, GB
     * --help: trợ giúp lệnh ls
 * pwd: hiển thị đường dẫn thư mục hiện tại
 * cd: thay đổi thư mục làm việc đến một thư mục mới
