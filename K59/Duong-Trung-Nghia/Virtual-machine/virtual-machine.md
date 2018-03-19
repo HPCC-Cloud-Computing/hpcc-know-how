@@ -56,16 +56,16 @@ KVM là một nền tảng ảo hóa trong Ubuntu được sử dụng trong cá
     ```sh
     virt-install \
     --virt-type=kvm \
-    --name=vm-4 \
-    --ram=512 \
-    --vcpus=1 \
+    --name=thao-ubuntu \
+    --ram=2048 \
+    --vcpus=4 \
     --os-variant=ubuntu16.04 \
     --virt-type=kvm \
     --hvm \
-    --cdrom=/home/nghiadt2/VMs/ubuntu-16.04.3-server-amd64.iso \
-    --network=network=192.168.60.0,model=virtio \
+    --cdrom=/home/bkcloud13/ubuntu-16.04.2-server-amd64.iso \
+    --network=bridge=br-vm-ex,model=virtio \
     --graphics vnc,listen=0.0.0.0 --noautoconsole \
-    --disk path=/home/nghiadt2/VMs/vm-4.qcow2,size=6,bus=virtio,format=qcow2
+    --disk path=/var/lib/libvirt/thao-ubuntu.qcow2,size=10,bus=virtio,format=qcow2
     ```
 1. Clone may ao
     1. Shutdown máy ảo cần clone:
@@ -157,7 +157,7 @@ KVM là một nền tảng ảo hóa trong Ubuntu được sử dụng trong cá
     virsh vol-create-as POOLNAME VOLNAME 12G --format raw|qcow2|qed
 
     Full allocation
-    time qemu-img create -f qcow2 /var/lib/libvirt/cinder_pool/cinder-vdb.qcow2 20000M -o preallocation=full
+    time qemu-img create -f qcow2 /var/lib/libvirt/controller15/cinder-vdb.qcow2 30000M -o preallocation=full
     ```
     1. Clone một volume
     ```sh
@@ -167,62 +167,134 @@ KVM là một nền tảng ảo hóa trong Ubuntu được sử dụng trong cá
     ```sh
     virsh vol-delete NAME --pool POOL
     ```
+    1. Attach disk
+    ```sh
+    virsh attach-disk cinder --source /var/lib/libvirt/cinder_pool/cinder-vdb.qcow2 --target vdb --persistent
+    ```
+    1. Detach disk
+    ```sh
+    virsh detach-disk cinder vdb --persistent
+    ```
+    1. Resize disk
+    * Sau đây là các bước giúp bạn tăng ổ đĩa cứng cho VMs
+    * Bước 1: Shutdown VM
+    * Bước 2: Tăng phần cứng vật lý: Ví dụ bạn muốn tăng 20G cho ổ đĩa 
+    ```sh
+    qemu-img resize <path_to_disk> +20G
+    hoặc: virsh vol-resize <capacity> <vol> --pool <pool_name>
+    ```
+    * Bước 3: Start VM
+    * Bước 4:
+    ```sh
+    % fdisk /dev/vda
+    ...
+    Device Boot      Start         End      Blocks   Id  System
+    /dev/vda1   *           1          13      104391   83  Linux
+    /dev/vda2              14        3263    26105625   8e  Linux LVM
 
-1. LVM
-    * https://vinahost.vn/ac/knowledgebase/226/Cac-thao-tac-qun-ly-a-tren-LVM.html
-    * https://www.cyberciti.biz/faq/how-to-add-disk-image-to-kvm-virtual-machine-with-virsh-command/
+    Command (m for help): d
+    Partition number (1-4): 2
 
+    Command (m for help): p
 
+    Disk /dev/vda: 48.3 GB, 48318382080 bytes
+    255 heads, 63 sectors/track, 5874 cylinders
+    Units = cylinders of 16065 * 512 = 8225280 bytes
 
+    Device Boot      Start         End      Blocks   Id  System
+    /dev/vda1   *           1          13      104391   83  Linux
 
+    Command (m for help): n 
+    Command action
+    e   extended
+    p   primary partition (1-4)
+    p
+    Partition number (1-4): 2
+    First cylinder (14-5874, default 14): 14
+    Last cylinder or +size or +sizeM or +sizeK (14-5874, default 5874): 
+    Using default value 5874
 
+    Command (m for help): p
 
-  sudo virt-install \
-    --virt-type=kvm \
-    --name controller \
-    --ram 8192 \
-    --vcpus=4 \
-    --cpu host-model-only,force=vmx \
-    --os-variant=ubuntu16.04 \
-    --virt-type=kvm \
-    --hvm \
-    --graphics vnc,listen=0.0.0.0 --noautoconsole \
-    --boot=hd \
-    --disk path=ubuntu16.04-3.qcow2,bus=virtio,format=qcow2 
+    Disk /dev/vda: 48.3 GB, 48318382080 bytes
+    255 heads, 63 sectors/track, 5874 cylinders
+    Units = cylinders of 16065 * 512 = 8225280 bytes
 
+    Device Boot      Start         End      Blocks   Id  System
+    /dev/vda1   *           1          13      104391   83  Linux
+    /dev/vda2              14        5874    47078482+  83  Linux
 
-virt-install \
---virt-type=kvm \
---name cinder \
---ram 4096 \
---vcpus=4 \
---os-variant ubuntu16.04 \
---virt-type=kvm \
---hvm \
---graphics vnc,listen=0.0.0.0 --noautoconsole \
---boot=hd \
---disk path=/var/lib/libvirt/cinder_pool/cinder.qcow2,bus=virtio,format=qcow2
+    Command (m for help): t
+    Partition number (1-4): 2
+    Hex code (type L to list codes): 8e
+    Changed system type of partition 2 to 8e (Linux LVM)
 
+    Command (m for help): p
 
-python -m nmt.nmt \
-    --src=vi --tgt=en \
-    --vocab_prefix=/root/nmt/nmt_model/nmt_data/vocab  \
-    --train_prefix=/root/nmt/nmt_model/nmt_data/train \
-    --dev_prefix=/root/nmt/nmt_model/nmt_data/tst2012  \
-    --test_prefix=/root/nmt/nmt_model/nmt_data/tst2013 \
-    --out_dir=/tmp/nmt_model \
-    --num_train_steps=12000 \
-    --steps_per_stats=100 \
-    --num_layers=2 \
-    --num_units=128 \
-    --dropout=0.2 \
-    --metrics=bleu
+    Disk /dev/vda: 48.3 GB, 48318382080 bytes
+    255 heads, 63 sectors/track, 5874 cylinders
+    Units = cylinders of 16065 * 512 = 8225280 bytes
 
+    Device Boot      Start         End      Blocks   Id  System
+    /dev/vda1   *           1          13      104391   83  Linux
+    /dev/vda2              14        5874    47078482+  8e  Linux LVM
 
+    Command (m for help): w
+    The partition table has been altered!
 
-python -m nmt.nmt \
-    --out_dir=/root/nmt/nmt_attention_model \
-    --inference_input_file=/tmp/my_infer_file.en \
-    --inference_output_file=/root/nmt/nmt_attention_model/output_infer.vi
+    Calling ioctl() to re-read partition table.
 
-virsh attach-disk cinder --source /var/lib/libvirt/cinder_pool/cinder-vdb.qcow2 --target vdb --persistent
+    WARNING: Re-reading the partition table failed with error 16: Device or 
+    resource busy.
+    The kernel still uses the old table.
+    The new table will be used at the next reboot.
+    Syncing disks.
+    %
+    ```
+    Bước 5: Reboot VM
+    Bước 6: Resize Phisical Volume của LVM
+    ```sh
+    % pvdisplay 
+    --- Physical volume ---
+    PV Name               /dev/vda2
+    VG Name               VolGroup00
+    PV Size               24.90 GB / not usable 21.59 MB
+    Allocatable           yes (but full)
+    PE Size (KByte)       32768
+    Total PE              796
+    Free PE               0
+    ...
+
+    % pvresize /dev/vda2
+
+    % pvdisplay
+    --- Physical volume ---
+    PV Name               /dev/vda2
+    VG Name               VolGroup00
+    PV Size               44.90 GB / not usable 22.89 MB
+    Allocatable           yes 
+    PE Size (KByte)       32768
+    Total PE              1436
+    Free PE               640
+    ...
+    ```
+    Bước 7: Resize Logical Volume
+    ```sh
+     % lvresize /dev/VolGroup00/LogVol00 -l +640
+    Extending logical volume LogVol00 to 43.88 GB
+    Logical volume LogVol00 successfully resized
+    ```
+    Bước 8: Cập nhật File Systems
+    ```sh
+    % resize2fs /dev/VolGroup00/LogVol00 
+    resize2fs 1.39 
+    Filesystem at /dev/VolGroup00/LogVol00 is mounted on /; on-line resizing required
+    Performing an on-line resize of /dev/VolGroup00/LogVol00 to 11501568 (4k) blocks.
+    The filesystem on /dev/VolGroup00/LogVol00 is now 11501568 blocks long.
+    ```
+
+### Tham Khảo
+
+* [Resize ổ cứng sử dụng LVM](    https://serverfault.com/questions/324281/how-do-you-increase-a-kvm-guests-disk-space/514169)
+* [Resize ổ cứng LVM & virt-resize](http://dnaeon.github.io/resizing-a-kvm-disk-image-on-lvm-the-easy-way/)
+* https://github.com/HPCC-Cloud-Computing/hpcc-know-how/blob/master/SDN/openvswitch-kvm-note.md
