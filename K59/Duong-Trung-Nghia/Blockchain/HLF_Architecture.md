@@ -26,7 +26,7 @@
 
 #### State
 
-* Là trạng thái mới nhất của blockchain (được gọi là `state` hay `world state`) được collect từ ledger database. Trong HLF, `state` được lưu trữ dưới dạng key/value store (KVS). Và việc thay đổi các trạng thái này là thông qua thực thi chaincode. 
+* Là trạng thái mới nhất của blockchain (được gọi là `state` hay `world state`). Trong HLF, `state` được lưu trữ dưới dạng key/value store (KVS). Và việc thay đổi các trạng thái này là thông qua thực thi chaincode. 
 * Lưu ý là: State chỉ được maintained bởi các peers, không phải bởi các orderers hay clients (ta sẽ nói rõ hơn về các khái niệm peers, orderers, clients ở bên dưới). 
 * **State partitioning (phân vùng trạng thái)**: Các keys trong KVS có thể được nhận biết từ tên của chúng là thuộc về 1 chaincode nào. Điều này nhằm hướng tới mục đích là: chỉ những transactions mà thuộc về 1 chaincode nào đó mới có thể thay đổi được giá trị trong keys thuộc về chaincode đó. Bên cạnh đó thì bất kì một chaincode nào cũng có thể đọc được giá trị của keys thuộc về một chaincode khác. Hiện tại thì HLF chưa support _cross-chaincode transactions_, tức là việc thay đổi trạng thái (values trong keys) thuộc về 1 hay nhiều chaincode.
 
@@ -89,7 +89,7 @@
 
 * Trong phần này ta tìm hiểu về workflow ở mức cơ bản nhất của một transaction hợp lệ trong HLF. Kịch bản đưa ra là ta có 2 client A và B, họ là những người muốn mua và bán củ cải. Mỗi client đều sở hữu 1 peer node trong network giúp họ tương tác với ledger thông qua gửi nhận transactions. 
     ![tx_flow_step0](./images/tx_flow_step0.png)
-* Giả sử rằng có 1 channel đã được tạo giữa 2 client, mỗi client đều đăng ký thành công và đã được chứng thực trong hệ thống thông qua các **CAs**, chaincode đã được cài đặt (installed) trên các peer và khởi tại (instantiated) trên channel. Chaincode này gồm 1 tập các hướng dẫn giao dịch và giá thỏa thuận cho củ cải. Một endorsement policy cũng được thiết lập cho chaincode để đảm bảo rằng, mỗi client A và B khi thực hiện giao dịch đều phải được chứng thực thông qua endorsement policy này. 
+* Giả sử rằng có 1 channel đã được tạo giữa 2 client, mỗi client đều đăng ký thành công và đã được chứng thực trong hệ thống thông qua các **CAs**, chaincode đã được cài đặt (installed) trên các peer và khởi tạo (instantiated) trên channel. Chaincode này gồm 1 tập các hướng dẫn giao dịch và giá thỏa thuận cho củ cải. Một endorsement policy cũng được thiết lập cho chaincode để đảm bảo rằng, mỗi client A và B khi thực hiện giao dịch đều phải được chứng thực thông qua endorsement policy này. 
 
 1. _Bước 1: Client A khởi tạo transaction mua củ cải_
 
@@ -111,7 +111,7 @@
         * `metadata`: các thuộc tính liên quan đến chaincode và application
         * `policies`: chứa các policies được áp dụng cho chaincode, và những policies này sẽ được chứng thực bởi peer node. Chú ý rằng, `txPayload` không tạo ra các `policies`, mà chỉ truyền vào policies ID và các tham số của các policies đã được định sẵn. (xem thêm phần [Endorsement policies](#endr_policy)) 
     * `anchor`: 
-* Sau khi tạo `PROPOSE` message, client A thông qua một SDK sẽ gửi message tới các peers mà nó kết nối. Ngoài ra, việc thực hiện băm mật mã cho `tx` được thực hiện trên tất cả các node, sẽ thu được một `tid = HASH(tx)`. Client A sẽ lưu trữ `tid` này vào bộ nhớ và đợi phản hồi từ các endorsing peers và sau đó sẽ dùng `tid` này để so sánh với các peers.  
+* Bên cạnh việc gửi `PROPOSE` message, việc thực hiện băm mật mã cho `tx` được thực hiện trên tất cả các node (bao gồm cả client A), sẽ thu được một `tid = HASH(tx)`. Client A sẽ lưu trữ `tid` này vào bộ nhớ và đợi phản hồi `tid` từ các endorsing peers và sau đó sẽ dùng `tid` này để so sánh với các peers.  
 
 1. _Bước 2: Endorsing peers xác nhận chữ ký và thực thi transaction trên chaincode_
 
