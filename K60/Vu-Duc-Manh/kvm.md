@@ -20,27 +20,33 @@
 - [Example configuration](#example-configuration)
 - [References](#references)
 
-###Hypervisor
+### Hypervisor
 
 - Hypervisor hay Virtual Machine Monitor (VMM) chỉ các phần mềm, firmware hoặc phần cứng chuyên dụng dùng để tạo ra các máy ảo.
+
 - Hypervisor là một chức năng trừu tượng tách biệt hệ điều hành với ứng dụng từ phần cứng máy tính. Sự trừu tượng hoá này cho phép phần cứng 
   máy chủ có thể độc lập vận hành một hoặc nhiều máy ảo như khách, cho phép nhiều guest VMs chia sẻ tài nguyên vật lý của hệ thống,như processor cycles, memory space, network bandwidth. Một hypervisor đôi khi gọi như virtual machine monitor.
+
 - Hypervisors cung cấp lợi ích cho trung tâm dữ liệu doanh nghiệp. Đầu tiên khả năng của một hệ thống máy chủ vật lý để chạy nhiều guest VMs có thể cải thiện việc sử dụng phần cứng. Nơi máy chủ vật lý chỉ có thể lưu trữ một hệ điều hành và ứng dụng, một hypervisor ảo hoá máy chủ, cho phép hệ thống lưu trữ nhiều khởi tạo VM, mỗi VM có thể chạy độc lập một hệ điều hành và ứng dụng trên cùng hệ thống vật lý sử dụng nhiều hơn tài nguyên có sẵn của hệ thống.
+
 - VMs có khả năng di dộng. Việc trừu tượng hoá cho diễn ra trong một hypervisor cũng làm cho VM độc lập với phần cứng cơ bản. Ứng dụng truyền thống có thể được kết hợp chặt với phần cứng máy chủ, nghĩa là việc di chuyển ứng dụng tới một máy chủ khác yêu cầu tốn thời gian và dễ bị lỗi trong khi cài đặt lại và cấu hình lại của ứng dụng. Bởi so sánh, một hypervisor làm phần cứng không liên quan tới VMs. Việc này cho phép bất kì VMs nào được di chuyển giữa bất kỳ máy chủ cục bộ hay từ xa nào với đủ tài nguyên máy tính có sẵn hầu hết có hiệu quả không bị gián đoạn tới VM; một tính năng gọi lạ live migration.
+
 - Các VM cũng được phân tách một cách hợp lý với nhau, mặc dù chúng chạy trên cùng một máy vật lý. Thực tế, một VM không tự nhiên biết hay phụ thuộc vào bất kỳ VM nào khác. Một error, crash hay malware attack trên một VM không ảnh hưởng đến các máy ảo còn lại trên cùng một máy hoặc các máy khác. Điều này khiến hypervisor cực kỳ an toàn.
+
 - VMs dễ dàng bảo vệ hơn các ứng dụng truyền thống. Một ứng dụng vật lý nói chung cần được quiesced(temporarily inactive) và sau đó backed up sử dụng tốn thời gian xử lý để giảm thời gian chết đáng kể cho ứng dụng. Một VM cơ bản nhỏ hơn mã hoạt động trong không gian bộ nhớ máy chủ. Công cụ **Snapshot** có thể nhanh chóng chụp ảnh nội dung của bố nhớ VM và lưu nó tới disk trong chốc lát, không bị quiescing ứng dụng. Mỗi snapshot chụp một image point-in-time của máy ảo để có thể nhanh chóng gọi lại để khôi phục VM theo yêu cầu.
-####Type of Hypervisor
+
+#### Type of Hypervisor
 - Bare metal
 	- deployed trực tiếp trên phần cứng của hệ thống mà không qua bất kỳ hệ điều hành hay phần mềm nào, phổ biến cho enterprise data center.
 - Host based
 	- run as software layer trên môt hệ điều hành máy chủ được dùng trên các endpoints như PCs.
 ![hypervisor](images/server_virt-hypervisor.jpg)
 
-###What is KVM?
+### What is KVM?
 - KVM or Kernel-based Virtual Machine là giải pháp ảo hoá đầy đủ  cho Linux trên phần cứng Intel 64 và AMD 64, nó bên trong Linux kernel từ 
 2.6.20 và trở nên ổn định và nhanh cho hầu hết mọi việc.
 
-####KVM Feautres
+#### KVM Feautres
 - Có nhiều tính năng hữu ích và lịch thế bạn sẽ đạt được khi sử dụng KVM để triển khai nền tảng ảo hoá. KVM hypervisor hỗ trợ các tính năng 
 	- Over-committing: cho phép nhiều CPU và bộ nhớ ảo hơn tài nguyên có sẵn trên máy.
 	- Thin provisioning: cho phép phân bố lưu trữ linh hoạt và tối ưu hoá không gian có sẵn cho mọi máy ảo khách.
@@ -48,7 +54,7 @@
  - Automatic NUMA balancing: cải thiện hiệu suất của ứng dụng chạy trên hệ thống phần cứng NUMA.
  - Virtual CPU hot add capability: cung cấp khả năng tăng xử lý như chạy máy ảo không có thời gian chết.
 
-####Install
+#### Install
 - Check CPU có hỗ trợ KVM hay không nếu số cpu trả về lớn hơn 0 là hỗ trợ
 ```bash 
 egrep -c ‘(svm|vmx)’ /proc/cpuinfo
@@ -59,8 +65,8 @@ egrep -c ‘(svm|vmx)’ /proc/cpuinfo
 sudo apt-get install qume-kvm libvirt-bin bridge-utils virt-manager virtinst
 ```
 
-###Libvirt Networking Management
-####Create libvirt network
+### Libvirt Networking Management
+#### Create libvirt network
 - Liệt kê các mạng có trên host
 ```bash
 root@manhvu-X550LD:~# virsh net-list --all
@@ -116,7 +122,7 @@ root@manhvu-X550LD:~/manh# virsh net-list --all
  192.168.160.0        inactive   no            yes
  default              active     yes           yes
 ```
-####View libvirt network info 
+#### View libvirt network info 
 - Xem trạng thái của mạng đã tạo 
 ```bash
 root@manhvu-X550LD:~/manh# virsh net-info 192.168.10.0
@@ -150,7 +156,7 @@ root@manhvu-X550LD:~/manh# virsh net-dumpxml 192.168.10.0
 ```
 *Bao gồm các thông số đã được cấu hình trong file 192.168.10.0.xml và các thông số khác được gán tự động*
 
-####Edit a libvirt network
+#### Edit a libvirt network
 - Thay đổi cấu hình mạng 192.168.10.0
 ```bash
 root@manhvu-X550LD:~/manh# virsh net-edit 192.168.10.0
@@ -182,7 +188,7 @@ root@manhvu-X550LD:~/manh# virsh net-start 192.168.10.0
 Network 192.168.10.0 started
 ```
 
-####Delete a libvirt network
+#### Delete a libvirt network
 - Trước khi xoá mạng cần ngừng hoạt động mạng đó
 ```bash
 root@manhvu-X550LD:~/manh# virsh net-destroy 192.168.10.0
@@ -204,7 +210,7 @@ error: failed to get network '192.168.10.0'
 error: Network not found: no network with matching name '192.168.10.0'
 
 ```
-###Libvirt Volume Management 
+### Libvirt Volume Management 
 - Kiểm tra các storage pool hiện có trên host 
 ```bash
 root@manhvu-X550LD:~/manh# virsh pool-list
@@ -240,14 +246,14 @@ root@manhvu-X550LD:~# virsh vol-list default
  kvm1.qcow2           /var/lib/libvirt/images/kvm1.qcow2      
  kvm2.qcow2           /var/lib/libvirt/images/kvm2.qcow2 
 ```
-###Libvirt Virtual Machine Management 
+### Libvirt Virtual Machine Management 
 - Kiểm tra các máy ảo trên host
 ```bash
 root@manhvu-X550LD:/var/lib/libvirt/images# virsh list --all
  Id    Name                           State
 ----------------------------------------------------
 ```
-####Create a new VM
+#### Create a new VM
 Kiểm tra thông tin tình trạng host 
 ```bash
 root@manhvu-X550LD:/var/lib/libvirt/images# egrep -c '(vmx|svm)' /proc/cpuinfo
@@ -356,7 +362,7 @@ root@manhvu-X550LD:~# virsh dumpxml controller
 ```bash
 root@manhvu-X550LD:~# virt-viewer controller
 ```
-####Clone a VM 
+#### Clone a VM 
 Có ba cách thường dùng để clone một VM
 - Cách 1:Clone volume của VM có sẵn sau đó tạo máy ảo mới trên volume được clone, thay option cdrom bằng ```--boot=hd``` set boot device first hard disk
 ```bash
@@ -378,7 +384,7 @@ root@manhvu-X550LD:~# virt-clone \
 > --original VM_NAME \
 > --auto-clone 
 ```
-####Network XML format
+#### Network XML format
 File xml được tạo để định nghĩa mạng với ```virsh net-define file.xml```. Các element và attribute được chia làm ba nhóm
 **General metadata**
 ```bash
@@ -477,13 +483,13 @@ File xml được tạo để định nghĩa mạng với ```virsh net-define fi
 - ip: chỉ định địa chỉ IPv4 hoặc IPv6 được cấu hình trên bridge device kết hợp với virtual network, với địa chỉ IPv4 có các attr ```netmask``` hay ```prefix```. Attr ```localPtr``` cấu hình DNS server có hay không chuyển tiếp DNS request với địa chỉ IP trong mạng; chứa thẻ ```dhcp``` với các sub-element
 	- range: chỉ định dải địa chỉ cung cấp DHCP client với attr ```start``` và ```end```
 	- host: chỉ định các host được định IP và tên trước bởi máy chủ DHCP
-####Create VM with Network 
+#### Create VM with Network 
 - Tạo network với ```virsh net-define```
 - Thêm card mạng 
 	- thiết lập tuỳ chọn ```--network=..``` khi chạy ```virt-install```
 	- chỉnh sửa cấu hình VM với ```virsh edit VM_NAME``` nên sao lưu file XML với ```virsh dumpxml VM_NAME```, chỉnh sửa mạng ở thẻ ```<interface```
 
-####Type Virtual Networking using libvirt
+#### Type Virtual Networking using libvirt
 Có 3 loại thường gặp Isolated virtual network, Routed virtual network, NATed virtual network
 - Isolated mode: tạo network cho VM tách biệt với các mạng khác, chỉ các máy ảo được thêm trong mạng có thể giao tiép với nhau.
 ![isolated virtual network](images/isolated_net.png)
